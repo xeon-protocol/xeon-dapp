@@ -2,18 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
+@import url("_dapp.css");
+@import url("_menu.css");
+@import url("_silkroad.css");
+/* @import url("home.css"); */
+@import url("_hedge.css");
+@import url("components.css");
+@import url("custom.css");
+@import url("fontawesome.min.css");
+@import url("style.css");
+@import url("testnet.css");
+@import url("ecosystem.css");
+/* @import url("_analytics.css");
+@import url("_solar.css");
+@import url("_wallet.css");
+@import url("404.css");
+@import url("about.css");
+@import url("announcements.css");
+@import url("aos.css");
+@import url("hedge-card-core.css");
+@import url("normalize.css");
+@import url("sweetalert.css");
+@import url("swiper-bundle.min.css");
+@import url("testnet-version.css"); */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
 }
 
 body {
