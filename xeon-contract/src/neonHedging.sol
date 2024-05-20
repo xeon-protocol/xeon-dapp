@@ -160,19 +160,19 @@ contract oXEONVAULT {
     // mapping topup requests 
     mapping(uint => topupData) public topupMap;
 
-    // mapping of all hedges created for each erc20
+    // mapping of all deals created for each erc20
     mapping(address => uint[]) private tokenOptions;
     mapping(address => uint[]) private tokenSwaps;
 
-    // mapping of all hedges taken for each erc20
+    // mapping of all deals taken for each erc20
     mapping(address => uint[]) private optionsBought;
     mapping(address => uint[]) private equityswapsBought;
 
-    // mapping of all hedges settled for each erc20
+    // mapping of all deals settled for each erc20
     mapping(address => uint[]) private optionsSettled;
     mapping(address => uint[]) private equityswapsSettled;
 
-    // mapping of all hedges for user by Id
+    // mapping of all deals for user by Id
     mapping(address => uint[]) public myoptionsCreated;
     mapping(address => uint[]) public myoptionsTaken;
     mapping(address => uint[]) public myswapsCreated;
@@ -182,14 +182,14 @@ contract oXEONVAULT {
     mapping(address => address[]) public userERC20s;
     mapping(address => address[]) public pairedERC20s;
 
-    // mapping of all protocol profits and fees collected from hedges
+    // mapping of all protocol profits and fees collected from deals
     mapping(address => uint256) public protocolProfitsTokens;//liquidated to paired at discount
     mapping(address => uint256) public protocolPairProfits;
     mapping(address => uint256) public protocolFeesTokens;//liquidated to paired at discount
     mapping(address => uint256) public protocolPairedFees;
-    mapping(address => uint256) public hedgesCreatedVolume;//volume saved in paired currency
-    mapping(address => uint256) public hedgesTakenVolume;
-    mapping(address => uint256) public hedgesCostVolume;
+    mapping(address => uint256) public dealsCreatedVolume;//volume saved in paired currency
+    mapping(address => uint256) public dealsTakenVolume;
+    mapping(address => uint256) public dealsCostVolume;
     mapping(address => uint256) public swapsVolume;
     mapping(address => uint256) public optionsVolume;
     mapping(address => uint256) public settledVolume;
@@ -204,9 +204,9 @@ contract oXEONVAULT {
 
     // mapping bookmarks of each user
     mapping(address => mapping(uint256 => bool)) public bookmarks;
-    mapping(address => uint256[]) public bookmarkedOptions; // Array to store bookmarked optionIds for each user
+    mapping(address => uint256[]) public bookmarkedOptions; // Array to store bookmarked dealIds for each user
     
-    // all hedges
+    // all deals
     uint[] private optionsCreated;    
     uint[] private equityswapsCreated;
     uint[] private optionsTaken;
@@ -218,7 +218,7 @@ contract oXEONVAULT {
     uint public equityswapsCreatedLength;
     uint public equityswapsTakenLength;
     uint public optionsTakenLength;
-    uint public optionID;
+    uint public dealID;
     uint public topupRequestID;
     uint public settledTradesCount;
     uint public miners;
@@ -249,10 +249,10 @@ contract oXEONVAULT {
     event received(address, uint);
     event onDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
     event onWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
-    event hedgeCreated(address indexed token, uint256 indexed optionId, uint256 createValue, HedgeType hedgeType, address indexed writer);
-    event hedgePurchased(address indexed token, uint256 indexed optionId, uint256 startValue, HedgeType hedgeType, address indexed buyer);
-    event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 endValue, uint256 payOff, address indexed miner);
-    event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 pairFee);
+    event hedgeCreated(address indexed token, uint256 indexed dealId, uint256 createValue, HedgeType hedgeType, address indexed writer);
+    event hedgePurchased(address indexed token, uint256 indexed dealId, uint256 startValue, HedgeType hedgeType, address indexed buyer);
+    event hedgeSettled(address indexed token, uint256 indexed dealId, uint256 endValue, uint256 payOff, address indexed miner);
+    event minedHedge(uint256 dealId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 pairFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
     event topupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
     event zapRequested(uint indexed hedgeId, address indexed party);
@@ -365,7 +365,7 @@ contract oXEONVAULT {
         require(withdrawable > 0 && withdrawable >= amount, "Insufficient Vault Balance. Deposit more tokens");
 
         // Assign option values directly to the struct
-        hedgingOption storage newOption = hedgeMap[optionID];
+        hedgingOption storage newOption = hedgeMap[dealID];
         newOption.owner = msg.sender;
         newOption.token = token;
         newOption.status = 1;
@@ -391,32 +391,32 @@ contract oXEONVAULT {
         // Update arrays
         if (newOption.hedgeType == HedgeType.SWAP) {
             require(cost >= newOption.createValue, "Swap collateral must be equal value");
-            myswapsCreated[msg.sender].push(optionID);
-            equityswapsCreated.push(optionID);
+            myswapsCreated[msg.sender].push(dealID);
+            equityswapsCreated.push(dealID);
             equityswapsCreatedLength ++;
-            tokenOptions[token].push(optionID);
+            tokenOptions[token].push(dealID);
         } else {
-            myoptionsCreated[msg.sender].push(optionID);
-            optionsCreated.push(optionID);
+            myoptionsCreated[msg.sender].push(dealID);
+            optionsCreated.push(dealID);
             optionsCreatedLength ++;
-            tokenSwaps[token].push(optionID);
+            tokenSwaps[token].push(dealID);
         }
 
         // Log protocol analytics
-        hedgesCreatedVolume[newOption.paired].add(newOption.createValue);
+        dealsCreatedVolume[newOption.paired].add(newOption.createValue);
         // Emit
-        emit hedgeCreated(token, optionID, newOption.createValue, newOption.hedgeType, msg.sender);
+        emit hedgeCreated(token, dealID, newOption.createValue, newOption.hedgeType, msg.sender);
     }
 
     // Hedge costs are in paired currency of underlying token
     // For Call and Put Options cost is premium, lockedinuse during buy, but paid out on settlement
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
     // Strike value is not set here, maturity calculations left to the settlement function
-    function buyHedge(uint256 _optionId) external nonReentrant {
-        hedgingOption storage hedge = hedgeMap[_optionId];
+    function buyHedge(uint256 _dealID) external nonReentrant {
+        hedgingOption storage hedge = hedgeMap[_dealID];
         userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
 
-        require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner can't buy");
+        require(_dealID < dealID && msg.sender != hedge.owner, "Invalid option ID | Owner can't buy");
         (, , , uint256 withdrawable, , ) = getUserTokenBalances(hedge.paired, msg.sender);
         require(withdrawable >= hedge.cost, "Insufficient free Vault balance");
 
@@ -434,29 +434,29 @@ contract oXEONVAULT {
 
         // Store updated structs
         userBalanceMap[hedge.paired][msg.sender] = stk;
-        hedgeMap[_optionId] = hedge;
+        hedgeMap[_dealID] = hedge;
 
         // Update arrays and takes count
         if (hedge.hedgeType == HedgeType.SWAP) {
             equityswapsTakenLength ++;
-            equityswapsBought[hedge.token].push(_optionId);
-            equityswapsTaken.push(_optionId);
-            myswapsTaken[msg.sender].push(_optionId);
+            equityswapsBought[hedge.token].push(_dealID);
+            equityswapsTaken.push(_dealID);
+            myswapsTaken[msg.sender].push(_dealID);
         } else {
             optionsTakenLength ++;
-            optionsBought[hedge.token].push(_optionId);
-            optionsTaken.push(_optionId);
-            myoptionsTaken[msg.sender].push(_optionId);
+            optionsBought[hedge.token].push(_dealID);
+            optionsTaken.push(_dealID);
+            myoptionsTaken[msg.sender].push(_dealID);
         }
 
         // Log pair tokens involved in protocol revenue
-        if (hedgesTakenVolume[hedge.paired] == 0) {
+        if (dealsTakenVolume[hedge.paired] == 0) {
             pairedERC20s[address(this)].push(hedge.paired);
         }
 
         // Protocol Revenue Trackers
-        hedgesTakenVolume[hedge.paired] += hedge.startValue;
-        hedgesCostVolume[hedge.paired] += hedge.cost;
+        dealsTakenVolume[hedge.paired] += hedge.startValue;
+        dealsCostVolume[hedge.paired] += hedge.cost;
 
         if (hedge.hedgeType == HedgeType.SWAP) {
             swapsVolume[hedge.paired] += hedge.startValue;
@@ -464,15 +464,15 @@ contract oXEONVAULT {
             optionsVolume[hedge.paired] += hedge.startValue;
         }
         // Emit the hedgePurchased event
-        emit hedgePurchased(hedge.token, _optionId, hedge.startValue, hedge.hedgeType, msg.sender);
+        emit hedgePurchased(hedge.token, _dealID, hedge.startValue, hedge.hedgeType, msg.sender);
     }
 
     // topup Request & Accept function
     // any party can initiate & accepter only matches amount
     // Action is request (false) or accept (true)
     // Request amount can be incremented if not accepted yet
-    function topupHedge(uint _optionId, uint256 amount, bool action) external nonReentrant {
-        hedgingOption storage hedge = hedgeMap[_optionId];
+    function topupHedge(uint _dealID, uint256 amount, bool action) external nonReentrant {
+        hedgingOption storage hedge = hedgeMap[_dealID];
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
         require(topupMap[topupRequestID].state == 0, "Request already accepted");
 
@@ -504,11 +504,11 @@ contract oXEONVAULT {
             hedge.cost += amount;
             topupMap[topupRequestID].amountTaker += amount;
         }
-        emit topupRequested(msg.sender, _optionId, amount, requestAccept);
+        emit topupRequested(msg.sender, _dealID, amount, requestAccept);
     }
 
-    function rejectTopupRequest(uint _optionId, uint _requestID) external {
-        hedgingOption storage hedge = hedgeMap[_optionId];
+    function rejectTopupRequest(uint _dealID, uint _requestID) external {
+        hedgingOption storage hedge = hedgeMap[_dealID];
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to reject");
         require(topupMap[_requestID].state == 0, "Request already accepted or rejected");
         topupMap[_requestID].state = 2;
@@ -520,8 +520,8 @@ contract oXEONVAULT {
         topupMap[_requestID].state = 2;
     }
 
-    function zapRequest(uint _optionId) external {  
-        hedgingOption storage hedge = hedgeMap[_optionId];    
+    function zapRequest(uint _dealID) external {  
+        hedgingOption storage hedge = hedgeMap[_dealID];    
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
         require(hedge.dt_started > block.timestamp, "Hedge not taken yet");
         if(msg.sender == hedge.owner) {
@@ -529,7 +529,7 @@ contract oXEONVAULT {
         } else {
             hedge.zapTaker = true;
         }
-        emit zapRequested(_optionId, msg.sender);
+        emit zapRequested(_dealID, msg.sender);
     }
     
     // Settlement 
@@ -543,12 +543,12 @@ contract oXEONVAULT {
     // fees are collected in paired tokens; if option cost was paid to owner as winning, if swap cost used as PayOff
     // fees are collected in underlying tokens; if option and swap PayOffs were done in underlying tokens
     // hedge fees are collected into address(this) userBalanceMap and manually distributed as dividents to a staking contract
-    // miners are the ones who settle hedges. Stake tokens to be able to mine hedges.
-    // miners can pick hedges with tokens and amounts they wish to mine & avoid accumulating mining rewards in unwanted tokens
+    // miners are the ones who settle deals. Stake tokens to be able to mine deals.
+    // miners can pick deals with tokens and amounts they wish to mine & avoid accumulating mining rewards in unwanted tokens
     // miner dust can be deposited into mining dust liquidation pools that sell the tokens at a discount & miners claim their share
     // each wallet has to log each token interacted with for the sake of pulling all balances credited to it on settlement. This allows for net worth valuations on wallets
     // protocol revenues are stored under userBalanceMap[address(this)] storage
-    // on revenue; protocol revenue from taxing hedges ARE moved to staking contract as staking dividents
+    // on revenue; protocol revenue from taxing deals ARE moved to staking contract as staking dividents
     // on revenue; proceeds for mining a hedge, are NOT moved to staking contract
     // on revenue; native equity swap liquidity proceeds ARE moved to staking contract
     // on revenue; revenue for providing native-collateral ARE transferred to staking contract
@@ -566,10 +566,10 @@ contract oXEONVAULT {
         bool newAddressFlag;
     }
 
-    function settleHedge(uint256 _optionId) external {
+    function settleHedge(uint256 _dealID) external {
         HedgeInfo memory hedgeInfo;
-        require(_optionId < optionID, "Invalid option ID");
-        hedgingOption storage option = hedgeMap[_optionId];
+        require(_dealID < dealID, "Invalid option ID");
+        hedgingOption storage option = hedgeMap[_dealID];
         // Check if either zapWriter or zapTaker flags are true, or if the hedge has expired
         require(option.zapWriter && option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
 
@@ -715,10 +715,10 @@ contract oXEONVAULT {
         option.dt_settled = block.timestamp;
 
         if(option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
-            optionsSettled[option.token].push(_optionId);            
+            optionsSettled[option.token].push(_dealID);            
         }
         if(option.hedgeType == HedgeType.SWAP) {
-            equityswapsSettled[option.token].push(_optionId);
+            equityswapsSettled[option.token].push(_dealID);
         }
         logMiningData(msg.sender);
         logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.pairedFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
@@ -729,8 +729,8 @@ contract oXEONVAULT {
             userERC20s[option.taker].push(option.token);            
         }
     
-        emit hedgeSettled(option.token, _optionId, hedgeInfo.underlyingValue, hedgeInfo.payOff, msg.sender);
-        emit minedHedge(_optionId, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
+        emit hedgeSettled(option.token, _dealID, hedgeInfo.underlyingValue, hedgeInfo.payOff, msg.sender);
+        emit minedHedge(_dealID, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
     }
 
     function logMiningData(address miner) internal {
@@ -777,18 +777,18 @@ contract oXEONVAULT {
     }
 
     // Toggle hedge bookmark using ID
-    function bookmarkHedge(uint256 _optionId) external {
-        bool bookmarked = bookmarks[msg.sender][_optionId];
-        bookmarks[msg.sender][_optionId] = !bookmarked;
-        emit bookmarkToggle(msg.sender, _optionId, !bookmarked);
+    function bookmarkHedge(uint256 _dealID) external {
+        bool bookmarked = bookmarks[msg.sender][_dealID];
+        bookmarks[msg.sender][_dealID] = !bookmarked;
+        emit bookmarkToggle(msg.sender, _dealID, !bookmarked);
         // Update bookmarkedOptions array for wallet
         if (!bookmarked) {
-            bookmarkedOptions[msg.sender].push(_optionId);
+            bookmarkedOptions[msg.sender].push(_dealID);
         } else {
             uint256[] storage options = bookmarkedOptions[msg.sender];
             for (uint256 i = 0; i < options.length; i++) {
-                if (options[i] == _optionId) {
-                    // When values match remove the optionId from array
+                if (options[i] == _dealID) {
+                    // When values match remove the dealId from array
                     if (i < options.length - 1) {
                         options[i] = options[options.length - 1];
                     }
@@ -800,8 +800,8 @@ contract oXEONVAULT {
     }
 
     // Get Bookmarks
-    function getBookmark(address user, uint256 _optionId) public view returns (bool) {
-        return bookmarks[user][_optionId];
+    function getBookmark(address user, uint256 _dealID) public view returns (bool) {
+        return bookmarks[user][_dealID];
     }
 
     function getmyBookmarks(address user) public view returns (uint256[] memory) {
@@ -977,8 +977,8 @@ contract oXEONVAULT {
     }
 
     // Function to get hedge details
-    function getHedgeDetails(uint256 _optionId) public view returns (hedgingOption memory) {
-        hedgingOption storage hedge = hedgeMap[_optionId];
+    function getHedgeDetails(uint256 _dealID) public view returns (hedgingOption memory) {
+        hedgingOption storage hedge = hedgeMap[_dealID];
         require(hedge.owner != address(0), "Option does not exist");
         return hedge;
     }
@@ -991,8 +991,8 @@ contract oXEONVAULT {
         uint256 count = 0;
 
         for (uint256 i = 0; i < rangeSize; i++) {
-            uint256 optionId = startId + i;
-            hedgingOption storage hedge = hedgeMap[optionId];
+            uint256 dealId = startId + i;
+            hedgingOption storage hedge = hedgeMap[dealId];
             if (hedge.owner != address(0)) {
                 result[count] = hedge;
                 count++;
