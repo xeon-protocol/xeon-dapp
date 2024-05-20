@@ -2,9 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("../components/Home/RightSidebar.css");
+
 @import url("_dapp.css");
 @import url("_menu.css");
 @import url("_silkroad.css");
+@import url("_wallet.css");
 /* @import url("home.css"); */
 @import url("_hedge.css");
 @import url("components.css");
@@ -15,7 +18,6 @@
 @import url("ecosystem.css");
 /* @import url("_analytics.css");
 @import url("_solar.css");
-@import url("_wallet.css");
 @import url("404.css");
 @import url("about.css");
 @import url("announcements.css");

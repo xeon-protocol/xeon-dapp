@@ -1,3 +1,4 @@
+import Footer from "./Footer";
 import Header from "./Header";
 
 // export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export default function RootLayout({
     <div>
       <Header />
       <main>{children}</main>
+      <Footer />
     </div>
   );
 }

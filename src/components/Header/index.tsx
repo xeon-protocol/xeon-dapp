@@ -1,5 +1,6 @@
 import Image from "next/image";
 import ImageLogo from "../../assets/imgs/maskot3.webp";
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -22,10 +23,10 @@ export default function Header() {
         <nav id="navbar" className="">
           <ul>
             <li>
-              <a href="index.html">Silkroad</a>
+              <Link href="/">Silkroad</Link>
             </li>
             <li>
-              <a href="wallet.html">Wallet</a>
+              <Link href="/wallet">Wallet</Link>
             </li>
             <li>
               <a href="analytics.html">Analytics</a>

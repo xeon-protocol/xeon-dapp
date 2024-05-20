@@ -2099,12 +2099,12 @@ button:disabled:hover {
   .circle-bg {
 	fill: none;
 	stroke: #eee;
-	stroke-width: 1.2;
+	strokeWidth: 1.2;
   }
   
   .circle {
 	fill: none;
-	stroke-width: 1.6;
+	strokeWidth: 1.6;
 	stroke-linecap: round;
 	-webkit-animation: progress 1s ease-out forwards;
 			animation: progress 1s ease-out forwards;
