@@ -269,14 +269,6 @@ contract oXEONVAULT {
         owner = msg.sender;
     }
 
-    function getPrice(address token0, address token1, uint32 period) external view returns (uint256 priceX96) {
-        address poolAddress = uniswapV3Factory.getPool(token0, token1, 3000); // 3000 is the fee tier (0.3%)
-        require(poolAddress != address(0), "Pool doesn't exist");
-        
-        (int24 tick, ) = OracleLibrary.consult(poolAddress, period);
-        priceX96 = OracleLibrary.getQuoteAtTick(tick, 1 ether, token0, token1);
-    }
-
     function depositToken(address _token, uint256 _amount) external nonReentrant {
         require(_amount > 0, "You're attempting to transfer 0 tokens");
         // Deposit WETH , stables or ERC20
@@ -832,43 +824,34 @@ contract oXEONVAULT {
     }
     
     // Get token value in paired currency.
-    // paired value is always the pair address of the token provided. get pair using UniswapV2 standard.
+    // paired value is always the pair address of the token provided. 
+    // TWAP oracle is used to get the price.
     function getUnderlyingValue(address _tokenAddress, uint256 _tokenAmount) public view returns (uint256, address) {
-        PairInfo memory pairInfo;
-        (pairInfo.pairAddress, pairInfo.pairedCurrency) = getPairAddressZK(_tokenAddress);
-        IUniswapV2Pair pair = IUniswapV2Pair(pairInfo.pairAddress);
-        if (pair.token0() == address(0) || pair.token1() == address(0)) { return (0, address(0));}
-        pairInfo.token0 = ERC20(pair.token0());
-        pairInfo.token1 = ERC20(pair.token1());
-        (pairInfo.reserve0, pairInfo.reserve1, ) = pair.getReserves();
-        pairInfo.token0Decimals = uint256(10) ** pairInfo.token0.decimals();
-        pairInfo.token1Decimals = uint256(10) ** pairInfo.token1.decimals();
-        uint256 tokenValue;
-        if (_tokenAddress == pair.token0()) {
-            tokenValue = (_tokenAmount * pairInfo.reserve1 * pairInfo.token1Decimals) / (pairInfo.reserve0 * pairInfo.token0Decimals);
-            return (tokenValue, pairInfo.pairedCurrency);
-        } else if (_tokenAddress == pair.token1()) {
-            tokenValue = (_tokenAmount * pairInfo.reserve0 * pairInfo.token0Decimals) / (pairInfo.reserve1 * pairInfo.token1Decimals);
-            return (tokenValue, pairInfo.pairedCurrency);
-        } else {
-            revert("Invalid token address");
-        }
+        (address poolAddress, address pairedCurrency) = getPairAddressZK(_tokenAddress);
+        require(poolAddress != address(0), "Pool doesn't exist");
+        
+        // Uniswap V3 TWAP Oracle
+        uint32 period = 3600; // attempting 1hr
+        (int24 tick, ) = OracleLibrary.consult(poolAddress, period);
+        
+        uint256 priceX96 = OracleLibrary.getQuoteAtTick(tick, uint128(_tokenAmount), _tokenAddress, pairedCurrency);
+        
+        return (priceX96, pairedCurrency);
     }
 
     // Zero Knowledge pair address generator
-    function getPairAddressZK(address tokenAddress) public view returns (address pairAddress, address pairedCurrency) {
-        IUniswapV2Factory factory = IUniswapV2Factory(UNISWAP_FACTORY_ADDRESS);
-        address wethPairAddress = factory.getPair(tokenAddress, wethAddress);
-        address usdtPairAddress = factory.getPair(tokenAddress, usdtAddress);
-        address usdcPairAddress = factory.getPair(tokenAddress, usdcAddress);
-        if (wethPairAddress != address(0)) {
-            return (wethPairAddress, wethAddress);
-        } else if (usdtPairAddress != address(0)) {
-            return (usdtPairAddress, usdtAddress);
-        } else if (usdcPairAddress != address(0)) {
-            return (usdcPairAddress, usdcAddress);
+    function getPairAddressZK(address tokenAddress) public view returns (address poolAddress, address pairedCurrency) {
+        address wethPoolAddress = uniswapV3Factory.getPool(tokenAddress, wethAddress, 3000); // 0.3% fee tier assumed
+        address usdtPoolAddress = uniswapV3Factory.getPool(tokenAddress, usdtAddress, 3000); // 0.3% fee tier
+        address usdcPoolAddress = uniswapV3Factory.getPool(tokenAddress, usdcAddress, 3000); // 0.3% fee tier
+        if (wethPoolAddress != address(0)) {
+            return (wethPoolAddress, wethAddress);
+        } else if (usdtPoolAddress != address(0)) {
+            return (usdtPoolAddress, usdtAddress);
+        } else if (usdcPoolAddress != address(0)) {
+            return (usdcPoolAddress, usdcAddress);
         } else {
-            revert("TokenValue: token is not paired with WETH, USDT, or USDC");
+            revert("Token is not paired with WETH, USDT, or USDC");
         }
     }
 
