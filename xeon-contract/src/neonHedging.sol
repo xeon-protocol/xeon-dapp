@@ -1,28 +1,37 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.4;
 
-// Xeon Protocol - Universal ERC20 OTC Hedging and Lending. 
-// Testnet Version 2.5
-// Deployed on Sepolia Testnet 10/04/2024
-// Sepolia testnet on the basis of Uniswap V2 Router support
-// Testnet goal is a functional basic protocol first. More complex checks, security and refactoring due during public testnet
+// Xeon Protocol - liquidity unlocking and risk management platform.
+// Audit findings corrections: 20 - 05 - 2024
 
 // ====================Description===========================
-// Protocol accepts an ERC20 address to function as below;
-// - Deposit, Withdraw any ERC20 tokens as collateral
-// - Get underlying value for tokens in WETH, USDT AND USDC as paired currencies
-// - Write or Buy: Call Options, Put Options and Equity Swaps OTC
-// - Requests to edit deal variables, passed on mutual consent
-// - Settle trade in paired tokens or equivalent in underlying assets upon deal maturity
-// - Payout profits and fees to: parties, protocol, miner
+// This is the main smart contract for the Xeon Protocol.
+// The smart contract is deployed on the testnet.
+// - Deposit any ERC-20 token as collateral 
+// - Withdraw any ERC20 token
+// - Get underlying value of any ERC20 token in paired currency
+// - Use Uniswap V3 TWAP oracle + other dynamic price sources to get price of assets
+// - Get user token balances 
+// - Lock in collateral for a duration
+// - Write/Take Loans requests
+// - Write/Take Options
+// - Write/Take Equity Swaps
+// - Write/Take OTC swaps
+// - Custom deal terms on all trades
+// - Requests to topup collateral during a deal, passed on mutual consent
+// - Requests to settle trade before maturity, passed on mutual consent
+// - Settle trade in underlying assets upon deal maturity
+// - Settle trade in paired currency upon deal maturity
+// - Payout settlement profits and fees to: trade parties, protocol, miner
 // - Distribute revenue or third party service stakes
-// - Read hedging data storages; array lists, individual mappings and structs, collective mappings and variables
+// - Restore collateral on settlement
+// - Read data storages; array lists, individual mappings and structs, collective mappings and variables
     
 //  Functionality goals
 //1. to receive any ERC20 token as collateral/underlying tokens
-//2. tokens are priced in their dex paired currency via getUnderlyingValue & getReserves from UniswapV2 standard.
-//4. enable hedge writing using tokens as underlying assets
-//5. enable hedge buying in paired currency for stipulated duration
+//2. tokens are priced in their dex paired currency.
+//4. enable writing using tokens as underlying assets
+//5. enable buying in paired currency for stipulated duration
 //6. settlement based on price of assets in comparison to strike value & terms
 //7. allow settle-now or topup-topup consensus between parties during a deal
 //8. payment and logging of proceeds, fees and commissions for protocol and parties involved
@@ -34,41 +43,37 @@ pragma solidity ^0.8.4;
 // - get pair addresses of all erc20
 // - get underlying value of all erc20
 // - cashier fees calculation
-// - create hedge
-// - buy hedge
+// - write deal
+// - buy deal
 // - settlement
-// - mine hedges / deals
+// - mine deal
 // - revenue and fees logging for all stakeholders
-// - get hedge details by id
-// - fetch hedges array; created, taken, settled
+// - get deal details by deal id
+// - fetch deal arrays; created, taken, settled
 
 // Third Party Key Dependencies
-// 0. WETH9 contract interface
-// 1. getReserves - Uniswap
-// 2. getPair - Uniswap
-// 3. getPairAddressZK - Custom
-// 4. getUnderlyingValue - Custom
+// 1. 
+// 2. 
+// 3. 
+// 4. 
 
 // Dev notes
 // - addresses can deposit or withdraw erc20 tokens 
 // - all tokens are treated as ERC20
-// - uniswap version 2 router is used in beta protocol
 // - deposits, lockedinuse and withdrawals track wallets balances
 // - lockedinuse is the current account (+-) on trades, and acts as escrow for each deal
-// - only paired currencies :weth, usdt and usdc contract balance tracked
 // - getUnderlyingValue fetches value of tokens & returns paired value & pair address
-// - unified writing, taking and settlement functions for all hedge types
-// - each hedge is taxed upon settlement, in relevant tokens (paired or underlying)
+// - split writing, taking and settlement functions for all deal types
+// - each deal is taxed upon settlement, in relevant tokens (paired or underlying)
 // - contract taxes credited in mappings under address(this) and send out to staking/rewards contract
-// - optionID / optionId used loosely to refer to all hedge types: swaps, call, put
 // - Smart contract does not have support for distributing earnings to staking contract yet
 
-import "./SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
-import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
+import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
+import "@uniswap/v3-periphery/contracts/libraries/OracleLibrary.sol";
+
 // minimal interface for the WETH9 contract
 interface IWETH9 {
     function transfer(address dst, uint wad) external returns (bool);
@@ -833,10 +838,10 @@ contract oXEONVAULT {
         pairInfo.token1Decimals = uint256(10) ** pairInfo.token1.decimals();
         uint256 tokenValue;
         if (_tokenAddress == pair.token0()) {
-            tokenValue = (_tokenAmount * pairInfo.reserve1 * pairInfo.token0Decimals) / (pairInfo.reserve0 * pairInfo.token1Decimals);
+            tokenValue = (_tokenAmount * pairInfo.reserve1 * pairInfo.token1Decimals) / (pairInfo.reserve0 * pairInfo.token0Decimals);
             return (tokenValue, pairInfo.pairedCurrency);
         } else if (_tokenAddress == pair.token1()) {
-            tokenValue = (_tokenAmount * pairInfo.reserve0 * pairInfo.token1Decimals) / (pairInfo.reserve1 * pairInfo.token0Decimals);
+            tokenValue = (_tokenAmount * pairInfo.reserve0 * pairInfo.token0Decimals) / (pairInfo.reserve1 * pairInfo.token1Decimals);
             return (tokenValue, pairInfo.pairedCurrency);
         } else {
             revert("Invalid token address");
