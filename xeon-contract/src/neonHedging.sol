@@ -238,8 +238,7 @@ contract oXEONVAULT {
     uint256 public usdcEquivWithdrawals;
 
     // core addresses
-    address private constant UNISWAP_FACTORY_ADDRESS = 0x7E0987E5b3a30e3f2828572Bb659A548460a3003;
-    address private constant UNISWAP_ROUTER_ADDRESS = 0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008;
+    IUniswapV3Factory public uniswapV3Factory;
     address public wethAddress;
     address public usdtAddress;
     address public usdcAddress;
@@ -258,9 +257,9 @@ contract oXEONVAULT {
     event topupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
     event zapRequested(uint indexed hedgeId, address indexed party);
 
-    constructor() {
-        IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
-        wethAddress = router.WETH();
+    constructor(address _uniswapV3Factory) {
+        uniswapV3Factory = IUniswapV3Factory(_uniswapV3Factory);
+        wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address on Sepolia
         usdtAddress = 0x297B8d4B35294e730087ADF0597A31a9bC1746af; // oUSDT address on Sepolia
         usdcAddress = 0x8267cF9254734C6Eb452a7bb9AAF97B392258b21; // USDC address on Sepolia
         XeonAddress = 0xDb90a9f7cEaA33a32Ec836Bbadeeaa8772Ad9797; // V2.1 deployed 14/01/2024 21:52:48
@@ -268,6 +267,14 @@ contract oXEONVAULT {
         feeNumerator = 5;
         feeDenominator = 1000;
         owner = msg.sender;
+    }
+
+    function getPrice(address token0, address token1, uint32 period) external view returns (uint256 priceX96) {
+        address poolAddress = uniswapV3Factory.getPool(token0, token1, 3000); // 3000 is the fee tier (0.3%)
+        require(poolAddress != address(0), "Pool doesn't exist");
+        
+        (int24 tick, ) = OracleLibrary.consult(poolAddress, period);
+        priceX96 = OracleLibrary.getQuoteAtTick(tick, 1 ether, token0, token1);
     }
 
     function depositToken(address _token, uint256 _amount) external nonReentrant {
