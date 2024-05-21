@@ -25,7 +25,7 @@ docker build -t xeon-dapp -f Dockerfile .
 docker run -p 3000:3000 xeon-dapp
 ```
 
-This will start the development server on port 3000.
+This will start the development server on port 3000 ([http://localhost:3000](http://localhost:3000)).
 
 #### Setup with Foundry (for Solidity testing)
 
@@ -36,7 +36,7 @@ docker build -t xeon-dapp-foundry -f Dockerfile.foundry .
 docker run -p 3000:3000 xeon-dapp-foundry
 ```
 
-This will start the development server on port 3000 with Foundry installed.
+This will start the development server and prepare Foundry for testing in the CLI.
 
 ## Local Development
 
@@ -58,18 +58,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Directory Structure
 
-- `xeon-contract` - Contains the Solidity contracts and related files.
-  - The `foundry.toml` file is used to configure Foundry.
+- `xeon-contract` - Contains the Solidity contracts and related files. The `foundry.toml` file is used to configure Foundry.
 - `src` - Source code for the Next.js application
 
-### Editing
-
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 
-## Additional Information
+## Current Work
 
-For additional info please contact the team.
+use this section to update with the current work being done
+steps, details
