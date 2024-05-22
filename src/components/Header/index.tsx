@@ -29,7 +29,7 @@ export default function Header() {
               <Link href="/wallet">Wallet</Link>
             </li>
             <li>
-              <a href="analytics.html">Analytics</a>
+              <Link href="analytics">Analytics</Link>
             </li>
             <li>
               <a href="guide.html">Guide</a>

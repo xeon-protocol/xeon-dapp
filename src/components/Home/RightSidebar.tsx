@@ -4,7 +4,13 @@ export default function RightSidebar() {
       <div className="liveEvents">
         <ul className="scifiUI">
           <li className="scifiUI_li">
-            <input type="radio" name="tab" id="tab1" checked />
+            <input
+              type="radio"
+              name="tab"
+              id="tab1"
+              checked
+              onChange={() => {}}
+            />
             <label htmlFor="tab1" id="statsLabel">
               Statistics
             </label>
