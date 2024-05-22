@@ -32,18 +32,18 @@ export default function Header() {
               <Link href="analytics">Analytics</Link>
             </li>
             <li>
-              <a href="guide.html">Guide</a>
+              <Link href="guide">Guide</Link>
             </li>
             <li>
-              <a href="testnet.html">Testing</a>
+              <Link href="testnet">Testing</Link>
             </li>
             <li>
-              <a
+              <Link
                 href="https://neon-hedge.gitbook.io/xeon-protocol-documentation/"
                 target="_blank"
               >
                 Docs
-              </a>
+              </Link>
             </li>
           </ul>
           <div className="account">
