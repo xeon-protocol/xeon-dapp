@@ -12,18 +12,24 @@ This repository contains the XEON Protocol dAapp, which includes both the Node.j
 You can set up the development environment using Docker with one of the two available Dockerfiles:
 
 1. `Dockerfile` - Standard setup, pull latest changes from remote using SSH
-2. `Dockerfile.local` - Standard setup, without pulling latest changes
+2. `Dockerfile.local` - Standard setup, using current local repo
 3. `Dockerfile.foundry` - Setup with Foundry for Solidity testing
 
 ### Building and Running the Docker Containers
 
-#### Standard Setup (without Foundry)
+#### Standard Setup (pull latest changes)
 
-To build and run the Docker container and pull the latest changes to the repo, ensure you have your SSH keys set up.
-Use the following commands:
+To build and run the Docker container and pull the latest changes to the repo, first make sure your SSH agent is running and your keys are added
 
 ```sh
-docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" \
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+```
+
+Build and run the Docker container without pulling the latest changes:
+
+```sh
+docker build --ssh default --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" \
              --build-arg SSH_PUBLIC_KEY="$(cat ~/.ssh/id_rsa.pub)" \
              --build-arg KNOWN_HOSTS="$(cat ~/.ssh/known_hosts)" \
              --build-arg REPO_URL="git@github.com:xeon-protocol/xeon-dapp.git" \
@@ -32,7 +38,9 @@ docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" \
 docker run -p 3000:3000 xeon-dapp
 ```
 
-To build and run the Docker container without pulling the latest changes:
+#### Standard Setup (local repo)
+
+Build and run the Docker container:
 
 ```sh
 docker build -t xeon-dapp -f Dockerfile.local .
