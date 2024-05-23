@@ -469,9 +469,8 @@ contract oXEONVAULT {
         emit hedgePurchased(hedge.token, _dealID, hedge.startValue, hedge.hedgeType, msg.sender);
     }
 
-    // topup Request & Accept function
+    // topup Request function
     // any party can initiate & accepter only matches amount
-    // Action is request (false) or accept (true)
     // Request amount can be incremented if not accepted yet
     function topupHedge(uint _dealID, uint256 amount) external nonReentrant {
         hedgingOption storage hedge = hedgeMap[_dealID];
