@@ -523,7 +523,7 @@ contract oXEONVAULT {
     function zapRequest(uint _dealID) external {  
         hedgingOption storage hedge = hedgeMap[_dealID];    
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
-        require(hedge.dt_started > block.timestamp, "Hedge not taken yet");
+        require(hedge.dt_started > hedge.dt_created, "Hedge not taken yet");
         if(msg.sender == hedge.owner) {
             hedge.zapWriter = true;
         } else {
