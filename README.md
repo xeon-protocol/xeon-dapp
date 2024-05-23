@@ -11,17 +11,31 @@ This repository contains the XEON Protocol dAapp, which includes both the Node.j
 
 You can set up the development environment using Docker with one of the two available Dockerfiles:
 
-1. `Dockerfile` - Standard setup without Foundry
-2. `Dockerfile.foundry` - Setup with Foundry for Solidity testing
+1. `Dockerfile` - Standard setup, pull latest changes from remote using SSH
+2. `Dockerfile.local` - Standard setup, without pulling latest changes
+3. `Dockerfile.foundry` - Setup with Foundry for Solidity testing
 
 ### Building and Running the Docker Containers
 
 #### Standard Setup (without Foundry)
 
-To build and run the Docker container for the standard setup:
+To build and run the Docker container and pull the latest changes to the repo, ensure you have your SSH keys set up.
+Use the following commands:
 
 ```sh
-docker build -t xeon-dapp -f Dockerfile .
+docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" \
+             --build-arg SSH_PUBLIC_KEY="$(cat ~/.ssh/id_rsa.pub)" \
+             --build-arg KNOWN_HOSTS="$(cat ~/.ssh/known_hosts)" \
+             --build-arg REPO_URL="git@github.com:xeon-protocol/xeon-dapp.git" \
+             -t xeon-dapp -f Dockerfile .
+
+docker run -p 3000:3000 xeon-dapp
+```
+
+To build and run the Docker container without pulling the latest changes:
+
+```sh
+docker build -t xeon-dapp -f Dockerfile.local .
 docker run -p 3000:3000 xeon-dapp
 ```
 

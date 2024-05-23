@@ -1,20 +1,27 @@
-# Use an official Node.js runtime as the base image
 FROM node:18-alpine
 
-# Set the working directory inside the container
+# Install Git and OpenSSH to pull the latest changes from remote
+RUN apk add --no-cache git openssh
+
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+# Copy SSH keys and set permissions
+# Use build args for SSH keys and URL
+ARG SSH_PRIVATE_KEY
+ARG SSH_PUBLIC_KEY
+ARG KNOWN_HOSTS
+ARG REPO_URL
 
-# Install app dependencies
+RUN mkdir -p /root/.ssh && \
+  echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa && \
+  echo "$SSH_PUBLIC_KEY" > /root/.ssh/id_rsa.pub && \
+  echo "$KNOWN_HOSTS" > /root/.ssh/known_hosts && \
+  chmod 600 /root/.ssh/id_rsa
+
+RUN git clone $REPO_URL .
+
 RUN npm install
 
-# Copy the rest of the application source code to the working directory
-COPY . .
-
-# Expose port 3000 to the outside world
 EXPOSE 3000
 
-# Define the command to run the application in development mode
 CMD ["npm", "run", "dev"]
