@@ -84,7 +84,7 @@ contract StakingContract is Ownable {
 
     function unstake() external stakingWindow {
         Staker storage staker = stakers[msg.sender];
-        require(staker.stakingTime - block.timestamp > 3 * 24 * 60 * 60,"Wait 30 days from your last stake action" );
+        require(block.timestamp - staker.stakingTime > 3 * 24 * 60 * 60,"Wait 30 days from your last stake action" );
         require(staker.amount > 0, "You have no staked tokens.");
 
         uint256 amountToUnstake = staker.amount.sub(staker.assignedForMining).sub(staker.assignedForLiquidity).sub(staker.assignedForCollateral);
@@ -169,7 +169,7 @@ contract StakingContract is Ownable {
     function claimRewards() external {
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
-        require(staker.stakingTime - block.timestamp > 3 * 24 * 60 * 60,"Wait 30 days from your last claim" );
+        require(block.timestamp - staker.stakingTime > 3 * 24 * 60 * 60,"Wait 30 days from your last claim" );
         
         uint256 ethChange = ethRewardBasis - lastRewardBasis[msg.sender];
         uint256 stakerRewardShare = ethChange.mul(staker.amount).div(getTotalStaked());
