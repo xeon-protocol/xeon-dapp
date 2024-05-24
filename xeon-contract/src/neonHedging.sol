@@ -68,8 +68,9 @@ pragma solidity ^0.8.4;
 // - contract taxes credited in mappings under address(this) and send out to staking/rewards contract
 // - Smart contract does not have support for distributing earnings to staking contract yet
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-periphery/contracts/libraries/OracleLibrary.sol";
@@ -271,22 +272,25 @@ contract oXEONVAULT {
 
     function depositToken(address _token, uint256 _amount) external nonReentrant {
         require(_amount > 0 && _token != address(0), "You're attempting to transfer 0 tokens");
-        // Deposit WETH , stables or ERC20
+
+        IERC20 token = IERC20(_token);
+
+        // Use SafeERC20 for WETH and other ERC-20 tokens, including USDT and USDC
+        SafeERC20.safeTransferFrom(token, msg.sender, address(this), _amount);
+
         if (_token == wethAddress) {
-            require(IWETH9(wethAddress).transferFrom(msg.sender, address(this), _amount), "Transfer failed");
             wethEquivDeposits += _amount;
         } else {
-            // Allowance check and transfer for non-WETH tokens
-            uint256 allowance = IERC20(_token).allowance(msg.sender, address(this));
-            require(allowance >= _amount, "You need to set a higher allowance");
-            require(IERC20(_token).transferFrom(msg.sender, address(this), _amount), "Transfer failed");
-
             // Log main pair equivalents
             if (_token != usdtAddress && _token != usdcAddress) {
                 (uint256 marketValue, address paired) = getUnderlyingValue(_token, _amount);
-                if (paired == wethAddress) wethEquivDeposits += marketValue;
-                else if (paired == usdtAddress) usdtEquivDeposits += marketValue;
-                else if (paired == usdcAddress) usdcEquivDeposits += marketValue;
+                if (paired == wethAddress) {
+                    wethEquivDeposits += marketValue;
+                } else if (paired == usdtAddress) {
+                    usdtEquivDeposits += marketValue;
+                } else if (paired == usdcAddress) {
+                    usdcEquivDeposits += marketValue;
+                }
             } else if (_token == usdtAddress) {
                 usdtEquivDeposits += _amount;
             } else if (_token == usdcAddress) {
@@ -302,8 +306,6 @@ contract oXEONVAULT {
         uto.deposited += _amount;
 
         // Log new token address
-        // protocolBalanceMap is analytics only, curcial to log below. 
-        // userBalanceMap stores protocols withdrawable balance
         if (protocolBalanceMap[_token].deposited == 0) {
             userERC20s[address(this)].push(_token);
             depositedTokensLength++;
@@ -497,6 +499,7 @@ contract oXEONVAULT {
 
         emit topupRequested(msg.sender, _dealID, amount);
     }
+    
     function acceptRequest(uint _requestID, uint _dealID) external nonReentrant {
         topupRequest storage request = topupMap[_requestID];
         hedgingOption storage hedge = hedgeMap[_dealID];
