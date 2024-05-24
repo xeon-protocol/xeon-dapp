@@ -5,62 +5,39 @@ This repository contains the XEON Protocol dAapp, which includes both the Node.j
 ## Prerequisites
 
 - Docker
+- Git
 - Node.js (for local development without Docker)
+- npm (v6 or higher)
+- Foundry (for smart contract development)
 
 ## Setting Up the Development Environment
 
-You can set up the development environment using Docker with one of the two available Dockerfiles:
+You can set up the development environment using Docker with the provided Dockerfiles.
 
-1. `Dockerfile` - Standard setup, pull latest changes from remote using SSH
-2. `Dockerfile.local` - Standard setup, using current local repo
-3. `Dockerfile.foundry` - Setup with Foundry for Solidity testing
+1. `Dockerfile` - Standard setup for Node.js app
+2. `Dockerfile.foundry` - Setup with Foundry for Solidity testing
 
 ### Building and Running the Docker Containers
 
-#### Standard Setup (pull latest changes)
+#### Standard Setup
 
-To build and run the Docker container and pull the latest changes to the repo, first make sure your SSH agent is running and your keys are added
-
-```sh
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_rsa
-```
-
-Build and run the Docker container without pulling the latest changes:
+To build and run the repository locally, ensure you have the latest changes from the repository locally on your machine:
 
 ```sh
-docker build --ssh default --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" \
-             --build-arg SSH_PUBLIC_KEY="$(cat ~/.ssh/id_rsa.pub)" \
-             --build-arg KNOWN_HOSTS="$(cat ~/.ssh/known_hosts)" \
-             --build-arg REPO_URL="git@github.com:xeon-protocol/xeon-dapp.git" \
-             -t xeon-dapp -f Dockerfile .
-
-docker run -p 3000:3000 xeon-dapp
+git pull origin main
 ```
-
-#### Standard Setup (local repo)
 
 Build and run the Docker container:
 
 ```sh
-docker build -t xeon-dapp -f Dockerfile.local .
+docker build -t xeon-dapp -f Dockerfile .
+
 docker run -p 3000:3000 xeon-dapp
 ```
 
 This will start the development server on port 3000 ([http://localhost:3000](http://localhost:3000)).
 
-#### Setup with Foundry (for Solidity testing)
-
-To build and run the Docker container with Foundry:
-
-```sh
-docker build -t xeon-dapp-foundry -f Dockerfile.foundry .
-docker run -p 3000:3000 xeon-dapp-foundry
-```
-
-This will start the development server and prepare Foundry for testing in the CLI.
-
-## Local Development
+#### Local Development
 
 If you prefer to run the application locally without Docker, follow these steps:
 
@@ -78,6 +55,22 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Setting up Foundry for Smart Contract Development
+
+The `xeon-contracts` directory contains the Solidity contracts and related files.
+To work with these contracts, you need to set up Foundry.
+
+1. Install Foundry:
+
+Follow the instructions on [Foundry's official website](https://book.getfoundry.sh/getting-started/installation) to install Foundry.
+
+```sh
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
+2. Navigate to the `xeon-contracts` directory and follow the instructions in [`xeon-contracts/README.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/xeon-contract/README.md) directory to build, run, and test.
+
 ## Directory Structure
 
 - `xeon-contract` - Contains the Solidity contracts and related files. The `foundry.toml` file is used to configure Foundry.
@@ -87,8 +80,8 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Foundry Documentation](https://book.getfoundry.sh/) - learn about Foundry.
 
 ## Current Work
 
-use this section to update with the current work being done
-steps, details
+Please update and follow along with the current development progress on [Trello](https://trello.com/b/F13JtDx1/development).

@@ -5,9 +5,14 @@ RUN apk add --no-cache bash curl git
 
 # Install Foundry
 RUN curl -L https://foundry.paradigm.xyz | bash
-RUN /root/.foundry/bin/foundryup
 
-WORKDIR /usr/src/app
+# Manually add Foundry to the PATH
+ENV PATH="/root/.foundry/bin:$PATH"
+
+# Run foundryup to complete the installation
+RUN foundryup
+
+WORKDIR /app
 
 COPY package*.json ./
 
@@ -15,13 +20,13 @@ RUN npm install
 
 COPY . .
 
-WORKDIR /usr/src/app/xeon-contract
+WORKDIR /app/xeon-contract
 
 COPY xeon-contract/foundry.toml .
 
-RUN /root/.foundry/bin/forge install
+RUN forge install
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 EXPOSE 3000
 
