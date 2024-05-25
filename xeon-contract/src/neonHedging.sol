@@ -629,13 +629,18 @@ contract oXEONVAULT {
         HedgeInfo memory hedgeInfo;
         require(_dealID < dealID, "Invalid option ID");
         hedgingOption storage option = hedgeMap[_dealID];
-        // Check if either zapWriter or zapTaker flags are true, or if the hedge has expired
-        require(option.zapWriter && option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
         require(option.status == 1, "Hedge already settled");
         if (option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
-            require(msg.sender == option.taker, "Taker has right to exercise");
+            if (block.timestamp < option.dt_expiry) {
+                require(msg.sender == option.taker, "Only the taker can settle before expiry");
+            } else {
+                //require(msg.sender == option.taker || minerMap[msg.sender], "Only the taker or a miner can settle after expiry");
+                // cancel it instead, rights have passed for options to be settled. Except swaps
+                // deleteOption(_dealID); proposal. When deleting an expired option a fee is charged & goes to protocol & miner
+            }
+        } else if (option.hedgeType == HedgeType.SWAP) {
+            require(option.zapWriter && option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
         }
-        require(msg.sender == option.taker, "Invalid party to settle");
 
         (hedgeInfo.underlyingValue, ) = getUnderlyingValue(option.token, option.amount);
 
