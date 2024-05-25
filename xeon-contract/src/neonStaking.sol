@@ -1,19 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract StakingContract is Ownable {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     IERC20 public stakingToken;
-    uint256 public poolExpiry; // The day when the staking pool expires and opens transacts for 3 days
+    uint256 public poolExpiry;// The day when the staking pool expires and opens transacts for 3 days
     uint256 public nextUnstakeDay; // The day when stakers can unstake again.
     uint256 public ethRewardBasis;
-    uint256 public ethLiquidityRewardBasis;
-    uint256 public ethCollateralRewardBasis ;
+    uint256 public liquidityRewardBasis;
+    uint256 public collateralRewardBasis;
     uint256 public totalAssignedForMining;
     uint256 public totalAssignedForLiquidity;
     uint256 public totalAssignedForCollateral;
@@ -47,7 +49,7 @@ contract StakingContract is Ownable {
     event RewardsDistributed(uint256 amount, uint indexed poolID);
 
     modifier stakingWindow() {
-       require(block.timestamp >= nextUnstakeDay && block.timestamp <= nextUnstakeDay.add(3 days), "staking or assigning features suspended at the moment.");
+       require(block.timestamp >= nextUnstakeDay && block.timestamp <= nextUnstakeDay.add(3 days), "Staking or assigning features suspended at the moment.");
         _;
     }
 
@@ -57,27 +59,31 @@ contract StakingContract is Ownable {
     }
 
     function startContract() external onlyOwner {
-        nextUnstakeDay = block.timestamp;//3 days for people to stake and assign
+        nextUnstakeDay = block.timestamp; // 3 days for people to stake & assign stakes to pools
     }
 
     function restartPool() external stakingWindow onlyOwner {
-        nextUnstakeDay = block.timestamp.add(30 days);//pool 30 days start now
+        nextUnstakeDay = block.timestamp.add(30 days);// opens every 30 days
     }
 
     function stake(uint256 _amount) external stakingWindow {
         require(_amount > 0, "Staked amount must be greater than zero.");
         require(stakers[msg.sender].amount == 0, "You can only stake once at a time.");
 
-        stakingToken.transferFrom(msg.sender, address(this), _amount);
+        stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
 
-        stakers[msg.sender] = Staker({
-            amount: _amount,
-            stakingTime: block.timestamp,
-            lastClaimedDay: stakers[msg.sender].lastClaimedDay,
-            assignedForMining: stakers[msg.sender].assignedForMining,
-            assignedForLiquidity: stakers[msg.sender].assignedForLiquidity,
-            assignedForCollateral: stakers[msg.sender].assignedForCollateral
-        });
+        Staker storage staker = stakers[msg.sender];
+
+        bool isFirstTimeStaking = (staker.amount == 0 && staker.stakingTime == 0);
+
+        staker.amount = _amount;
+        staker.stakingTime = block.timestamp;
+
+        if (isFirstTimeStaking) {
+            lastRewardBasis[msg.sender] = ethRewardBasis;
+            lastLiquidityRewardBasis[msg.sender] = liquidityRewardBasis;
+            lastCollateralRewardBasis[msg.sender] = collateralRewardBasis;
+        }
 
         emit Staked(msg.sender, _amount);
     }

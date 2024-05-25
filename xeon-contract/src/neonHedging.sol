@@ -75,6 +75,7 @@ import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-periphery/contracts/libraries/OracleLibrary.sol";
 
+
 // minimal interface for the WETH9 contract
 interface IWETH9 {
     function transfer(address dst, uint wad) external returns (bool);
@@ -357,15 +358,16 @@ contract oXEONVAULT {
         emit onWithdraw(token, amount, msg.sender);
     }
 
-    // Create Hedge: covers both call options and equity swaps. put options to be enabled in Beta V2
+    // Hedge creation
+    // Create Hedge: covers call options, put options and equity swaps.
     // premium or buying cost paid in paired token of the underlying asset in the deal
-    // no premium for swaps. swap collateral must  be equal for both parties, settle function relies on this implementation here
-    // put options will have a max loss check to only accept a strike price 50% away max
+    // no premium for swaps. swap collateral must  be equal for both parties, settle function relies on this implementation
+    // you can only write options with an underlyingValue and strike value that puts Taker in loss now
     function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 strikeprice, uint256 deadline) external nonReentrant {
         require(tool <= 2 && amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
         (, , , uint256 withdrawable, , ) = getUserTokenBalances(token, msg.sender);
         require(withdrawable > 0 && withdrawable >= amount, "Insufficient Vault Balance. Deposit more tokens");
-
+       
         // Assign option values directly to the struct
         hedgingOption storage newOption = hedgeMap[dealID];
         newOption.owner = msg.sender;
@@ -385,6 +387,13 @@ contract oXEONVAULT {
             newOption.hedgeType = HedgeType.SWAP;
         } else {
             revert("Invalid tool option");
+        }
+
+        // Users can only write options with an underlyingValue and strike value that puts Taker in loss now
+        if(newOption.hedgeType == HedgeType.CALL) {
+            require(newOption.strikeValue > newOption.createValue, "Strike price must be greater than market value");
+        } else if(newOption.hedgeType == HedgeType.PUT) {
+            require(newOption.strikeValue < newOption.createValue, "Strike price must be less than market value");
         }
 
         // Update user balances for token in hedge
@@ -412,9 +421,11 @@ contract oXEONVAULT {
     }
 
     // Hedge costs are in paired currency of underlying token
-    // For Call and Put Options cost is premium, lockedinuse during buy, but paid out on settlement
+    // Cost is paid out to Writer immediately
+    // Cost is not taxed, no protocol fees apply. Only profits are taxed on settlement
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
     // Strike value is not set here, maturity calculations left to the settlement function
+    // We have to debit costs and credit them to withdrawn for the Taker. Profits are recorded as deposits on settlement
     function buyHedge(uint256 _dealID) external nonReentrant {
         hedgingOption storage hedge = hedgeMap[_dealID];
         userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
@@ -431,7 +442,11 @@ contract oXEONVAULT {
 
         require(hedge.startValue > 0, "Math error whilst getting price");
 
-        stk.lockedinuse = stk.lockedinuse.add(hedge.cost);
+        // Transfer cost from Taker userBalanceMap to Writer userBalanceMap
+        userBalanceMap[hedge.paired][msg.sender].withdrawn = userBalanceMap[hedge.paired][msg.sender].withdrawn.add(hedge.cost);
+        userBalanceMap[hedge.token][hedge.owner].deposited = userBalanceMap[hedge.token][hedge.owner].deposited.add(hedge.cost);
+
+        // Update struct, start the deal
         hedge.dt_started = block.timestamp;
         hedge.taker = msg.sender;
         hedge.status = 2;
@@ -440,7 +455,7 @@ contract oXEONVAULT {
         userBalanceMap[hedge.paired][msg.sender] = stk;
         hedgeMap[_dealID] = hedge;
 
-        // Update arrays and takes count
+        // Update arrays and taken count
         if (hedge.hedgeType == HedgeType.SWAP) {
             equityswapsTakenLength ++;
             equityswapsBought[hedge.token].push(_dealID);
@@ -617,7 +632,10 @@ contract oXEONVAULT {
         // Check if either zapWriter or zapTaker flags are true, or if the hedge has expired
         require(option.zapWriter && option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
         require(option.status == 1, "Hedge already settled");
-        require(msg.sender == option.owner || msg.sender == option.taker, "Invalid party to settle");
+        if (option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
+            require(msg.sender == option.taker, "Taker has right to exercise");
+        }
+        require(msg.sender == option.taker, "Invalid party to settle");
 
         (hedgeInfo.underlyingValue, ) = getUnderlyingValue(option.token, option.amount);
 
@@ -629,126 +647,115 @@ contract oXEONVAULT {
         userBalance storage ccUT = userBalanceMap[option.token][address(this)];
         userBalance storage minrT = userBalanceMap[option.token][address(this)];
         userBalance storage minrB = userBalanceMap[option.paired][address(this)];
-
-        hedgeInfo.pairedFee = calculateFee(option.cost);
+        
         hedgeInfo.newAddressFlag = ttiU.deposited == 0;
 
         if (option.hedgeType == HedgeType.CALL) {
-            hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > option.startValue.add(option.cost);
+            hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > option.strikeValue.add(option.cost);
             if (hedgeInfo.marketOverStart) {
                 // Taker profit in pair currency = underlying - cost - strike value
                 // Convert to equivalent tokens lockedInUse by owner, factor fee
                 // Check if collateral is enough, otherwise use max balance from Owner lockedInUse
-                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.startValue.add(option.cost));
+                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.strikeValue.add(option.cost));
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
                 if (otiU.lockedinuse < hedgeInfo.tokensDue){
                     hedgeInfo.tokensDue = otiU.lockedinuse;
                 }
                 hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
-                // Move payoff - in underlying, take full gains from owner, credit taxed payoff to taker, pocket difference
+                // Move payoff - in underlying, take payoff from owner, credit taxed payoff to taker, finalize owner loss
                 ttiU.deposited = ttiU.deposited.add(hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee));
                 otiU.lockedinuse = otiU.lockedinuse.sub(option.amount.sub(hedgeInfo.tokensDue));
                 otiU.withdrawn = otiU.withdrawn.add(hedgeInfo.tokensDue);
-                // Restore winners collateral
-                oti.deposited = oti.deposited.add(option.cost.sub(hedgeInfo.pairedFee));
-                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
-                tti.withdrawn = tti.withdrawn.add(option.cost);
-                // Move cost - credit taxes in both, as profit is in underlying and cost is in pair
+                // Restore taker collateral from lockedInUse - not applicable, taker won & cost was paid to owner
+                //
+                // Move fees - credit taxes in both, as profit is in underlying and cost is in pair
                 ccUT.deposited = ccUT.deposited.add((hedgeInfo.tokenFee * 85) / 100);
-                ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
                 // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
                 minrT.deposited = minrT.deposited.add((hedgeInfo.tokenFee * 15) / 100);
-                minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
                 // Log wallet PL: 0 - owner won, 1 taker won
                 logPL(hedgeInfo.payOff.sub(calculateFee(hedgeInfo.payOff)), option.paired, option.owner, option.taker, 1);
             } else {
-                // Move payoff - owner wins cost & losses nothing. 
-                oti.deposited = oti.deposited.add(option.cost.sub(hedgeInfo.pairedFee));
-                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
-                tti.withdrawn = tti.withdrawn.add(option.cost);
+                // Move payoff - owner wins cost & losses nothing. Mining not required as cost already paid to writer
                 // Restore winners collateral - underlying to owner. none to taker.
                 oti.lockedinuse = oti.lockedinuse.sub(option.amount);
-                // Move money - credit pair fees only as the payout is in paired currency. 
-                ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
-                minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
                 // Log wallet PL: 0 - owner won, 1 taker won
-                logPL(option.cost.sub(hedgeInfo.pairedFee), option.paired, option.owner, option.taker, 0);
+                logPL(option.cost, option.paired, option.owner, option.taker, 0);
             }
         } else if (option.hedgeType == HedgeType.PUT) {
-            hedgeInfo.isBelowStrikeValue = hedgeInfo.underlyingValue < option.startValue.sub(option.cost);
+            hedgeInfo.isBelowStrikeValue = option.strikeValue > hedgeInfo.underlyingValue.add(option.cost);
             if (hedgeInfo.isBelowStrikeValue) {
-                // Taker profit in paired = strike value - underlying - cost
+                // Taker profit in paired = underlying value - strike value
                 // Convert to equivalent tokens lockedInUse by writer, factor fee
                 // Check if writer collateral is enough, otherwise use max balance from writer lockedInUse
-                hedgeInfo.payOff = option.startValue.sub(hedgeInfo.underlyingValue).sub(option.cost);
+                hedgeInfo.payOff = option.strikeValue.sub(hedgeInfo.underlyingValue).add(option.cost);
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
                 if (otiU.lockedinuse < hedgeInfo.tokensDue){
                     hedgeInfo.tokensDue = otiU.lockedinuse;
                 }
+                // Get protocol settlement fee in tokens
                 hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
-                // Move payoff - in underlying, take value difference from writer, credit taxed payoff to taker, pocket difference
-                ttiU.deposited = ttiU.deposited.add(hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee));
+                // Move payoff - in underlying, take payoff from writer, credit taxed payoff to taker, finalize writer loss
                 otiU.lockedinuse = otiU.lockedinuse.sub(option.amount.sub(hedgeInfo.tokensDue));
+                ttiU.deposited = ttiU.deposited.add(hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee));                
                 otiU.withdrawn = otiU.withdrawn.add(hedgeInfo.tokensDue);
-                // Restore winners collateral
-                oti.deposited = oti.deposited.add(option.cost.sub(hedgeInfo.pairedFee));
-                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
-                tti.withdrawn = tti.withdrawn.add(option.cost);
-                // Move cost - credit taxes in both, as profit is in underlying and cost is in paired
+                // Restore taker collateral from lockedInUse - not applicable, taker won & cost already paid to owner
+                //
+                // Move fees - credit taxes in both, as profit is in underlying and cost is in paired
                 ccUT.deposited = ccUT.deposited.add((hedgeInfo.tokenFee * 85) / 100);
-                ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
                 // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
                 minrT.deposited = minrT.deposited.add((hedgeInfo.tokenFee * 15) / 100);
-                minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
                 logPL(hedgeInfo.payOff.sub(calculateFee(hedgeInfo.payOff)), option.paired, option.owner, option.taker, 1);
             } else {
-                // Move payoff - owner wins cost & losses nothing
-                oti.deposited = oti.deposited.add(option.cost.sub(hedgeInfo.pairedFee));
-                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
-                tti.withdrawn = tti.withdrawn.add(option.cost);
+                // Writer wins cost & losses nothing. Mining not required as cost already paid to writer
                 // Restore winners collateral - underlying to owner. none to taker
                 oti.lockedinuse = oti.lockedinuse.sub(option.amount);
-                // Move money - credit pair fees only as the payout is in paired. 
-                ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
-                minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
-                logPL(option.cost.sub(hedgeInfo.pairedFee), option.paired, option.owner, option.taker, 0);
+                // Log wallet PL: 0 - owner won, 1 taker won
+                logPL(option.cost, option.paired, option.owner, option.taker, 0);
             }
         } else if (option.hedgeType == HedgeType.SWAP) {
+            // if price if higher than start, payoff in token to taker
+            // if price is lower than start, payoff in paired token to writer
             if (hedgeInfo.underlyingValue > option.startValue) {
                 hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.startValue);
-                if (hedgeInfo.payOff > option.cost) {
-                    hedgeInfo.payOff = option.cost;
-                }
+                // Convert payoff to token equivalent
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
+                // Use all tokens if token amount is not enough to cover payoff
+                if (hedgeInfo.tokensDue > option.amount) {
+                    hedgeInfo.tokensDue = option.amount;
+                }
+                // Get protocol settlement fee in tokens. EquitySwaps vary in payoff unlike options where its always = hedge cost
                 hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
-                // Move money - in underlying, take full gains from owner, credit taxed amount to taker, pocket difference
+                // Move payoff - in underlying, take full gains from writer, credit taxed amount to taker, pocket difference
                 ttiU.deposited = ttiU.deposited.add(hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee));
                 otiU.lockedinuse = otiU.lockedinuse.sub(option.amount);
                 otiU.withdrawn = otiU.withdrawn.add(hedgeInfo.tokensDue);
                  // Restore winner collateral - for taker restore cost (swaps have no premium)
                 tti.lockedinuse = tti.lockedinuse.sub(option.cost);
-                // Move money - take taxes from profits in underlying. none in paired because taker won underlying tokens
+                // Move fees - take taxes from profits in underlying. none in paired because taker won underlying tokens
                 ccUT.deposited = ccUT.deposited.add((hedgeInfo.tokenFee * 85) / 100);
                 // Miner fee - 15% of protocol fee for settling option. none in paired because taker won underlying tokens
                 minrT.deposited = minrT.deposited.add((hedgeInfo.tokenFee * 15) / 100);
                 logPL(hedgeInfo.payOff.sub(calculateFee(hedgeInfo.payOff)), option.paired, option.owner, option.taker, 0);
             } else {                
                 hedgeInfo.payOff = option.startValue.sub(hedgeInfo.underlyingValue);
+                // Use all cost if paired token amount is not enough to cover payoff
                 if (hedgeInfo.payOff > option.cost) {
                     hedgeInfo.payOff = option.cost;
                 }
-                // Move payoff - loss of paired cost to taker only, owner loses nothing
-                // 1. credit equivalent payoff in paired to owner
+                // Get protocol settlement fee in paired currency. [EquitySwaps vary in payoff unlike options where its always = hedge cost]
+                hedgeInfo.pairedFee = calculateFee(hedgeInfo.payOff);
+                // Move payoff - loss of paired cost to taker only, writer loses nothing
+                // 1. credit equivalent payoff in paired to writer
                 // 2. credit takers full cost back & then debit loss using withrawn instantly
                 oti.deposited = oti.deposited.add(hedgeInfo.payOff.sub(hedgeInfo.pairedFee));
                 tti.lockedinuse = tti.lockedinuse.sub(option.cost);
                 tti.withdrawn = tti.withdrawn.add(hedgeInfo.payOff);
                 // Restore winner collateral - for owner, all underlying tokens
                 otiU.lockedinuse = otiU.lockedinuse.sub(option.amount);
-                // Move money - profits in pair so only paired fees credited
+                // Move fees - profits in pair so only paired fees credited
                 ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
                 // Miner fee - 15% of protocol fee for settling option. none in underlying tokens
                 minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
