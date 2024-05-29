@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 // Xeon Protocol - liquidity unlocking and risk management platform.
-// Audit findings corrections: 20 - 05 - 2024
+// Audit findings corrections: 20/05/2024 to 29/05/2024
 
 // ====================Description===========================
 // This is the main smart contract for the Xeon Protocol.
