@@ -65,8 +65,9 @@ pragma solidity ^0.8.4;
 // - getUnderlyingValue fetches value of tokens & returns paired value & pair address
 // - split writing, taking and settlement functions for all deal types
 // - each deal is taxed upon settlement, in relevant tokens (paired or underlying)
-// - contract taxes credited in mappings under address(this) and send out to staking/rewards contract
-// - Smart contract does not have support for distributing earnings to staking contract yet
+// - contract taxes credited in mappings under address(this) and withdrwan by owner
+// - losses, costs paid to Writer, fees charged: are added to users withdrawal balance
+// - profits, fees paid to Taker: are added to users deposit balance
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -76,7 +77,7 @@ import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-periphery/contracts/libraries/OracleLibrary.sol";
 import "./neonStaking.sol";
 
-// minimal interface for the WETH9 contract
+// minimal interface for the WETH9 contract 
 interface IWETH9 {
     function transfer(address dst, uint wad) external returns (bool);
     function transferFrom(address src, address dst, uint wad) external returns (bool);
@@ -262,13 +263,15 @@ contract oXEONVAULT {
     event topupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
     event zapRequested(uint indexed hedgeId, address indexed party);
     event hedgeDeleted(uint256 indexed dealID, address indexed deletedBy);
+    event feesTransferred(address indexed token, address indexed to, uint256 amount);
 
+    // constructor
     constructor(address _uniswapV3Factory, neonHedging _stakingContract) {
         require(_uniswapV3Factory != address(0), "Invalid UniswapV3Factory address");
         require(address(_stakingContract) != address(0), "Invalid StakingContract address");
 
         uniswapV3Factory = IUniswapV3Factory(_uniswapV3Factory);
-        stakingContract = _stakingContract;
+        stakingContract = neonStaking(_stakingContract);
 
         wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address on Sepolia
         usdtAddress = 0x297B8d4B35294e730087ADF0597A31a9bC1746af; // oUSDT address on Sepolia
@@ -423,7 +426,7 @@ contract oXEONVAULT {
     * @param to The address of the recipient wallet to which the fees are to be credited.
     * @param amount The amount of fees to be transferred.
     */
-    function transferCollectedFees(address token, address to, uint256 amount) internal {
+    function transferCollectedFees(address token, address to, uint256 amount) external onlyOwner {
         require(userBalanceMap[token][address(this)].deposited >= amount, "Insufficient protocol balance");
 
         userBalanceMap[token][address(this)].deposited -= amount;
@@ -766,6 +769,7 @@ contract oXEONVAULT {
         hedgingOption storage hedge = hedgeMap[_dealID];
 
         // Get token decimal for calculations
+        IERC20 token = IERC20(_token);
         uint tokenDecimals = token.decimals();
         
         // Ensure the caller's authority and the state of the top-up request
@@ -799,16 +803,16 @@ contract oXEONVAULT {
         uint256 takerAmountToUse = request.amountTaker;
         
         // Ensure that the parties has sufficient balance to cover the top-up
-        // Check and lock owner collateral
         require(getUserTokenBalances(ownerToken, hedge.owner).withdrawable >= ownerAmountToUse, "Insufficient owner collateral");
         userBalance storage ownerBalance = userBalanceMap[ownerToken][hedge.owner];
-        ownerBalance.lockedinuse += ownerAmountToUse;
+        ownerBalance.lockedinuse += ownerAmountToUse;// lock collateral in deal
+        ownerBalance.deposited += takerAmountToUse;//receive cost from taker
         userBalanceMap[ownerToken][hedge.owner] = ownerBalance;
         
-        // Check and lock taker collateral
+        // Taker liquidity withdrawn not lockedInUse
         require(getUserTokenBalances(takerToken, hedge.taker).withdrawable >= takerAmountToUse, "Insufficient taker collateral");
         userBalance storage takerBalance = userBalanceMap[takerToken][hedge.taker];
-        takerBalance.lockedinuse += takerAmountToUse;
+        takerBalance.withdrawn += takerAmountToUse;//send cost to taker
         userBalanceMap[takerToken][hedge.taker] = takerBalance;
         
         // Update the state of the top-up request to indicate acceptance and record the acceptance time

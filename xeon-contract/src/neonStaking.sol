@@ -2,7 +2,6 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
@@ -49,7 +48,7 @@ contract StakingContract is Ownable {
     event RewardsDistributed(uint256 amount, uint indexed poolID);
 
     modifier stakingWindow() {
-       require(block.timestamp >= nextUnstakeDay && block.timestamp <= nextUnstakeDay.add(3 days), "Staking or assigning features suspended at the moment.");
+        require(block.timestamp >= nextUnstakeDay && block.timestamp <= nextUnstakeDay + 3 days, "Staking or assigning features suspended at the moment.");
         _;
     }
 
@@ -63,23 +62,24 @@ contract StakingContract is Ownable {
     }
 
     function restartPool() external stakingWindow onlyOwner {
-        nextUnstakeDay = block.timestamp.add(30 days);// opens every 30 days
+        nextUnstakeDay = block.timestamp + 30 days;// opens every 30 days
     }
 
     function stake(uint256 _amount) external stakingWindow {
         require(_amount > 0, "Staked amount must be greater than zero.");
-        require(stakers[msg.sender].amount == 0, "You can only stake once at a time.");
 
         stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
 
         Staker storage staker = stakers[msg.sender];
 
-        bool isFirstTimeStaking = (staker.amount == 0 && staker.stakingTime == 0);
+        // Update the staked amount
+        staker.amount += _amount;
 
-        staker.amount = _amount;
-        staker.stakingTime = block.timestamp;
+        // Update the staking time if it's the first time staking
+        if (staker.stakingTime == 0) {
+            staker.stakingTime = block.timestamp;
 
-        if (isFirstTimeStaking) {
+            // Initialize reward basis if it's the first time staking
             lastRewardBasis[msg.sender] = ethRewardBasis;
             lastLiquidityRewardBasis[msg.sender] = liquidityRewardBasis;
             lastCollateralRewardBasis[msg.sender] = collateralRewardBasis;
@@ -88,13 +88,26 @@ contract StakingContract is Ownable {
         emit Staked(msg.sender, _amount);
     }
 
-    function unstake() external stakingWindow {
+    function unstake() external {
         Staker storage staker = stakers[msg.sender];
-        require(block.timestamp - staker.stakingTime > 3 * 24 * 60 * 60,"Wait 30 days from your last stake action" );
         require(staker.amount > 0, "You have no staked tokens.");
 
-        uint256 amountToUnstake = staker.amount.sub(staker.assignedForMining).sub(staker.assignedForLiquidity).sub(staker.assignedForCollateral);
-        staker.amount = staker.amount.sub(amountToUnstake);
+        uint256 amountToUnstake = staker.amount;
+        uint256 totalAssignedAmount = staker.assignedForMining + staker.assignedForLiquidity + staker.assignedForCollateral;
+
+        if (totalAssignedAmount > 0) {
+            // Calculate the portion of the unstaked amount that was assigned
+            uint256 assignedMining = (staker.assignedForMining * amountToUnstake) / totalAssignedAmount;
+            uint256 assignedLiquidity = (staker.assignedForLiquidity * amountToUnstake) / totalAssignedAmount;
+            uint256 assignedCollateral = (staker.assignedForCollateral * amountToUnstake) / totalAssignedAmount;
+
+            // Subtract the assigned amounts
+            staker.assignedForMining -= assignedMining;
+            staker.assignedForLiquidity -= assignedLiquidity;
+            staker.assignedForCollateral -= assignedCollateral;
+        }
+
+        staker.amount -= amountToUnstake;
 
         stakingToken.transfer(msg.sender, amountToUnstake);
 
@@ -104,28 +117,28 @@ contract StakingContract is Ownable {
     function assignTokens(uint256 _percentForMining, uint256 _percentForLiquidity, uint256 _percentForCollateral) external stakingWindow {
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
-        require(_percentForMining.add(_percentForLiquidity).add(_percentForCollateral) <= 100, "Total assigned percentage cannot exceed 100%.");
+        require(_percentForMining + _percentForLiquidity + _percentForCollateral <= 100, "Total assigned percentage cannot exceed 100%.");
 
         uint256 totalStakedAmount = staker.amount;
 
         // Calculate the unassigned amount.
-        uint256 totalAssignedAmount = staker.assignedForMining.add(staker.assignedForLiquidity).add(staker.assignedForCollateral);
-        uint256 unassignedAmount = totalStakedAmount.sub(totalAssignedAmount);
+        uint256 totalAssignedAmount = staker.assignedForMining + staker.assignedForLiquidity + staker.assignedForCollateral;
+        uint256 unassignedAmount = totalStakedAmount - totalAssignedAmount;
 
         // Calculate the new assigned amounts based on the provided percentages.
-        uint256 newAssignedForMining = unassignedAmount.mul(_percentForMining).div(100);
-        uint256 newAssignedForLiquidity = unassignedAmount.mul(_percentForLiquidity).div(100);
-        uint256 newAssignedForCollateral = unassignedAmount.mul(_percentForCollateral).div(100);
+        uint256 newAssignedForMining = unassignedAmount * _percentForMining / 100;
+        uint256 newAssignedForLiquidity = unassignedAmount * _percentForLiquidity / 100;
+        uint256 newAssignedForCollateral = unassignedAmount * _percentForCollateral / 100;
 
         // Update the assigned percentages for Mining, liquidity, and collateral.
-        staker.assignedForMining = staker.assignedForMining.add(newAssignedForMining);
-        staker.assignedForLiquidity = staker.assignedForLiquidity.add(newAssignedForLiquidity);
-        staker.assignedForCollateral = staker.assignedForCollateral.add(newAssignedForCollateral);
+        staker.assignedForMining += newAssignedForMining;
+        staker.assignedForLiquidity += newAssignedForLiquidity;
+        staker.assignedForCollateral += newAssignedForCollateral;
 
         // Update globals
-        totalAssignedForMining = totalAssignedForMining.add(newAssignedForMining);
-        totalAssignedForLiquidity = totalAssignedForLiquidity.add(newAssignedForLiquidity);
-        totalAssignedForCollateral = totalAssignedForCollateral.add(newAssignedForCollateral);
+        totalAssignedForMining += newAssignedForMining;
+        totalAssignedForLiquidity += newAssignedForLiquidity;
+        totalAssignedForCollateral += newAssignedForCollateral;
 
         emit TokensAssigned(msg.sender, staker.assignedForMining, staker.assignedForLiquidity, staker.assignedForCollateral);
     }
@@ -140,33 +153,33 @@ contract StakingContract is Ownable {
         require(staker.assignedForCollateral >= _amountFromCollateral, "Unassign amount exceeds assigned for collateral.");
 
         // Update the assigned percentages for Mining, liquidity, and collateral.
-        staker.assignedForMining = staker.assignedForMining.sub(_amountFromMining);
-        staker.assignedForLiquidity = staker.assignedForLiquidity.sub(_amountFromLiquidity);
-        staker.assignedForCollateral = staker.assignedForCollateral.sub(_amountFromCollateral);
+        staker.assignedForMining -= _amountFromMining;
+        staker.assignedForLiquidity -= _amountFromLiquidity;
+        staker.assignedForCollateral -= _amountFromCollateral;
 
         // Update globals
-        totalAssignedForMining = totalAssignedForMining.sub(_amountFromMining);
-        totalAssignedForLiquidity = totalAssignedForLiquidity.sub(_amountFromLiquidity);
-        totalAssignedForCollateral = totalAssignedForCollateral.sub(_amountFromCollateral);
+        totalAssignedForMining -= _amountFromMining;
+        totalAssignedForLiquidity -= _amountFromLiquidity;
+        totalAssignedForCollateral -= _amountFromCollateral;
 
         emit TokensUnassigned(msg.sender, _amountFromMining, _amountFromLiquidity, _amountFromCollateral);
     }
 
     function depositRewards() external payable onlyOwner {
         require(msg.value > 0, "Reward amount must be greater than zero.");
-        ethRewardBasis = ethRewardBasis.add(msg.value);
+        ethRewardBasis = ethRewardBasis +msg.value;
         emit RewardsDistributed(msg.value, 1);
     }
 
     function depositLiquidityRewards() external payable onlyOwner {
         require(msg.value > 0, "Reward amount must be greater than zero.");
-        ethLiquidityRewardBasis = ethLiquidityRewardBasis.add(msg.value);
+        ethLiquidityRewardBasis = ethLiquidityRewardBasis + msg.value;
         emit RewardsDistributed(msg.value, 2);
     }
 
     function depositCollateralRewards() external payable onlyOwner {
         require(msg.value > 0, "Reward amount must be greater than zero.");
-        ethCollateralRewardBasis = ethCollateralRewardBasis.add(msg.value);
+        ethCollateralRewardBasis = ethCollateralRewardBasis + msg.value;
         emit RewardsDistributed(msg.value, 3);
     }
     // proposal
@@ -178,7 +191,7 @@ contract StakingContract is Ownable {
         require(block.timestamp - staker.stakingTime > 3 * 24 * 60 * 60,"Wait 30 days from your last claim" );
         
         uint256 ethChange = ethRewardBasis - lastRewardBasis[msg.sender];
-        uint256 stakerRewardShare = ethChange.mul(staker.amount).div(getTotalStaked());
+        uint256 stakerRewardShare = ethChange * staker.amount / getTotalStaked();
 
         staker.lastClaimedDay = block.timestamp;
         lastRewardBasis[msg.sender] = ethRewardBasis;
@@ -195,7 +208,7 @@ contract StakingContract is Ownable {
         require(staker.assignedForLiquidity > 0, "You have no tokens assigned for liquidity.");
         
         uint256 ethChange = ethLiquidityRewardBasis - lastLiquidityRewardBasis[msg.sender];
-        uint256 liquidityRewardShare = ethChange.mul(staker.assignedForLiquidity).div(totalAssignedForLiquidity);
+        uint256 liquidityRewardShare = ethChange * staker.assignedForLiquidity / totalAssignedForLiquidity;
 
         staker.lastClaimedDay = block.timestamp;
         lastLiquidityRewardBasis[msg.sender] = ethLiquidityRewardBasis;
@@ -212,7 +225,7 @@ contract StakingContract is Ownable {
         require(staker.assignedForCollateral > 0, "You have no tokens assigned for protocol collateral.");
         
         uint256 ethChange = ethCollateralRewardBasis - lastCollateralRewardBasis[msg.sender];
-        uint256 collateralRewardShare = ethChange.mul(staker.assignedForCollateral).div(totalAssignedForCollateral);
+        uint256 collateralRewardShare = ethChange * staker.assignedForCollateral / totalAssignedForCollateral;
 
         staker.lastClaimedDay = block.timestamp;
         lastCollateralRewardBasis[msg.sender] = ethCollateralRewardBasis;
@@ -232,7 +245,7 @@ contract StakingContract is Ownable {
         }
 
         uint256 ethChange = ethRewardBasis - lastRewardBasis[msg.sender];
-        uint256 stakerRewardShare = ethChange.mul(staker.amount).div(getTotalStaked());
+        uint256 stakerRewardShare = ethChange * staker.amount / getTotalStaked();
         return stakerRewardShare;
     }
 
@@ -244,7 +257,7 @@ contract StakingContract is Ownable {
         }
 
         uint256 ethChange = ethLiquidityRewardBasis - lastLiquidityRewardBasis[msg.sender];
-        uint256 liquidityRewardShare = ethChange.mul(staker.assignedForLiquidity).div(totalAssignedForLiquidity);
+        uint256 liquidityRewardShare = ethChange * staker.assignedForLiquidity / totalAssignedForLiquidity;
         return liquidityRewardShare;
     }
 
@@ -256,15 +269,15 @@ contract StakingContract is Ownable {
         }
 
         uint256 ethChange = ethCollateralRewardBasis - lastCollateralRewardBasis[msg.sender];
-        uint256 collateralRewardShare = ethChange.mul(staker.assignedForCollateral).div(totalAssignedForCollateral);
+        uint256 collateralRewardShare = ethChange * staker.assignedForCollateral / totalAssignedForCollateral;
         return collateralRewardShare;
     }
 
     function getAssignedAndUnassignedAmounts(address stakerAddress) external view returns (uint256 assignedForMining, uint256 assignedForLiquidity, uint256 assignedForCollateral, uint256 unassigned) {
         Staker storage staker = stakers[stakerAddress];
         uint256 totalStakedAmount = staker.amount;
-        uint256 totalAssignedAmount = staker.assignedForMining.add(staker.assignedForLiquidity).add(staker.assignedForCollateral);
-        uint256 unassignedAmount = totalStakedAmount.sub(totalAssignedAmount);
+        uint256 totalAssignedAmount = staker.assignedForMining + staker.assignedForLiquidity + staker.assignedForCollateral;
+        uint256 unassignedAmount = totalStakedAmount - totalAssignedAmount;
         return (staker.assignedForMining, staker.assignedForLiquidity, staker.assignedForCollateral, unassignedAmount);
     }
 
@@ -277,13 +290,13 @@ contract StakingContract is Ownable {
     }
 
     function getTotalAssigned() public view returns (uint256) {
-        return totalAssignedForMining.add(totalAssignedForLiquidity).add(totalAssignedForCollateral);
+        return totalAssignedForMining + totalAssignedForLiquidity + totalAssignedForCollateral;
     }
 
     function getTotalUnassigned() public view returns (uint256) {
         uint256 totalStakedAmount = getTotalStaked();
         uint256 totalAssignedAmount = getTotalAssigned();
-        return totalStakedAmount.sub(totalAssignedAmount);
+        return totalStakedAmount - totalAssignedAmount;
     }
 
     function getStakers() public view returns (address[] memory) {
