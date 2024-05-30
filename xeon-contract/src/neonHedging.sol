@@ -879,7 +879,10 @@ contract oXEONVAULT {
     * - The caller must be either the owner or the taker of the hedging option.
     * - The hedging option must have already been taken.
     * - The hedge must be Equity Swap type to benefit from the "zap". 
-    * - Call & Put options are excerised at Taker's discretion before expiry, zap is not benefical to Taker, but Writer.
+    * - Call & Put options are excerised at Taker's discretion before expiry, zap benefits Writer to end sooner
+    * - If both parties agree to Zap, expiry date on the deal is updated to now: 
+    * ---Taker loses right to exercise Call or Put Option.
+    * ---Equity Swaps are unaffected. Setllement can now be triggered sooner.
     * 
     * @param _dealID The unique identifier of the hedging option.
     */
@@ -896,6 +899,11 @@ contract oXEONVAULT {
         } else {
             hedge.zapTaker = true;
         }
+
+        // Update expiry date to now if flags are true for both parties
+        if(hedge.zapWriter && hedge.zapTaker) {
+            hedge.dt_expiry = block.timestamp;
+        }
         
         // Emit an event indicating that a "zap" has been requested
         emit zapRequested(_dealID, msg.sender);
@@ -908,27 +916,32 @@ contract oXEONVAULT {
     * The settlement involves determining the payoff based on the underlying value, updating user balances, and distributing fees.
     * 
     * Settlement Process Overview:
-    * - The value is calculated using the 'getOptionValue' function.
+    * - The value is always measured in paired currency, token value is calculated using the 'getUnderlyingValue' function.
     * - The strike value is set by the writer, establishing the strike price. The start value is set when the hedge is initiated.
     * - Premium is the cost and is paid in the pair currency of the underlying token.
     * - For swaps, the cost equals 100% of the underlying start value, acting as collateral rather than hedge premium.
-    * - The payoff, which is the difference between the start and strike value, is paid in underlying or pair currency.
+    * - The payoff, which is the difference between the market value and strike value, is paid in underlying or pair currency.
     * - Losses are immediately debited from withdrawn funds. For winners, profits are credited directly to the deposited balance.
     * - Initials for both parties are restored by moving funds from locked in use to deposit, which is the reverse of creating or buying.
-    * - Fees are collected in paired tokens if the option cost was paid to the owner as winning, or in swap cost used as PayOff.
+    * - Fees are collected in paired tokens if option and swap PayOffs were done in paired tokens.
     * - Fees are collected in underlying tokens if option and swap PayOffs were done in underlying tokens.
-    * - Hedge fees are collected into 'address(this)' userBalanceMap and manually distributed as dividends to a staking contract.
-    * - Miners can settle deals after expiry by staking tokens.
+    * - Settlement fees are collected into 'address(this)' userBalanceMap and manually distributed as dividends to a staking contract.
+    * - Miners can settle deals after they expire, important for Equity Swaps not Options. For options Miners can only delete unexercised options.
+    * - Miners have no right to validate or settle Equity Swaps. But for Options and Loans (in our lending platform) they can after expiry.
     * - Miners can pick deals with tokens and amounts they wish to mine to avoid accumulating mining rewards in unwanted tokens.
     * - Each wallet has to log each token interacted with for the sake of pulling all balances credited to it on settlement. This allows for net worth valuations on wallets.
     * - Protocol revenues are stored under 'userBalanceMap[address(this)]' storage. On revenue, protocol revenue is withdrawn manually and sent to the staking wallet.
     * - Takers only can settle/exercise open call options and put options before expiry. After expiry, it's deleted and taxed.
-    * - Owners have the ability to settle equity swaps, but only after expiry. Takers have no right to settle after options expire; they are deleted.
+    * - Both parties have the ability to settle equity swaps, but only after expiry. 
     * 
     * Conditions and Rules:
     * - Call and put options can only be settled by miners or the taker.
     * - Only the taker can settle before expiry; after expiry, the option is deleted.
     * - Swaps require fast settlement after expiry and can be settled by the miner or any of the parties in the deal.
+    * - If a hedge has Zap request consesus on experdited settlement, the expiry date is updated to now.
+    * - If the loser of a deal does not have enough collateral to pay the winner PayOff, all the losers collateral is used to pay the winner.
+    * - For Put Options, Takers must take care to excerice the option whilst the collateral from the Owner still has value to cover the PayOff.
+    * - After the PayOff is deducted from losers collateral, any remaining value or balance locked in the deal is restored to the loser.
     * 
     * Requirements:
     * - The caller must be either the owner or the taker of the hedging option.
