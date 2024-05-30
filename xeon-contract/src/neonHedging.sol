@@ -229,6 +229,8 @@ contract oXEONVAULT {
     // fee variables
     uint256 public feeNumerator;
     uint256 public feeDenominator;
+    uint256 public protocolFeeRate;
+    uint256 public validatorFeeRate;    
 
     // erc20 deposits equiv in paired currencies
     uint256 public wethEquivDeposits;
@@ -264,6 +266,8 @@ contract oXEONVAULT {
     event zapRequested(uint indexed hedgeId, address indexed party);
     event hedgeDeleted(uint256 indexed dealID, address indexed deletedBy);
     event feesTransferred(address indexed token, address indexed to, uint256 amount);
+    event validatorFeeUpdated(uint256 protocolFeeRate, uint256 validatorFeeRate);
+    event feeUpdated(uint256 feeNumerator, uint256 feeDenominator);
 
     // constructor
     constructor(address _uniswapV3Factory, neonHedging _stakingContract) {
@@ -874,7 +878,8 @@ contract oXEONVAULT {
     * Requirements:
     * - The caller must be either the owner or the taker of the hedging option.
     * - The hedging option must have already been taken.
-    * - The hedge must be Equity Swap type. Call and Put options are excerised at Taker's discretion before expiry.
+    * - The hedge must be Equity Swap type to benefit from the "zap". 
+    * - Call & Put options are excerised at Taker's discretion before expiry, zap is not benefical to Taker, but Writer.
     * 
     * @param _dealID The unique identifier of the hedging option.
     */
@@ -947,17 +952,17 @@ contract oXEONVAULT {
         require(_dealID < dealID, "Invalid option ID");
         hedgingOption storage option = hedgeMap[_dealID];
         require(option.status == 2, "Hedge already settled");
+
+        // Validate caller's authority based on hedge type and timing
         if (option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
-            // require settler be miner or taker only
             require(msg.sender == option.taker || isMiner(msg.sender), "Invalid party to settle");
             if (block.timestamp < option.dt_expiry) {
                 require(msg.sender == option.taker, "Only the taker can settle before expiry");
             } else {
-                //taker cant settle after expiry, its deleted, taker risks losing money coz cost already paid to writer
-                deleteHedge(_dealID);
+                deleteHedge(_dealID); // Taker cannot settle after expiry, hedge is deleted
+                return;
             }
         } else if (option.hedgeType == HedgeType.SWAP) {
-            // require settler == miner or any of the parties in the deal. swaps require fast settlement after expiry
             require(msg.sender == option.owner || msg.sender == option.taker || isMiner(msg.sender), "Invalid party to settle");
             require(option.zapWriter && option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
         }
@@ -975,6 +980,7 @@ contract oXEONVAULT {
         
         hedgeInfo.newAddressFlag = ttiU.deposited == 0;
 
+        // Settlement logic for CALLs
         if (option.hedgeType == HedgeType.CALL) {
             hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > option.strikeValue + option.cost;
             if (hedgeInfo.marketOverStart) {
@@ -995,9 +1001,9 @@ contract oXEONVAULT {
                 // Restore taker collateral from lockedInUse - not applicable, taker won & cost was paid to owner
                 //
                 // Move fees - credit taxes in both, as profit is in underlying and cost is in pair
-                ccUT.deposited += (hedgeInfo.tokenFee * 85) / 100;
-                // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
-                minrT.deposited += (hedgeInfo.tokenFee * 15) / 100;
+                ccUT.deposited += (hedgeInfo.tokenFee * protocolFeeRate) / 100;
+                // Miner fee - X% of protocol fee for settling option. Mining call options always come with 2 token fees
+                minrT.deposited += (hedgeInfo.tokenFee * validatorFeeRate) / 100;
                 // Log wallet PL: 0 - owner won, 1 taker won
                 logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
             } else {
@@ -1007,7 +1013,10 @@ contract oXEONVAULT {
                 // Log wallet PL: 0 - owner won, 1 taker won
                 logPL(option.cost, option.paired, option.owner, option.taker, 0);
             }
-        } else if (option.hedgeType == HedgeType.PUT) {
+        } 
+        
+        // Settlement logic for PUTs
+        else if (option.hedgeType == HedgeType.PUT) {
             hedgeInfo.isBelowStrikeValue = option.strikeValue > hedgeInfo.underlyingValue + option.cost;
             if (hedgeInfo.isBelowStrikeValue) {
                 // Taker profit in paired = underlying value - strike value
@@ -1026,19 +1035,20 @@ contract oXEONVAULT {
                 ttiU.deposited += hedgeInfo.tokensDue - hedgeInfo.tokenFee;
                 otiU.withdrawn += hedgeInfo.tokensDue;
                 // Restore taker collateral from lockedInUse - not applicable, taker won & cost already paid to owner
-                //
                 // Move fees - credit taxes in both, as profit is in underlying and cost is in paired
-                ccUT.deposited += (hedgeInfo.tokenFee * 85) / 100;
-                minrT.deposited += (hedgeInfo.tokenFee * 15) / 100;
+                ccUT.deposited += (hedgeInfo.tokenFee * protocolFeeRate) / 100;
+                minrT.deposited += (hedgeInfo.tokenFee * validatorFeeRate) / 100;
                 logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
             } else {
                 // Writer wins cost & losses nothing. Mining not required as cost already paid to writer
                 // Restore winners collateral - underlying to owner. none to taker
                 oti.lockedinuse -= option.amount;
-                // Log wallet PL: 0 - owner won, 1 taker won
                 logPL(option.cost, option.paired, option.owner, option.taker, 0);
             }
-        } else if (option.hedgeType == HedgeType.SWAP) {
+        } 
+        
+        // Settlement logic for SWAP
+        else if (option.hedgeType == HedgeType.SWAP) {
             // if price if higher than start, payoff in token to taker
             // if price is lower than start, payoff in paired token to writer
             if (hedgeInfo.underlyingValue > option.startValue) {
@@ -1059,9 +1069,9 @@ contract oXEONVAULT {
                 // Restore winner collateral - for taker restore cost (swaps have no premium)
                 tti.lockedinuse -= option.cost;
                 // Move fees - take taxes from profits in underlying. none in paired because taker won underlying tokens
-                ccUT.deposited += (hedgeInfo.tokenFee * 85) / 100;
-                // Miner fee - 15% of protocol fee for settling option. none in paired because taker won underlying tokens
-                minrT.deposited += (hedgeInfo.tokenFee * 15) / 100;
+                ccUT.deposited += (hedgeInfo.tokenFee * protocolFeeRate) / 100;
+                // Miner fee - X% of protocol fee for settling option. none in paired because taker won underlying tokens
+                minrT.deposited += (hedgeInfo.tokenFee * validatorFeeRate) / 100;
                 logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 0);
             } else {                
                 hedgeInfo.payOff = option.startValue - hedgeInfo.underlyingValue;
@@ -1080,9 +1090,9 @@ contract oXEONVAULT {
                 // Restore winner collateral - for owner, all underlying tokens
                 otiU.lockedinuse -= option.amount;
                 // Move fees - profits in pair so only paired fees credited
-                ccBT.deposited += (hedgeInfo.pairedFee * 85) / 100;
-                // Miner fee - 15% of protocol fee for settling option. none in underlying tokens
-                minrB.deposited += (hedgeInfo.pairedFee * 15) / 100;
+                ccBT.deposited += (hedgeInfo.pairedFee * protocolFeeRate) / 100;
+                // Miner fee - X% of protocol fee for settling option. none in underlying tokens
+                minrB.deposited += (hedgeInfo.pairedFee * validatorFeeRate) / 100;
                 logPL(hedgeInfo.payOff, option.paired, option.owner, option.taker, 1);
             }
         }
@@ -1180,6 +1190,23 @@ contract oXEONVAULT {
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner external {
         feeNumerator = numerator;
         feeDenominator = denominator;
+        emit feeUpdated(numerator, denominator);
+    }
+    
+    /**
+    * @notice Updates the validator fee.
+    * 
+    * This function updates the validator fee as a pecentage
+    * 
+    * @param protocolPercent The percentage amount of protocol fee.
+    * @param validatorPercent The percentage amount of validator fee.
+    */
+    function updateValidatorFee(uint256 protocolPercent, uint256 validatorPercent) onlyOwner external {
+        // check that protocolFeeRate + validatorFeeRate == 100
+        require (protocolPercent + validatorPercent == 100, "Total fee rate must be 100");
+        protocolFeeRate = protocolPercent;
+        validatorFeeRate = validatorPercent;
+        emit validatorFeeUpdated(protocolFeeRate, validatorFeeRate);
     }
     
     /**
@@ -1188,7 +1215,7 @@ contract oXEONVAULT {
     * This function calculates the fee based on the given amount and the fee numerator and denominator.
     * 
     * @param amount The amount for which the fee is calculated.
-    * @return The calculated fee.
+    * @return The calculated fee amount.
     */
     function calculateFee(uint256 amount) public view returns (uint256) {
         require(amount >= feeDenominator, "Revenue is too small");    
