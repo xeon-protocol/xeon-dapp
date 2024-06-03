@@ -309,7 +309,7 @@ contract oTestnetERC20 is Context, IERC20, Ownable {
 
     function openTrading() external onlyOwner() {
         require(!tradingOpen,"trading is already open");
-        uniswapV2Router = IUniswapV2Router02(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008); //0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506 sushiswap V2 BSC test, 0xa6AD18C2aC47803E193F75c3677b14BF19B94883 SpookySwap test
+        uniswapV2Router = IUniswapV2Router02(0x1689E7B1F10000AE47eBfE339a4f69dECd19F602); //0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506 sushiswap V2 BSC test, 0xa6AD18C2aC47803E193F75c3677b14BF19B94883 SpookySwap test
         _approve(address(this), address(uniswapV2Router), _tTotal);
         uniswapV2Pair = IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH());
         uniswapV2Router.addLiquidityETH{value: address(this).balance}(address(this),balanceOf(address(this)),0,0,owner(),block.timestamp);
