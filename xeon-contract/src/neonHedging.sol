@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.4;
+pragma solidity >=0.4.0 <0.8.5;
 
 // Xeon Protocol - liquidity unlocking and risk management platform.
 // Audit findings corrections: 20/05/2024 to 29/05/2024
@@ -75,7 +75,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-periphery/contracts/libraries/OracleLibrary.sol";
-import "./neonStaking.sol";
+import "./xeonStaking.sol";
 
 // minimal interface for the WETH9 contract 
 interface IWETH9 {
@@ -84,8 +84,7 @@ interface IWETH9 {
 }
 
 contract oXEONVAULT {
-
-    using SafeMath for uint256;
+    using SafeERC20 for IERC20;
     bool private isExecuting;
 
     modifier nonReentrant() {
@@ -251,7 +250,7 @@ contract oXEONVAULT {
     address public owner;
 
     // Instance of the staking contract
-    neonStaking public stakingContract;
+    xeonStaking public stakingContract;
 
     // events
     event received(address, uint);
@@ -562,8 +561,10 @@ contract oXEONVAULT {
         require(hedge.startValue > 0, "Math error whilst getting price"); // Sanity check
 
         // Transfer cost from Taker userBalanceMap to Writer userBalanceMap
-        userBalanceMap[hedge.paired][msg.sender].withdrawn += hedge.cost;
-        userBalanceMap[hedge.token][hedge.owner].deposited += hedge.cost;
+        if (hedge.hedgeType != HedgeType.SWAP) {
+            userBalanceMap[hedge.paired][msg.sender].withdrawn += hedge.cost;
+            userBalanceMap[hedge.token][hedge.owner].deposited += hedge.cost;
+        }
 
         // Update hedge struct to indicate it is taken and record the taker
         hedge.dt_started = block.timestamp; 

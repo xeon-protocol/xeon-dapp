@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract StakingContract is Ownable {
-    using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     IERC20 public stakingToken;
     uint256 public poolExpiry;// The day when the staking pool expires and opens transacts for 3 days
     uint256 public nextUnstakeDay; // The day when stakers can unstake again.
-    uint256 public ethRewardBasis;
-    uint256 public liquidityRewardBasis;
-    uint256 public collateralRewardBasis;
+    uint256 public ethRewardBasis;    
+    uint256 public ethLiquidityRewardBasis;
+    uint256 public ethCollateralRewardBasis;
     uint256 public totalAssignedForMining;
     uint256 public totalAssignedForLiquidity;
     uint256 public totalAssignedForCollateral;
@@ -81,8 +80,8 @@ contract StakingContract is Ownable {
 
             // Initialize reward basis if it's the first time staking
             lastRewardBasis[msg.sender] = ethRewardBasis;
-            lastLiquidityRewardBasis[msg.sender] = liquidityRewardBasis;
-            lastCollateralRewardBasis[msg.sender] = collateralRewardBasis;
+            lastLiquidityRewardBasis[msg.sender] = ethLiquidityRewardBasis;
+            lastCollateralRewardBasis[msg.sender] = ethCollateralRewardBasis;
         }
 
         emit Staked(msg.sender, _amount);
