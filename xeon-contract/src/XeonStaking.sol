@@ -225,7 +225,7 @@ contract XeonStaking is Ownable {
         require(staker.liquidityRewards > 0, "You have no tokens assigned for liquidity.");
         
         uint256 ethChange = totalEthLiquidityRewards - lastLiquidityRewardBasis[msg.sender];
-        uint256 liquidityRewardShare = ethChange * staker.liquidityRewards / totalLiquidityRewards;;
+        uint256 liquidityRewardShare = ethChange * staker.liquidityRewards / totalLiquidityRewards;
 
         staker.lastClaimedTimestamp = block.timestamp;
         lastLiquidityRewardBasis[msg.sender] = totalEthLiquidityRewards;
