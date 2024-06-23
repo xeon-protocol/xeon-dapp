@@ -1,6 +1,10 @@
 [profile.default]
-src = "src"
-out = "out"
-libs = ["lib"]
+src = 'src'
+out = 'out'
+libs = ['lib']
 
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+[dependencies]
+openzeppelin = { path = "node_modules/@openzeppelin/contracts" }
+uniswap_v2_core = { path = "node_modules/@uniswap/v2-core" }
+uniswap_v3_core = { path = "node_modules/@uniswap/v3-core" }
+uniswap_v3_periphery = { path = "node_modules/@uniswap/v3-periphery" }
