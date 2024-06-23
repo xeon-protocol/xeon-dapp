@@ -1,4 +1,3 @@
-# Use an official Node.js runtime as the base image
 FROM node:18-alpine
 
 # Install Foundry dependencies
@@ -6,34 +5,29 @@ RUN apk add --no-cache bash curl git
 
 # Install Foundry
 RUN curl -L https://foundry.paradigm.xyz | bash
-RUN /root/.foundry/bin/foundryup
 
-# Set the working directory for the Node.js application
-WORKDIR /usr/src/app
+# Manually add Foundry to the PATH
+ENV PATH="/root/.foundry/bin:$PATH"
 
-# Copy package.json and package-lock.json to the working directory
+# Run foundryup to complete the installation
+RUN foundryup
+
+WORKDIR /app
+
 COPY package*.json ./
 
-# Install app dependencies
 RUN npm install
 
-# Copy the rest of the application source code to the working directory
 COPY . .
 
-# Set the working directory for the Foundry project
-WORKDIR /usr/src/app/xeon-contract
+WORKDIR /app/xeon-contract
 
-# Copy foundry.toml to the working directory
 COPY xeon-contract/foundry.toml .
 
-# Install Foundry dependencies
-RUN /root/.foundry/bin/forge install
+RUN forge install
 
-# Go back to the root working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Expose port 3000 to the outside world
 EXPOSE 3000
 
-# Define the command to run the application in development mode
 CMD ["npm", "run", "dev"]
