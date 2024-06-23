@@ -87,7 +87,7 @@ interface IPriceOracle {
     function getTWAP(address pool, uint32 interval) external view returns (uint256);
 }
 
-contract XeonVault {
+contract XeonHedging {
     using SafeERC20 for IERC20;
     bool private isExecuting;
 
