@@ -72,8 +72,9 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
-import "./xeonStaking.sol";
+import "./XeonStaking.sol";
 
 // minimal interface for the WETH9 contract 
 interface IWETH9 {
@@ -82,11 +83,11 @@ interface IWETH9 {
 }
 
 // Interface for our Uniswap price contract
-interface IUniswapInteraction {
+interface IPriceOracle {
     function getTWAP(address pool, uint32 interval) external view returns (uint256);
 }
 
-contract oXEONVAULT {
+contract XeonVault {
     using SafeERC20 for IERC20;
     bool private isExecuting;
 
@@ -245,13 +246,14 @@ contract oXEONVAULT {
     uint256 public usdcEquivWithdrawals;
 
     // core addresses
+    IUniswapV2Factory public uniswapV2Factory;
     IUniswapV3Factory public uniswapV3Factory;
     xeonStaking public stakingContract;
-    address public uniswapInteraction;
+    address public priceOracle;
     address public wethAddress;
     address public usdtAddress;
     address public usdcAddress;
-    address public XeonAddress;
+    address public xeonAddress;
     address public stakingAddress;
     address public owner;
 
@@ -272,26 +274,28 @@ contract oXEONVAULT {
     event feesTransferred(address indexed token, address indexed to, uint256 amount);
     event validatorFeeUpdated(uint256 protocolFeeRate, uint256 validatorFeeRate);
     event feeUpdated(uint256 feeNumerator, uint256 feeDenominator);
+    event EtherWithdrawn(address indexed to, uint256 amount);
 
     // constructor
-    constructor(address _uniswapV3Factory, address _uniswapInteraction, xeonStaking _stakingContract) {
+    constructor(address, _uniswapV2Factory, address _uniswapV3Factory, address _priceOracle, xeonStaking _stakingContract) {
         require(_uniswapV3Factory != address(0), "Invalid UniswapV3Factory address");
-        require(_uniswapInteraction != address(0), "Invalid Oracle Address");
+        require(_priceOracle != address(0), "Invalid Oracle Address");
         require(address(_stakingContract) != address(0), "Invalid StakingContract Address");
 
+        uniswapV2Factory = IUniswapV2Factory(_uniswapV2Factory);
         uniswapV3Factory = IUniswapV3Factory(_uniswapV3Factory);
-        uniswapInteraction = _uniswapInteraction;
-        stakingContract = xeonStaking(_stakingContract);
+        priceOracle = _priceOracle;
+        stakingContract = XeonStaking(_stakingContract);
 
         wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address on Sepolia
         usdtAddress = 0x297B8d4B35294e730087ADF0597A31a9bC1746af; // oUSDT address on Sepolia
         usdcAddress = 0x8267cF9254734C6Eb452a7bb9AAF97B392258b21; // USDC address on Sepolia
-        XeonAddress = 0xDb90a9f7cEaA33a32Ec836Bbadeeaa8772Ad9797; // V2.1 deployed 14/01/2024 21:52:48
+        xeonAddress = 0xDb90a9f7cEaA33a32Ec836Bbadeeaa8772Ad9797; // V2.1 deployed 14/01/2024 21:52:48
 
         feeNumerator = 5;
         feeDenominator = 1000;
 
-        emit contractInitialized(_uniswapInteraction, address(_stakingContract));
+        emit contractInitialized(_priceOracle, address(_stakingContract));
     }
 
     /**
@@ -1172,7 +1176,7 @@ contract oXEONVAULT {
     * @param endValue The end value of the settlement.
     */
     function logAnalyticsFees(address token, uint256 tokenFee, uint256 pairedFee, uint256 tokenProfit, uint256 pairProfit, uint256 endValue) internal {
-        (address paired, ) = getPairAddressZK(token);
+        (address paired, ) = getPairAddress(token);
         // All profits made by traders
         protocolProfitsTokens[token] += tokenProfit; 
         protocolPairProfits[paired] += pairProfit;
@@ -1322,33 +1326,69 @@ contract oXEONVAULT {
     // paired value is always the pair address of the token provided. 
     // TWAP oracle is used to get the price.
     function getUnderlyingValue(address _tokenAddress, uint256 _tokenAmount) public view returns (uint256, address) {
-        (address poolAddress, address pairedCurrency) = getPairAddressZK(_tokenAddress);
+        (address poolAddress, address pairedCurrency) = getPairAddress(_tokenAddress);
         require(poolAddress != address(0), "Pool doesn't exist");
         
         // Uniswap V3 TWAP Oracle
         uint32 period = 3600; // attempting 1hr
-        uint256 priceX96 = IUniswapInteraction(uniswapInteraction).getTWAP(poolAddress, period);
+        uint256 priceX96 = IPriceOracle(priceOracle).getTWAP(poolAddress, period);
         
         uint256 value = (priceX96 * _tokenAmount) / (1 << 96); // Adjust for fixed-point division
         
         return (value, pairedCurrency);
     }
 
-    // Zero Knowledge pair address generator
-    function getPairAddressZK(address tokenAddress) public view returns (address poolAddress, address pairedCurrency) {
-        address wethPoolAddress = uniswapV3Factory.getPool(tokenAddress, wethAddress, 3000); // 0.3% fee tier assumed
-        address usdtPoolAddress = uniswapV3Factory.getPool(tokenAddress, usdtAddress, 3000); // 0.3% fee tier
-        address usdcPoolAddress = uniswapV3Factory.getPool(tokenAddress, usdcAddress, 3000); // 0.3% fee tier
-        if (wethPoolAddress != address(0)) {
-            return (wethPoolAddress, wethAddress);
-        } else if (usdtPoolAddress != address(0)) {
-            return (usdtPoolAddress, usdtAddress);
-        } else if (usdcPoolAddress != address(0)) {
-            return (usdcPoolAddress, usdcAddress);
-        } else {
-            revert("Token is not paired with WETH, USDT, or USDC");
+// Get pair address for a given token across multiple fee tiers
+function getPairAddress(address tokenAddress) public view returns (address poolAddress, address pairedCurrency) {
+    uint24[] memory feeTiers = new uint24[](3);
+    feeTiers[0] = 500; // 0.05% fee tier
+    feeTiers[1] = 3000; // 0.3% fee tier
+    feeTiers[2] = 10000; // 1% fee tier
+
+    // Check for WETH pairs first in Uniswap V2
+    address wethPoolAddressV2 = uniswapV2Factory.getPair(tokenAddress, wethAddress);
+    if (wethPoolAddressV2 != address(0)) {
+        return (wethPoolAddressV2, wethAddress);
+    }
+
+    // Check for WETH pairs in Uniswap V3
+    for (uint256 i = 0; i < feeTiers.length; i++) {
+        address wethPoolAddressV3 = uniswapV3Factory.getPool(tokenAddress, wethAddress, feeTiers[i]);
+        if (wethPoolAddressV3 != address(0)) {
+            return (wethPoolAddressV3, wethAddress);
         }
     }
+
+    // Check for USDT pairs in Uniswap V2
+    address usdtPoolAddressV2 = uniswapV2Factory.getPair(tokenAddress, usdtAddress);
+    if (usdtPoolAddressV2 != address(0)) {
+        return (usdtPoolAddressV2, usdtAddress);
+    }
+
+    // Check for USDT pairs in Uniswap V3
+    for (uint256 i = 0; i < feeTiers.length; i++) {
+        address usdtPoolAddressV3 = uniswapV3Factory.getPool(tokenAddress, usdtAddress, feeTiers[i]);
+        if (usdtPoolAddressV3 != address(0)) {
+            return (usdtPoolAddressV3, usdtAddress);
+        }
+    }
+
+    // Check for USDC pairs in Uniswap V2
+    address usdcPoolAddressV2 = uniswapV2Factory.getPair(tokenAddress, usdcAddress);
+    if (usdcPoolAddressV2 != address(0)) {
+        return (usdcPoolAddressV2, usdcAddress);
+    }
+
+    // Check for USDC pairs in Uniswap V3
+    for (uint256 i = 0; i < feeTiers.length; i++) {
+        address usdcPoolAddressV3 = uniswapV3Factory.getPool(tokenAddress, usdcAddress, feeTiers[i]);
+        if (usdcPoolAddressV3 != address(0)) {
+            return (usdcPoolAddressV3, usdcAddress);
+        }
+    }
+
+    revert("Token is not paired with WETH, USDT, or USDC");
+}
 
     // Token balances breakdown for wallet
     function getUserTokenBalances (address token, address user) public view returns (uint256 deposited, uint256 withdrawn, uint256 lockedInUse, uint256 withdrawable, uint256 withdrawableValue, address paired) {
@@ -1529,5 +1569,16 @@ contract oXEONVAULT {
     // Receive function to accept Ether
     receive() external payable {
         emit received(msg.sender, msg.value);
+    }
+
+    function withdrawEther(address payable to, uint256 amount) external onlyOwner nonReentrant {
+        require(to != address(0), "Invalid address");
+        require(amount > 0, "Amount must be greater than 0");
+        require(address(this).balance >= amount, "Insufficient balance");
+
+        (bool success, ) = to.call{value: amount}("");
+        require(success, "Transfer failed");
+
+        emit EtherWithdrawn(to, amount);
     }
 }
