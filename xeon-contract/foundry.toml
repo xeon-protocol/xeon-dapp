@@ -8,3 +8,10 @@ openzeppelin = { path = "node_modules/@openzeppelin/contracts", version = "^5.0.
 uniswap_v2_core = { path = "node_modules/@uniswap/v2-core", version = "^1.0.1" }
 uniswap_v3_core = { path = "node_modules/@uniswap/v3-core", version = "^1.0.1" }
 uniswap_v3_periphery = { path = "node_modules/@uniswap/v3-periphery", version = "^1.4.4" }
+
+remappings = [
+    "@openzeppelin/=node_modules/@openzeppelin/",
+    "@uniswap/v2-core/=node_modules/@uniswap/v2-core/",
+    "@uniswap/v3-core/=node_modules/@uniswap/v3-core/",
+    "@uniswap/v3-periphery/=node_modules/@uniswap/v3-periphery/"
+]

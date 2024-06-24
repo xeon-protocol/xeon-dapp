@@ -225,7 +225,7 @@ contract XeonStaking is Ownable {
         require(staker.liquidityRewards > 0, "You have no tokens assigned for liquidity.");
         
         uint256 ethChange = totalEthLiquidityRewards - lastLiquidityRewardBasis[msg.sender];
-        uint256 liquidityRewardShare = ethChange * staker.liquidityRewards / totalLiquidityRewards;;
+        uint256 liquidityRewardShare = ethChange * staker.liquidityRewards / totalLiquidityRewards;
 
         staker.lastClaimedTimestamp = block.timestamp;
         lastLiquidityRewardBasis[msg.sender] = totalEthLiquidityRewards;
@@ -242,7 +242,7 @@ contract XeonStaking is Ownable {
         require(staker.collateralRewards > 0, "You have no tokens assigned for protocol collateral.");
         
         uint256 ethChange = totalEthCollateralRewards - lastCollateralRewardBasis[msg.sender];
-        uint256 collateralRewardShare = ethChange * staker.collateralRewards / totalCollateralRewards;;
+        uint256 collateralRewardShare = ethChange * staker.collateralRewards / totalCollateralRewards;
 
         staker.lastClaimedTimestamp = block.timestamp;
         lastCollateralRewardBasis[msg.sender] = totalEthCollateralRewards;
@@ -274,7 +274,7 @@ contract XeonStaking is Ownable {
         }
 
         uint256 ethChange = totalEthLiquidityRewards - lastLiquidityRewardBasis[msg.sender];
-        uint256 liquidityRewardShare = ethChange * staker.liquidityRewards / totalLiquidityRewards;;
+        uint256 liquidityRewardShare = ethChange * staker.liquidityRewards / totalLiquidityRewards;
         return liquidityRewardShare;
     }
 
@@ -286,7 +286,7 @@ contract XeonStaking is Ownable {
         }
 
         uint256 ethChange = totalEthCollateralRewards - lastCollateralRewardBasis[msg.sender];
-        uint256 collateralRewardShare = ethChange * staker.collateralRewards / totalCollateralRewards;;
+        uint256 collateralRewardShare = ethChange * staker.collateralRewards / totalCollateralRewards;
         return collateralRewardShare;
     }
 
@@ -307,7 +307,7 @@ contract XeonStaking is Ownable {
     }
 
     function getTotalAssigned() public view returns (uint256) {
-        return totalMiningRewards + totalLiquidityRewards; + totalCollateralRewards;;
+        return totalMiningRewards + totalLiquidityRewards; + totalCollateralRewards;
     }
 
     function getTotalUnassigned() public view returns (uint256) {
