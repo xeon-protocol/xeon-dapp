@@ -258,22 +258,22 @@ contract XeonHedging {
     address public owner;
 
     // events
-    event received(address, uint);
-    event contractInitialized(address indexed, address indexed);
-    event onDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
-    event onWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
-    event hedgeCreated(address indexed token, uint256 indexed dealId, uint256 createValue, HedgeType hedgeType, address indexed writer);
-    event hedgePurchased(address indexed token, uint256 indexed dealId, uint256 startValue, HedgeType hedgeType, address indexed buyer);
-    event hedgeSettled(address indexed token, uint256 indexed dealId, uint256 endValue, uint256 payOff, address indexed miner);
-    event minedHedge(uint256 dealId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 pairFee);
-    event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
-    event topupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount);
-    event topupAccepted(address indexed acceptor, uint256 indexed dealID, uint256 indexed requestID, uint256 pairedAmount);
-    event zapRequested(uint256 indexed hedgeId, address indexed party);
-    event hedgeDeleted(uint256 indexed dealID, address indexed deletedBy);
-    event feesTransferred(address indexed token, address indexed to, uint256 amount);
-    event validatorFeeUpdated(uint256 protocolFeeRate, uint256 validatorFeeRate);
-    event feeUpdated(uint256 feeNumerator, uint256 feeDenominator);
+    event Received(address, uint);
+    event ContractInitialized(address indexed, address indexed);
+    event OnDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
+    event OnWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
+    event HedgeCreated(address indexed token, uint256 indexed dealId, uint256 createValue, HedgeType hedgeType, address indexed writer);
+    event HedgePurchased(address indexed token, uint256 indexed dealId, uint256 startValue, HedgeType hedgeType, address indexed buyer);
+    event HedgeSettled(address indexed token, uint256 indexed dealId, uint256 endValue, uint256 payOff, address indexed miner);
+    event MinedHedge(uint256 dealId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 pairFee);
+    event BookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
+    event TopupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount);
+    event TopupAccepted(address indexed acceptor, uint256 indexed dealID, uint256 indexed requestID, uint256 pairedAmount);
+    event ZapRequested(uint256 indexed hedgeId, address indexed party);
+    event HedgeDeleted(uint256 indexed dealID, address indexed deletedBy);
+    event FeesTransferred(address indexed token, address indexed to, uint256 amount);
+    event ValidatorFeeUpdated(uint256 protocolFeeRate, uint256 validatorFeeRate);
+    event FeeUpdated(uint256 feeNumerator, uint256 feeDenominator);
     event EtherWithdrawn(address indexed to, uint256 amount);
 
     // constructor
@@ -296,7 +296,7 @@ contract XeonHedging {
         feeNumerator = 5;
         feeDenominator = 1000;
 
-        emit contractInitialized(_priceOracle, address(_stakingContract));
+        emit ContractInitialized(_priceOracle, address(_stakingContract));
     }
 
     /**
@@ -308,7 +308,7 @@ contract XeonHedging {
     * - The amount of tokens to be deposited must be greater than zero.
     * - The token address must be valid (non-zero).
     *
-    * Emits an {onDeposit} event.
+    * Emits an {OnDeposit} event.
     *
     * @param _token The address of the ERC-20 token to be deposited.
     * @param _amount The amount of tokens to be deposited.
@@ -366,7 +366,7 @@ contract XeonHedging {
         protocolBalanceMap[_token].deposited += receivedAmount;
 
         // Emit deposit event
-        emit onDeposit(_token, receivedAmount, msg.sender);
+        emit OnDeposit(_token, receivedAmount, msg.sender);
     }
 
     /**
@@ -377,7 +377,7 @@ contract XeonHedging {
     * - The amount to be withdrawn must be greater than zero and less than or equal to the user's available balance.
     * - The caller must not be the contract itself.
     *
-    * Emits an {onWithdraw} event.
+    * Emits an {OnWithdraw} event.
     *
     * @param token The address of the ERC-20 token to be withdrawn.
     * @param amount The amount of tokens to be withdrawn.
@@ -424,7 +424,7 @@ contract XeonHedging {
         }
 
         // Emit withdrawal event
-        emit onWithdraw(token, amount, msg.sender);
+        emit OnWithdraw(token, amount, msg.sender);
     }
 
     /**
@@ -435,7 +435,7 @@ contract XeonHedging {
     * - The protocol must have a sufficient balance to transfer the specified amount.
     * - The amount to be transferred must be specified and non-zero.
     *
-    * Emits a {feesTransferred} event.
+    * Emits a {FeesTransferred} event.
     *
     * @param token The address of the token for which the fees are being transferred.
     * @param to The address of the recipient wallet to which the fees are to be credited.
@@ -447,7 +447,7 @@ contract XeonHedging {
         userBalanceMap[token][address(this)].deposited -= amount;
         userBalanceMap[token][to].deposited += amount;
 
-        emit feesTransferred(token, to, amount);
+        emit FeesTransferred(token, to, amount);
     }
 
     /**
@@ -465,7 +465,7 @@ contract XeonHedging {
     * - For PUT options, the strike price must be less than the market value.
     * - For SWAPs, the collateral value must be equal.
     *
-    * Emits a {hedgeCreated} event.
+    * Emits a {HedgeCreated} event.
     *
     * @param tool The type of hedge (0 for CALL, 1 for PUT, 2 for SWAP).
     * @param token The address of the ERC-20 token.
@@ -530,7 +530,7 @@ contract XeonHedging {
         hedgesCreatedVolume[newOption.paired] += newOption.createValue;
 
         // Emit hedge creation event
-        emit hedgeCreated(token, dealID, newOption.createValue, newOption.hedgeType, msg.sender);
+        emit HedgeCreated(token, dealID, newOption.createValue, newOption.hedgeType, msg.sender);
     }
 
     /**
@@ -548,7 +548,7 @@ contract XeonHedging {
     * - The caller must have sufficient free vault balance.
     * - The deal ID must be valid and less than the current deal ID.
     *
-    * Emits a {hedgePurchased} event.
+    * Emits a {HedgePurchased} event.
     *
     * @param _dealID The ID of the hedge to be purchased.
     */
@@ -615,8 +615,8 @@ contract XeonHedging {
             optionsVolume[hedge.paired] += hedge.startValue;
         }
 
-        // Emit the hedgePurchased event
-        emit hedgePurchased(hedge.token, _dealID, hedge.startValue, hedge.hedgeType, msg.sender);
+        // Emit the HedgePurchased event
+        emit HedgePurchased(hedge.token, _dealID, hedge.startValue, hedge.hedgeType, msg.sender);
     }
 
     /**
@@ -686,7 +686,7 @@ contract XeonHedging {
         delete hedgeMap[_dealID];
 
         // Emit event
-        emit hedgeDeleted(_dealID, msg.sender);
+        emit HedgeDeleted(_dealID, msg.sender);
     }
 
     /**
@@ -765,7 +765,7 @@ contract XeonHedging {
         hedgeMap[_dealID] = hedge;
 
         // Emit an event indicating that a top-up has been requested
-        emit topupRequested(msg.sender, _dealID, amount);
+        emit TopupRequested(msg.sender, _dealID, amount);
     }
     
     /**
@@ -840,7 +840,7 @@ contract XeonHedging {
         request.acceptTime = block.timestamp;
         
         // Emit an event indicating that the top-up request has been accepted
-        emit topupAccepted(msg.sender, _dealID, _requestID, pairedAmount);
+        emit TopupAccepted(msg.sender, _dealID, _requestID, pairedAmount);
     }
 
     /**
@@ -922,7 +922,7 @@ contract XeonHedging {
         }
         
         // Emit an event indicating that a "zap" has been requested
-        emit zapRequested(_dealID, msg.sender);
+        emit ZapRequested(_dealID, msg.sender);
     }
 
     /**
@@ -1145,8 +1145,8 @@ contract XeonHedging {
             userERC20s[option.taker].push(option.token);            
         }
     
-        emit hedgeSettled(option.token, _dealID, hedgeInfo.underlyingValue, hedgeInfo.payOff, msg.sender);
-        emit minedHedge(_dealID, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
+        emit HedgeSettled(option.token, _dealID, hedgeInfo.underlyingValue, hedgeInfo.payOff, msg.sender);
+        emit MinedHedge(_dealID, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
     }
 
     /**
@@ -1219,7 +1219,7 @@ contract XeonHedging {
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner external {
         feeNumerator = numerator;
         feeDenominator = denominator;
-        emit feeUpdated(numerator, denominator);
+        emit FeeUpdated(numerator, denominator);
     }
     
     /**
@@ -1235,7 +1235,7 @@ contract XeonHedging {
         require (protocolPercent + validatorPercent == 100, "Total fee rate must be 100");
         protocolFeeRate = protocolPercent;
         validatorFeeRate = validatorPercent;
-        emit validatorFeeUpdated(protocolFeeRate, validatorFeeRate);
+        emit ValidatorFeeUpdated(protocolFeeRate, validatorFeeRate);
     }
     
     /**
@@ -1264,7 +1264,7 @@ contract XeonHedging {
     function bookmarkHedge(uint256 _dealID) external {
         bool bookmarked = bookmarks[msg.sender][_dealID];
         bookmarks[msg.sender][_dealID] = !bookmarked;
-        emit bookmarkToggle(msg.sender, _dealID, !bookmarked);
+        emit BookmarkToggle(msg.sender, _dealID, !bookmarked);
         // Update bookmarkedOptions array for wallet
         if (!bookmarked) {
             bookmarkedOptions[msg.sender].push(_dealID);
@@ -1569,7 +1569,7 @@ function getPairAddress(address tokenAddress) public view returns (address poolA
 
     // Receive function to accept Ether
     receive() external payable {
-        emit received(msg.sender, msg.value);
+        emit Received(msg.sender, msg.value);
     }
 
     function withdrawEther(address payable to, uint256 amount) external onlyOwner nonReentrant {
