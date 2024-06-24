@@ -48,7 +48,7 @@ contract XeonStaking is Ownable {
     event RewardClaimed(address indexed staker, uint256 amount, uint indexed poolID);
     event RewardsDistributed(uint256 amount, uint indexed poolID);
     event EmergencyUnstakeSet(bool enabled);
-
+    event EmergencyUnstaked(address indexed staker, uint256 amount);
 
     modifier stakingWindow() {
         require(block.timestamp >= nextUnstakeTimestamp
