@@ -9,7 +9,6 @@ contract XeonStaking is Ownable {
     using SafeERC20 for IERC20;
 
     IERC20 public stakingToken;
-    uint256 public poolExpiryTimestamp;// The day when the staking pool expires and opens transacts for 3 days
     uint256 public nextUnstakeTimestamp; // The day when stakers can unstake again.
     uint256 public totalEthRewards;    
     uint256 public totalEthLiquidityRewards;
@@ -58,7 +57,6 @@ contract XeonStaking is Ownable {
         stakingToken = IERC20(xeonToken);
 
         // Initialize state variables
-        poolExpiryTimestamp = 0;
         nextUnstakeTimestamp = 0;
         totalEthRewards = 0;
         totalEthLiquidityRewards = 0;
@@ -78,8 +76,8 @@ contract XeonStaking is Ownable {
 
 // todo: new: bool canUnstake = false? new: block.timestamp >= nextStakePeriodTimestamp then nextUnstakeDay = block.timestamp + 30 days else error?
     function restartPool() external stakingWindow onlyOwner {
-        nextUnstakeTimestamp
- = block.timestamp + 30 days;// opens every 30 days
+        require(block.timestamp > nextUnstakeTimestamp + 3 days, "Cannot restart pool during the current unstake period.");
+        nextUnstakeTimestamp = block.timestamp + 30 days; // Start a new 30-day staking period
     }
 
     function stake(uint256 _amount) external stakingWindow {
@@ -106,6 +104,7 @@ contract XeonStaking is Ownable {
     }
 
     function unstake() external {
+        require(block.timestamp >= nextUnstakeTimestamp && block.timestamp <= nextUnstakeTimestamp + 3 days, "Unstaking is not allowed now.");
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
 
