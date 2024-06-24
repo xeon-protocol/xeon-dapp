@@ -20,6 +20,7 @@ contract XeonStaking is Ownable {
     uint256 public totalClaimedLiquidityRewards;
     uint256 public totalClaimedCollateralRewards;
     address[] public allStakerAddresses;
+    bool public canUnstake;
 
     struct Staker {
         uint256 amount;
@@ -55,8 +56,6 @@ contract XeonStaking is Ownable {
     constructor(address xeonToken) {
         require(xeonToken != address(0), "Invalid token address.");
         stakingToken = IERC20(xeonToken);
-
-        // Initialize state variables
         nextUnstakeTimestamp = 0;
         totalEthRewards = 0;
         totalEthLiquidityRewards = 0;
@@ -67,17 +66,19 @@ contract XeonStaking is Ownable {
         totalClaimedRewards = 0;
         totalClaimedLiquidityRewards = 0;
         totalClaimedCollateralRewards = 0;
+        canUnstake = false;
     }
 
     function beginUnstakeWindow() external onlyOwner {
         nextUnstakeTimestamp
  = block.timestamp; // 3 days for people to stake & assign stakes to pools
+        canUnstake = true;
     }
 
-// todo: new: bool canUnstake = false? new: block.timestamp >= nextStakePeriodTimestamp then nextUnstakeDay = block.timestamp + 30 days else error?
     function restartPool() external stakingWindow onlyOwner {
         require(block.timestamp > nextUnstakeTimestamp + 3 days, "Cannot restart pool during the current unstake period.");
         nextUnstakeTimestamp = block.timestamp + 30 days; // Start a new 30-day staking period
+        canUnstake = false;
     }
 
     function stake(uint256 _amount) external stakingWindow {
@@ -104,7 +105,7 @@ contract XeonStaking is Ownable {
     }
 
     function unstake() external {
-        require(block.timestamp >= nextUnstakeTimestamp && block.timestamp <= nextUnstakeTimestamp + 3 days, "Unstaking is not allowed now.");
+        require(canUnstake, "Unstaking is not allowed now.");
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
 
