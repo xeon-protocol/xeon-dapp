@@ -39,6 +39,7 @@ contract XeonStaking is Ownable {
     mapping(address => uint256) public totalClaimedCollateralRewardslateral;
     mapping(address => uint256) public totalClaimedLiquidityRewardsuidity;
 
+    event Received(adress indexed sender, uint256 amount);
     event Staked(address indexed staker, uint256 amount);
     event Unstaked(address indexed staker, uint256 amount);
     event TokensAssigned(address indexed staker, uint256 amountForMining, uint256 amountForLiquidity, uint256 amountForCollateral);
@@ -336,6 +337,16 @@ contract XeonStaking is Ownable {
         }
 
         return stakersWithAmount;
+    }
+
+        receive() external payable {
+        emit Received(msg.sender, msg.value);
+    }
+
+    function withdrawEther() external onlyOwner {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No Ether available to withdraw.");
+        payable(owner()).transfer(balance);
     }
 
 }
