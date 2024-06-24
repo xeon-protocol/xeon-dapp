@@ -70,6 +70,7 @@ contract XeonStaking is Ownable {
     }
 
     function beginUnstakeWindow() external onlyOwner {
+        require(block.timestamp >= nextUnstakeTimestamp - 30 days, "30-day staking period has not yet passed.");
         nextUnstakeTimestamp
  = block.timestamp; // 3 days for people to stake & assign stakes to pools
         canUnstake = true;
