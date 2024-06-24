@@ -277,7 +277,8 @@ contract XeonHedging {
     event EtherWithdrawn(address indexed to, uint256 amount);
 
     // constructor
-    constructor(address, _uniswapV2Factory, address _uniswapV3Factory, address _priceOracle, xeonStaking _stakingContract) {
+    constructor(address _uniswapV2Factory, address _uniswapV3Factory, address _priceOracle, xeonStaking _stakingContract) {
+        require(_uniswapV2Factory != address(0), "Invalid UniswapV2Factory address");
         require(_uniswapV3Factory != address(0), "Invalid UniswapV3Factory address");
         require(_priceOracle != address(0), "Invalid Oracle Address");
         require(address(_stakingContract) != address(0), "Invalid StakingContract Address");
