@@ -21,6 +21,8 @@ contract XeonStaking is Ownable {
     uint256 public totalClaimedCollateralRewards;
     address[] public allStakerAddresses;
     bool public canUnstake;
+    bool public emergencyUnstakeEnabled;
+
 
     struct Staker {
         uint256 amount;
@@ -45,6 +47,8 @@ contract XeonStaking is Ownable {
     event TokensUnassigned(address indexed staker, uint256 amountFromMining, uint256 amountFromLiquidity, uint256 amountFromCollateral);
     event RewardClaimed(address indexed staker, uint256 amount, uint indexed poolID);
     event RewardsDistributed(uint256 amount, uint indexed poolID);
+    event EmergencyUnstakeSet(bool enabled);
+
 
     modifier stakingWindow() {
         require(block.timestamp >= nextUnstakeTimestamp
@@ -66,7 +70,6 @@ contract XeonStaking is Ownable {
         totalClaimedRewards = 0;
         totalClaimedLiquidityRewards = 0;
         totalClaimedCollateralRewards = 0;
-        canUnstake = false;
     }
 
     function beginUnstakeWindow() external onlyOwner {
@@ -106,7 +109,7 @@ contract XeonStaking is Ownable {
     }
 
     function unstake() external {
-        require(canUnstake, "Unstaking is not allowed now.");
+        require(canUnstake || emergencyUnstakeEnabled, "Unstaking is not allowed now.");
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
 
@@ -130,6 +133,10 @@ contract XeonStaking is Ownable {
         stakingToken.transfer(msg.sender, amountToUnstake);
 
         emit Unstaked(msg.sender, amountToUnstake);
+        
+        if (emergencyUnstakeEnabled) {
+        emit EmergencyUnstaked(msg.sender, amountToUnstake);
+    }
     }
 
     function assignTokens(uint256 _percentForMining, uint256 _percentForLiquidity, uint256 _percentForCollateral) external stakingWindow {
@@ -337,5 +344,10 @@ contract XeonStaking is Ownable {
 
         return stakersWithAmount;
     }
+
+    function setEmergencyUnstake(bool _enabled) external onlyOwner {
+    emergencyUnstakeEnabled = _enabled;
+    emit EmergencyUnstakeSet(_enabled);
+}
 
 }
