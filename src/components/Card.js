@@ -188,6 +188,36 @@ function Card() {
               </div>
             </div>
           </div>
+          <div className="md:hidden flex justify-between items-center mt-5">
+            <div className="flex justify-between items-center mt-5 ">
+              <div className="flex items-center justify-center">
+                <button className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-2 py-2 rounded-full">
+                  <MdRadioButtonChecked className="mr-1" /> Vacant
+                </button>
+                <button
+                  onClick={() => {
+                    router.push("/dashboard");
+                  }}
+                  className="bg-black flex items-center gap-2 border-none text-white px-4 py-2 rounded-lg ml-4"
+                >
+                  View{" "}
+                  <div class="ml-1 rounded-full w-6 h-6 p-px bg-gradient-to-b from-grey to-transparent">
+                    <div class="bg-black  h-6 rounded-full flex m-auto justify-center items-center">
+                      <FaBookmark size={14} />
+                    </div>
+                  </div>
+                </button>
+                <Button
+                  _hover={{ scale: 1.1 }}
+                  className="text-white bg-button-gradient w-full rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
+                  p={8}
+                  variant="solid"
+                >
+                  Buy Option
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <Modal isOpen={isOpen} onClose={onClose} className={"bg-black"}>
