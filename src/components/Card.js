@@ -210,12 +210,12 @@ function Card() {
                 <Button
                   onClick={onOpen}
                   _hover={{ scale: 1.1 }}
-                  className="text-white bg-button-gradient w-full rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
+                  className="text-white bg-button-gradient w-full p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
                   p={8}
                   variant="solid"
                 >
                   Buy Option
-                </Button>
+                </button>
               </div>
             </div>
           </div>
