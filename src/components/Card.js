@@ -188,7 +188,7 @@ function Card() {
               </div>
             </div>
           </div>
-          <div className="md:hidden flex justify-between items-center mt-5">
+          <div className="lg:hidden flex justify-between items-center mt-5">
             <div className="flex justify-between items-center mt-5 ">
               <div className="flex items-center justify-center">
                 <button className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-2 py-2 rounded-full">
