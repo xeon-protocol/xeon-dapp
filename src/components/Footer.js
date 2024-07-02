@@ -112,7 +112,7 @@ import React from "react";
 
 function Footer() {
   return (
-    <Box position="relative" width="100%">
+    <Box fontWeight={"400"} position="relative" width="100%">
       <Image src="/line_footer.webp" alt="line footer" width="100%" />
       <Box
         position="absolute"
@@ -167,60 +167,45 @@ function Footer() {
             </a>
           </Box>
         </Box>
-        <Box
-          className="w-full md:w-1/6 p-4"
-          bg="green.500"
-          color="white"
-          textAlign="left"
-        >
-          <p className="mb-2"> {`{ READ }`}</p>
-          <li className="mb-2">
+        <Box className="w-full md:w-1/6 p-4" textAlign="left">
+          <p className="mb-2 text-grey">{`{ READ }`}</p>
+          <li className="mb-2 text-grey">
             {" "}
             <Link href="/documentation">Documentation</Link>
           </li>
 
-          <li className="mb-2">
+          <li className="mb-2 text-grey">
             <Link href="/whitepaper">Whitepaper</Link>
           </li>
-          <li className="mb-2">
+          <li className="mb-2 text-grey">
             <Link href="/medium">Medium</Link>
           </li>
         </Box>
-        <Box
-          className="w-full md:w-1/6 p-4"
-          bg="red.500"
-          color="white"
-          textAlign="left"
-        >
-          <p className="mb-2"> {`{ ENGINEERING }`}</p>
-          <li className="mb-2">
+        <Box className="w-full md:w-1/6 p-4" textAlign="left">
+          <p className="mb-2 text-grey">{`{ ENGINEERING }`}</p>
+          <li className="mb-2 text-grey">
             {" "}
             <Link href="/github">Github Repo</Link>
           </li>
 
-          <li className="mb-2">
+          <li className="mb-2 text-grey">
             <Link href="/smart-contracts">Smart Contracts</Link>
           </li>
-          <li className="mb-2">
+          <li className="mb-2 text-grey">
             <Link href="/security-audits">Secutity Audits</Link>
           </li>
         </Box>
-        <Box
-          className="w-full md:w-1/6 p-4"
-          bg="purple.500"
-          color="white"
-          textAlign="left"
-        >
-          <p className="mb-2"> {`{ REVENUE SHARING }`}</p>
-          <li className="mb-2">
+        <Box className="w-full md:w-1/6 p-4" textAlign="left">
+          <p className="mb-2 text-grey">{`{ REVENUE SHARING }`}</p>
+          <li className="mb-2 text-grey">
             {" "}
             <Link href="/protocol-fees">Protocol Fees</Link>
           </li>
 
-          <li className="mb-2">
+          <li className="mb-2 text-grey">
             <Link href="/ways-to-earn">Ways to Earn</Link>
           </li>
-          <li className="mb-2">
+          <li className="mb-2 text-grey">
             <Link href="/miner-program">Miner Program</Link>
           </li>
         </Box>
