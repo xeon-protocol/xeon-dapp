@@ -142,27 +142,27 @@ function Footer() {
           <p>ERC20 Hedging & Lending Ecosystem.</p>
           <Box className="flex items-center gap-4 mt-5">
             <a
-              href="https://twitter.com"
+              href="https://twitter.com/XeonProtocol"
               target="_blank"
               rel="noopener noreferrer"
             >
               <Image src="/x.webp" alt="twitter" />
             </a>
             <a
-              href="https://medium.com"
+              href="https://medium.com/@xeonprotocol"
               target="_blank"
               rel="noopener noreferrer"
             >
               <Image src="/medium.webp" alt="medium" />
             </a>
             <a
-              href="https://telegram.org"
+              href="https://t.me/XeonProtocolPortal"
               target="_blank"
               rel="noopener noreferrer"
             >
               <Image src="/telegram.webp" alt="telegram" />
             </a>
-            <a href="mailto:example@example.com">
+            <a href="mailto:info@xeon-protocol.io">
               <Image src="/mail.webp" alt="mail" />
             </a>
           </Box>
@@ -171,42 +171,42 @@ function Footer() {
           <p className="mb-2 text-grey">{`{ READ }`}</p>
           <li className="mb-2 text-grey">
             {" "}
-            <Link href="/documentation">Documentation</Link>
+            <Link href="https://xeonprotocol.gitbook.io/xeon-protocol">Documentation</Link>
           </li>
 
           <li className="mb-2 text-grey">
             <Link href="/whitepaper">Whitepaper</Link>
           </li>
           <li className="mb-2 text-grey">
-            <Link href="/medium">Medium</Link>
+            <Link href="https://medium.com/@xeonprotocol">Medium</Link>
           </li>
         </Box>
         <Box className="w-full md:w-1/6 p-4" textAlign="left">
           <p className="mb-2 text-grey">{`{ ENGINEERING }`}</p>
           <li className="mb-2 text-grey">
             {" "}
-            <Link href="/github">Github Repo</Link>
+            <Link href="https://github.com/neonhedge">Github Repo</Link>
           </li>
 
           <li className="mb-2 text-grey">
-            <Link href="/smart-contracts">Smart Contracts</Link>
+            <Link href="https://docs.xeon-protocol.io/documentation/mechanics/development/deployments">Smart Contracts</Link>
           </li>
           <li className="mb-2 text-grey">
-            <Link href="/security-audits">Secutity Audits</Link>
+            <Link href="https://docs.xeon-protocol.io/documentation/mechanics/development/security-audits">Secutity Audits</Link>
           </li>
         </Box>
         <Box className="w-full md:w-1/6 p-4" textAlign="left">
           <p className="mb-2 text-grey">{`{ REVENUE SHARING }`}</p>
           <li className="mb-2 text-grey">
             {" "}
-            <Link href="/protocol-fees">Protocol Fees</Link>
+            <Link href="https://docs.xeon-protocol.io/documentation/real-yield/protocol-income">Protocol Fees</Link>
           </li>
 
           <li className="mb-2 text-grey">
-            <Link href="/ways-to-earn">Ways to Earn</Link>
+            <Link href="https://docs.xeon-protocol.io/documentation/earn-with-us/how-to-earn">Ways to Earn</Link>
           </li>
           <li className="mb-2 text-grey">
-            <Link href="/miner-program">Miner Program</Link>
+            <Link href="https://docs.xeon-protocol.io/documentation/earn-with-us/hedge-mining">Miner Program</Link>
           </li>
         </Box>
       </Box>
