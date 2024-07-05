@@ -14,7 +14,7 @@ function Header() {
   return (
     <header
       className="flex items-center justify-between p-1 bg-black text-white 
-    border border-gray-800 rounded-full fixed top-6 w-full z-50  w-[calc(100%-4rem)] 
+    border border-gray-800 rounded-full fixed top-6 w-full z-50  w-[calc(100%-5rem)] 
     left-1/2 transform -translate-x-1/2
     max-w-screen-2xl
     "

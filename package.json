@@ -17,10 +17,12 @@
     "@uniswap/v2-core": "^1.0.1",
     "@uniswap/v3-core": "^1.0.1",
     "@uniswap/v3-periphery": "^1.4.4",
+    "lottie-web": "^5.12.2",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^5.2.1",
+    "react-lottie-player": "^2.0.0",
     "recharts": "^2.12.7"
   },
   "devDependencies": {
