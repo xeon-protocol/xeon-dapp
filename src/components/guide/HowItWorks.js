@@ -23,7 +23,7 @@ function ScrollCard() {
           play
         />
       </div>
-      <div className="w-full lg:w-1/2 lg:px-10 relative">
+      <div className="w-full lg:w-full lg:px-10 relative">
         <div className="border-2 border-[#6c6c6c] rounded-3xl text-grey p-4">
           <Image
             borderRadius={"2xl"}
