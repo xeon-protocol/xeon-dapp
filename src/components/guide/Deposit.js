@@ -1,7 +1,7 @@
 import { Image } from "@chakra-ui/react";
 import React from "react";
 import Lottie from "react-lottie-player";
-import lottieJson2 from "@/assets/animations/pe1.json";
+import lottieJson2 from "@/assets/animations/PE1.json";
 function ScrollCard() {
   return (
     <div className="flex flex-col gap-6 md:gap-12 lg:gap-0 lg:pb-20 relative md:flex-row justify-between items-center px-8 pt-8 max-w-screen-2xl mx-auto">

@@ -2,7 +2,7 @@
 import Header from "@/components/Header";
 import React from "react";
 import Lottie from "react-lottie-player";
-import lottieJson from "@/assets/animations/pe2.json";
+import lottieJson from "@/assets/animations/PE2.json";
 import lottieJson2 from "@/assets/animations/planet_orbit1.json";
 import TestNetCard from "@/components/guide/Testnet";
 import { Image } from "@chakra-ui/react";
