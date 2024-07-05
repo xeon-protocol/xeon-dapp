@@ -1,13 +1,13 @@
 import { Image } from "@chakra-ui/react";
 import React from "react";
 import Lottie from "react-lottie-player";
-import lottieJson2 from "../../../public/animations/blue_planet.json";
+import lottieJson2 from "@/assets/animations/blue_planet.json";
 function ScrollCard() {
   return (
-    <div className="flex flex-col relative mt-10 lg:mt-20 lg:flex-row justify-between items-center px-8 pt-8 max-w-screen-2xl mx-auto">
-      <div className="w-full lg:px-10 relative">
-        <div className="border-2 border-[#6c6c6c] rounded-3xl text-grey p-4">
-          <p className="text-grey text-lg mt-5 md:w-[85%]">
+    <div className="flex flex-col-reverse relative mt-10 lg:mt-20 md:flex-row-reverse lg:flex-row gap-6 md:gap-12 justify-between items-start px-8 pt-8 max-w-screen-2xl mx-auto">
+      <div className="w-full md:w-[100%] lg:w-full lg:px-10 relative">
+        <div className="lg:border-2 md:text-justify border-[#6c6c6c] rounded-3xl text-grey md:p-4">
+          <p className="text-grey text-lg md:mt-5 md:w-[85%]">
             Manage risk & liquidity on any ERC20 tokens you own. This platform
             enables you to unlock liquidity and manage risk on any ERC20 tokens
             you own, without selling.
@@ -86,7 +86,7 @@ function ScrollCard() {
           </p>
         </div>
       </div>
-      <div className="w-full lg:w-full lg:sticky lg:top-3/4 lg:transform lg:-translate-y-1/2">
+      <div className="w-full md:w-[40%] lg:mt-20 lg:w-full md:sticky md:top-3/4 md:transform md:-translate-y-1/2">
         <h1 className="text-grey md:text-lg lg:text-xl">{`{ O4 }`}</h1>
         <h1 className="text-grey text-3xl md:text-5xl lg:text-7xl">
           Use
@@ -97,7 +97,7 @@ function ScrollCard() {
           Cases
         </h1>
         <Lottie
-          className="w-[40%] absolute top-[-55px] right-[5%] hidden opacity-20 lg:block"
+          className="w-[40%] md:md:absolute top-[-55px] right-[5%] hidden opacity-20 lg:block"
           loop
           animationData={lottieJson2}
           play

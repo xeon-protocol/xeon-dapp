@@ -1,11 +1,11 @@
 import { Image } from "@chakra-ui/react";
 import React from "react";
 import Lottie from "react-lottie-player";
-import lottieJson2 from "../../../public/animations/pe1.json";
+import lottieJson2 from "@/assets/animations/pe1.json";
 function ScrollCard() {
   return (
-    <div className="flex flex-col relative lg:flex-row justify-between items-center px-8 pt-8 max-w-screen-2xl mx-auto">
-      <div className="w-full lg:pl-16">
+    <div className="flex flex-col gap-6 md:gap-12 lg:gap-0 lg:pb-20 relative md:flex-row justify-between items-center px-8 pt-8 max-w-screen-2xl mx-auto">
+      <div className="w-full md:w-[40%] lg:w-full lg:pl-16">
         <h1 className="text-lime md:text-lg lg:text-xl">{`{ O3 }`}</h1>
         <h1 className="text-grey text-3xl md:text-5xl lg:text-7xl">
           Make a<span className="text-lime md:hidden"> Deposit</span>
@@ -15,21 +15,21 @@ function ScrollCard() {
           Deposit
         </h1>
       </div>
-      <div className="w-full relative">
+      <div className="w-[100%] relative">
         <Lottie
-          className="w-[40%] absolute top-[-40px] left-[-29%] hidden lg:block"
+          className="w-[40%] md:absolute top-[-40px] left-[-29%] hidden lg:block"
           loop
           animationData={lottieJson2}
           play
         />
-        <div className="absolute top-16 md:left-[30px] w-full h-full">
+        <div className="md:absolute top-16 md:left-[30px] w-full h-full">
           <Image
             borderRadius={"md"}
             src="/animations/xeon-testnet.gif"
             // w={"100%"}
 
             alt="container"
-            className="relative ml-[-20px] "
+            className="relative lg:ml-[-20px] md:w-[87%] lg:w-auto"
           />
           {/* <p className="text-grey text-lg mt-5 md:w-[85%]">
             We built an entire protocol from scratch to enable users to deposit
@@ -44,9 +44,13 @@ function ScrollCard() {
         <Image
           src="/card-109.svg"
           // w={"100%"}
-          h={"400px"}
+          h={{
+            base: "150px",
+            md: "300px",
+            lg: "400px",
+          }}
           alt="container"
-          className="relative hidden md:block ml-[-20px]"
+          className="relative hidden md:block lg:ml-[-20px]"
         />
       </div>
     </div>

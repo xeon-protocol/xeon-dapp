@@ -3,8 +3,8 @@ import React from "react";
 
 function ScrollCard() {
   return (
-    <div className="flex flex-col relative mt-10 lg:mt-20 lg:flex-row-reverse justify-between items-center px-8 pt-8 max-w-screen-2xl mx-auto">
-      <div className="w-full ">
+    <div className="flex flex-col gap-6 md:gap-12 lg:py-32 relative mt-10 lg:mt-20 lg:flex-row-reverse md:flex-row justify-between items-center px-8 pt-8 max-w-screen-2xl mx-auto">
+      <div className="w-full md:w-[40%] lg:w-full ">
         <h1 className="text-grey md:text-lg lg:text-xl">{`{ O2 }`}</h1>
         <h1 className="text-grey text-3xl md:text-5xl lg:text-7xl">
           Go to
