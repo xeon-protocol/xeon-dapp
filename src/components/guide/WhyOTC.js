@@ -6,7 +6,7 @@ function ScrollCard() {
   return (
     <div className="flex flex-col-reverse relative mt-10 lg:mt-20 md:flex-row-reverse gap-6 md:gap-12 lg:flex-row justify-between items-start px-8 pt-8 max-w-screen-2xl mx-auto">
       <div className="w-full lg:px-10 relative">
-        <div className=" text-grey p-4">
+        <div className=" text-grey md:p-4">
           <p className="text-grey text-lg md:mt-5 md:w-[100%] lg:text-justify ">
             ERC20 standard legacy support. This is a simple approach to a very
             basic need. The solution needed to be direct in addressing the
