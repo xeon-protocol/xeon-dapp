@@ -15,6 +15,7 @@ import TokenTable from "@/components/testing/TokenTable";
 import TokenDeposit from "@/components/testing/TokenDeposits";
 import WriteHedges from "@/components/testing/WriteHedges";
 import WithdrawTokens from "@/components/testing/WithdrawTokens";
+import SoftwareVersions from "@/components/testing/Versions";
 import { motion } from "framer-motion";
 function Page() {
   const glitchVariants = {
@@ -138,7 +139,7 @@ function Page() {
       <TokenDeposit />
       <WriteHedges />
       <WithdrawTokens />
-
+      <SoftwareVersions />
       {/* <HowItWorks />
       <WhyOTC /> */}
     </>
