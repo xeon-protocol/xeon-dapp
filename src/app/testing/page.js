@@ -34,21 +34,52 @@ function Page() {
       },
     },
   };
+  const headingVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 },
+  };
   return (
     <>
       <div className="bg-[#000] lg:min-h-[100vh] 2xl:min-h-[50vh] px-8 pt-8 max-w-screen-2xl mx-auto relative">
         <Header />
         <div className="flex flex-col md:gap-12 md:flex-row justify-between 2xl:mt-[20%] mt-[18%]">
           <div className="md:w-[40%] lg:w-[100%] md:px-0 lg:px-18 flex items-center md:block">
-            <h1 className="text-light-purple text-3xl md:text-5xl lg:text-7xl mt-4 lg:mt-14">
+            <motion.h1
+              className="text-light-purple text-3xl md:text-5xl lg:text-7xl  lg:mt-14"
+              initial="hidden"
+              animate="visible"
+              variants={headingVariants}
+              transition={{ duration: 0.6 }}
+            >
               Neon
-            </h1>
-            <h1 className="text-grey text-3xl md:text-5xl lg:text-7xl">
+            </motion.h1>
+            <motion.h1
+              className="text-grey text-3xl ml-1 md:ml-0  md:text-5xl lg:text-7xl"
+              initial="hidden"
+              animate="visible"
+              variants={headingVariants}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               Testnet
-            </h1>
-            <h1 className="text-grey text-3xl md:text-5xl lg:text-7xl">
+            </motion.h1>
+            <motion.h1
+              className="text-grey text-3xl md:text-5xl ml-1 md:ml-0 lg:text-7xl"
+              initial="hidden"
+              animate="visible"
+              variants={headingVariants}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
               Guide
-            </h1>
+            </motion.h1>
 
             <Image
               src="/dotted.webp"
@@ -96,29 +127,46 @@ function Page() {
               alt="container"
               className="relative hidden  md:block ml-[-20px]"
             />
-            <div className="flex md:mt-40 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-evenly  2xl:ml-[-100px]">
-              <a
+            <motion.div
+              className="flex md:mt-40 z-5 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-evenly 2xl:ml-[-100px]"
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.a
                 href="https://neon-hedge.gitbook.io/xeon-protocol-documentation/"
                 className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey"
+                variants={itemVariants}
+                transition={{ duration: 0.6, delay: 0.2 }}
               >
                 Read Manual
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href="/guide"
                 className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey"
+                variants={itemVariants}
+                transition={{ duration: 0.6, delay: 0.4 }}
               >
                 Jump to Dapp
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href="https://t.me/xeon_protocol"
                 className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey"
+                variants={itemVariants}
+                transition={{ duration: 0.6, delay: 0.6 }}
               >
                 Telegram Support
-              </a>
-            </div>
-            <div>
+              </motion.a>
+            </motion.div>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
               <p className="text-grey md:text-lg mt-5">{`{  Welcome to the Instruction Portal for the Neon Hedge test platform  }`}</p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -140,8 +188,6 @@ function Page() {
       <WriteHedges />
       <WithdrawTokens />
       <SoftwareVersions />
-      {/* <HowItWorks />
-      <WhyOTC /> */}
     </>
   );
 }
