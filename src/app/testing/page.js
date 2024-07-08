@@ -113,6 +113,46 @@ function Page() {
                 to use our Dapp. When done, proceed to below section and claim
                 our mock ERC20 tokens.
               </p>
+              <motion.div
+                className="flex md:mt-40 z-5 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-evenly 2xl:ml-[-100px]"
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+                transition={{ duration: 0.6 }}
+              >
+                <motion.a
+                  href="https://neon-hedge.gitbook.io/xeon-protocol-documentation/"
+                  className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey"
+                  variants={itemVariants}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  Read Manual
+                </motion.a>
+                <motion.a
+                  href="/guide"
+                  className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey"
+                  variants={itemVariants}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
+                  Jump to Dapp
+                </motion.a>
+                <motion.a
+                  href="https://t.me/xeon_protocol"
+                  className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey"
+                  variants={itemVariants}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                >
+                  Telegram Support
+                </motion.a>
+              </motion.div>
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+                transition={{ duration: 0.6, delay: 0.8 }}
+              >
+                <p className="text-grey md:text-lg md:ml-[-20px] mt-5">{`{  Welcome to the Instruction Portal for the Neon Hedge test platform  }`}</p>
+              </motion.div>
             </div>
             <Image
               src="/card-109.svg"
@@ -127,46 +167,6 @@ function Page() {
               alt="container"
               className="relative hidden  md:block ml-[-20px]"
             />
-            <motion.div
-              className="flex md:mt-40 z-5 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-evenly 2xl:ml-[-100px]"
-              initial="hidden"
-              animate="visible"
-              variants={containerVariants}
-              transition={{ duration: 0.6 }}
-            >
-              <motion.a
-                href="https://neon-hedge.gitbook.io/xeon-protocol-documentation/"
-                className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey"
-                variants={itemVariants}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                Read Manual
-              </motion.a>
-              <motion.a
-                href="/guide"
-                className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey"
-                variants={itemVariants}
-                transition={{ duration: 0.6, delay: 0.4 }}
-              >
-                Jump to Dapp
-              </motion.a>
-              <motion.a
-                href="https://t.me/xeon_protocol"
-                className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey"
-                variants={itemVariants}
-                transition={{ duration: 0.6, delay: 0.6 }}
-              >
-                Telegram Support
-              </motion.a>
-            </motion.div>
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={containerVariants}
-              transition={{ duration: 0.6, delay: 0.8 }}
-            >
-              <p className="text-grey md:text-lg mt-5">{`{  Welcome to the Instruction Portal for the Neon Hedge test platform  }`}</p>
-            </motion.div>
           </div>
         </div>
       </div>
