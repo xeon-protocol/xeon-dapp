@@ -207,7 +207,7 @@ function Card() {
                     </div>
                   </div>
                 </button>
-                <Button
+                <button
                   onClick={onOpen}
                   _hover={{ scale: 1.1 }}
                   className="text-white bg-button-gradient w-full p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
