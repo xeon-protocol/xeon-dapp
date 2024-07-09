@@ -31,3 +31,25 @@ body {
 li{
   list-style: none;
 }
+@keyframes border-animation {
+  0% {
+    border-color: lime;
+  }
+  25% {
+    border-color: floral;
+  }
+  50% {
+    border-color: purple;
+  }
+  75% {
+    border-color: lightblue;
+  }
+  100% {
+    border-color: lime;
+  }
+}
+
+.hover\\:border-animate:hover {
+  animation: border-animation 2s infinite;
+  border-width: 2px;
+}
