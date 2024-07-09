@@ -2,11 +2,11 @@
 pragma solidity ^0.8.4;
 
 // Xeon Protocol - liquidity unlocking and risk management platform.
-// Audit findings corrections: 20 - 05 - 2024
+// Audit findings updates: 09/06/2024
 
 // ====================Description===========================
 // This is the main smart contract for the Xeon Protocol.
-// The smart contract is deployed on the testnet.
+// The smart contract is deployed on testnet.
 // - Deposit any ERC-20 token as collateral 
 // - Withdraw any ERC20 token
 // - Get underlying value of any ERC20 token in paired currency
@@ -60,8 +60,8 @@ pragma solidity ^0.8.4;
 // Dev notes
 // - addresses can deposit or withdraw erc20 tokens 
 // - all tokens are treated as ERC20
-// - deposits, lockedinuse and withdrawals track wallets balances
-// - lockedinuse is the current account (+-) on trades, and acts as escrow for each deal
+// - deposits, lockedInUse and withdrawals track wallets balances
+// - lockedInUse is the current account (+-) on trades, and acts as escrow for each deal
 // - getUnderlyingValue fetches value of tokens & returns paired value & pair address
 // - split writing, taking and settlement functions for all deal types
 // - each deal is taxed upon settlement, in relevant tokens (paired or underlying)
@@ -72,10 +72,9 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
-import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
-import "@uniswap/v3-periphery/contracts/libraries/OracleLibrary.sol";
-import "./neonStaking.sol";
+import "./XeonStaking.sol";
 
 // minimal interface for the WETH9 contract 
 interface IWETH9 {
@@ -83,9 +82,13 @@ interface IWETH9 {
     function transferFrom(address src, address dst, uint wad) external returns (bool);
 }
 
-contract oXEONVAULT {
+// Interface for our Uniswap price contract
+interface IPriceOracle {
+    function getTWAP(address pool, uint32 interval) external view returns (uint256);
+}
 
-    using SafeMath for uint256;
+contract XeonHedging {
+    using SafeERC20 for IERC20;
     bool private isExecuting;
 
     modifier nonReentrant() {
@@ -101,7 +104,7 @@ contract oXEONVAULT {
     struct userBalance {
         uint256 deposited; // incremented on successful deposit
         uint256 withdrawn; // incremented on successful withdrawal
-        uint256 lockedinuse; // adjust on deal creation or buy or settle
+        uint256 lockedInUse; // adjust on deal creation or buy or settle
     }
     struct contractBalance {
         uint256 deposited;
@@ -207,7 +210,7 @@ contract oXEONVAULT {
 
     // mapping bookmarks of each user
     mapping(address => mapping(uint256 => bool)) public bookmarks;
-    mapping(address => uint256[]) public bookmarkedOptions; // Array to store bookmarked dealIds for each user
+    mapping(address => uint256[]) public bookmarkedOptions; 
     
     // all deals
     uint[] private optionsCreated;    
@@ -229,6 +232,8 @@ contract oXEONVAULT {
     // fee variables
     uint256 public feeNumerator;
     uint256 public feeDenominator;
+    uint256 public protocolFeeRate;
+    uint256 public validatorFeeRate;    
 
     // erc20 deposits equiv in paired currencies
     uint256 public wethEquivDeposits;
@@ -241,37 +246,47 @@ contract oXEONVAULT {
     uint256 public usdcEquivWithdrawals;
 
     // core addresses
+    IUniswapV2Factory public uniswapV2Factory;
     IUniswapV3Factory public uniswapV3Factory;
+    xeonStaking public stakingContract;
+    address public priceOracle;
     address public wethAddress;
     address public usdtAddress;
     address public usdcAddress;
-    address public XeonAddress;
+    address public xeonAddress;
+    address public stakingAddress;
     address public owner;
 
-    // Instance of the staking contract
-    neonStaking public stakingContract;
-
     // events
-    event received(address, uint);
-    event onDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
-    event onWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
-    event hedgeCreated(address indexed token, uint256 indexed dealId, uint256 createValue, HedgeType hedgeType, address indexed writer);
-    event hedgePurchased(address indexed token, uint256 indexed dealId, uint256 startValue, HedgeType hedgeType, address indexed buyer);
-    event hedgeSettled(address indexed token, uint256 indexed dealId, uint256 endValue, uint256 payOff, address indexed miner);
-    event minedHedge(uint256 dealId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 pairFee);
-    event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
-    event topupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
-    event zapRequested(uint indexed hedgeId, address indexed party);
-    event hedgeDeleted(uint256 indexed dealID, address indexed deletedBy);
-    event feesTransferred(address indexed token, address indexed to, uint256 amount);
+    event Received(address, uint);
+    event ContractInitialized(address indexed, address indexed);
+    event OnDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
+    event OnWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
+    event HedgeCreated(address indexed token, uint256 indexed dealId, uint256 createValue, HedgeType hedgeType, address indexed writer);
+    event HedgePurchased(address indexed token, uint256 indexed dealId, uint256 startValue, HedgeType hedgeType, address indexed buyer);
+    event HedgeSettled(address indexed token, uint256 indexed dealId, uint256 endValue, uint256 payOff, address indexed miner);
+    event MinedHedge(uint256 dealId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 pairFee);
+    event BookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
+    event TopupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount);
+    event TopupAccepted(address indexed acceptor, uint256 indexed dealID, uint256 indexed requestID, uint256 pairedAmount);
+    event ZapRequested(uint256 indexed hedgeId, address indexed party);
+    event HedgeDeleted(uint256 indexed dealID, address indexed deletedBy);
+    event FeesTransferred(address indexed token, address indexed to, uint256 amount);
+    event ValidatorFeeUpdated(uint256 protocolFeeRate, uint256 validatorFeeRate);
+    event FeeUpdated(uint256 feeNumerator, uint256 feeDenominator);
+    event EtherWithdrawn(address indexed to, uint256 amount);
 
     // constructor
-    constructor(address _uniswapV3Factory, neonHedging _stakingContract) {
+    constructor(address _uniswapV2Factory, address _uniswapV3Factory, address _priceOracle, xeonStaking _stakingContract) {
+        require(_uniswapV2Factory != address(0), "Invalid UniswapV2Factory address");
         require(_uniswapV3Factory != address(0), "Invalid UniswapV3Factory address");
-        require(address(_stakingContract) != address(0), "Invalid StakingContract address");
+        require(_priceOracle != address(0), "Invalid Oracle Address");
+        require(address(_stakingContract) != address(0), "Invalid StakingContract Address");
 
+        uniswapV2Factory = IUniswapV2Factory(_uniswapV2Factory);
         uniswapV3Factory = IUniswapV3Factory(_uniswapV3Factory);
-        stakingContract = neonStaking(_stakingContract);
+        priceOracle = _priceOracle;
+        stakingContract = XeonStaking(_stakingContract);
 
         wethAddress = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address on Sepolia
         usdtAddress = 0x297B8d4B35294e730087ADF0597A31a9bC1746af; // oUSDT address on Sepolia
@@ -281,7 +296,7 @@ contract oXEONVAULT {
         feeNumerator = 5;
         feeDenominator = 1000;
 
-        emit ContractInitialized(_uniswapV3Factory, address(_stakingContract));
+        emit ContractInitialized(_priceOracle, address(_stakingContract));
     }
 
     /**
@@ -293,7 +308,7 @@ contract oXEONVAULT {
     * - The amount of tokens to be deposited must be greater than zero.
     * - The token address must be valid (non-zero).
     *
-    * Emits an {onDeposit} event.
+    * Emits an {OnDeposit} event.
     *
     * @param _token The address of the ERC-20 token to be deposited.
     * @param _amount The amount of tokens to be deposited.
@@ -351,7 +366,7 @@ contract oXEONVAULT {
         protocolBalanceMap[_token].deposited += receivedAmount;
 
         // Emit deposit event
-        emit onDeposit(_token, receivedAmount, msg.sender);
+        emit OnDeposit(_token, receivedAmount, msg.sender);
     }
 
     /**
@@ -362,7 +377,7 @@ contract oXEONVAULT {
     * - The amount to be withdrawn must be greater than zero and less than or equal to the user's available balance.
     * - The caller must not be the contract itself.
     *
-    * Emits an {onWithdraw} event.
+    * Emits an {OnWithdraw} event.
     *
     * @param token The address of the ERC-20 token to be withdrawn.
     * @param amount The amount of tokens to be withdrawn.
@@ -409,7 +424,7 @@ contract oXEONVAULT {
         }
 
         // Emit withdrawal event
-        emit onWithdraw(token, amount, msg.sender);
+        emit OnWithdraw(token, amount, msg.sender);
     }
 
     /**
@@ -450,7 +465,7 @@ contract oXEONVAULT {
     * - For PUT options, the strike price must be less than the market value.
     * - For SWAPs, the collateral value must be equal.
     *
-    * Emits a {hedgeCreated} event.
+    * Emits a {HedgeCreated} event.
     *
     * @param tool The type of hedge (0 for CALL, 1 for PUT, 2 for SWAP).
     * @param token The address of the ERC-20 token.
@@ -494,7 +509,7 @@ contract oXEONVAULT {
         }
 
         // Update user balances for token in hedge
-        userBalanceMap[token][msg.sender].lockedinuse += amount;
+        userBalanceMap[token][msg.sender].lockedInUse += amount;
         
         // Update arrays
         if (newOption.hedgeType == HedgeType.SWAP) {
@@ -515,7 +530,7 @@ contract oXEONVAULT {
         hedgesCreatedVolume[newOption.paired] += newOption.createValue;
 
         // Emit hedge creation event
-        emit hedgeCreated(token, dealID, newOption.createValue, newOption.hedgeType, msg.sender);
+        emit HedgeCreated(token, dealID, newOption.createValue, newOption.hedgeType, msg.sender);
     }
 
     /**
@@ -533,7 +548,7 @@ contract oXEONVAULT {
     * - The caller must have sufficient free vault balance.
     * - The deal ID must be valid and less than the current deal ID.
     *
-    * Emits a {hedgePurchased} event.
+    * Emits a {HedgePurchased} event.
     *
     * @param _dealID The ID of the hedge to be purchased.
     */
@@ -558,8 +573,10 @@ contract oXEONVAULT {
         require(hedge.startValue > 0, "Math error whilst getting price"); // Sanity check
 
         // Transfer cost from Taker userBalanceMap to Writer userBalanceMap
-        userBalanceMap[hedge.paired][msg.sender].withdrawn += hedge.cost;
-        userBalanceMap[hedge.token][hedge.owner].deposited += hedge.cost;
+        if (hedge.hedgeType != HedgeType.SWAP) {
+            userBalanceMap[hedge.paired][msg.sender].withdrawn += hedge.cost;
+            userBalanceMap[hedge.token][hedge.owner].deposited += hedge.cost;
+        }
 
         // Update hedge struct to indicate it is taken and record the taker
         hedge.dt_started = block.timestamp; 
@@ -598,8 +615,8 @@ contract oXEONVAULT {
             optionsVolume[hedge.paired] += hedge.startValue;
         }
 
-        // Emit the hedgePurchased event
-        emit hedgePurchased(hedge.token, _dealID, hedge.startValue, hedge.hedgeType, msg.sender);
+        // Emit the HedgePurchased event
+        emit HedgePurchased(hedge.token, _dealID, hedge.startValue, hedge.hedgeType, msg.sender);
     }
 
     /**
@@ -624,7 +641,7 @@ contract oXEONVAULT {
     * 
     * @param _dealID The ID of the hedge to be deleted.
     */
-    function deleteHedge(uint256 _dealID) external nonReentrant {
+    function deleteHedge(uint256 _dealID) public nonReentrant {
         hedgingOption storage hedge = hedgeMap[_dealID];
         require(hedge.status == 1 || hedge.status == 2, "Invalid hedge status");
 
@@ -669,7 +686,7 @@ contract oXEONVAULT {
         delete hedgeMap[_dealID];
 
         // Emit event
-        emit hedgeDeleted(_dealID, msg.sender);
+        emit HedgeDeleted(_dealID, msg.sender);
     }
 
     /**
@@ -686,7 +703,8 @@ contract oXEONVAULT {
     * @return bool Returns `true` if the address is a miner, otherwise `false`.
     */
     function isMiner(address _addr) internal view returns (bool) {
-        return userBalanceMap[stakingContract][_addr].deposited > 0;
+        (uint256 assignedForMining,,,) = stakingContract.getAssignedAndUnassignedAmounts(_addr);
+        return assignedForMining > 0;
     }
 
     /**
@@ -711,7 +729,7 @@ contract oXEONVAULT {
     function topupRequest(uint _dealID, uint256 amount) external nonReentrant {
         hedgingOption storage hedge = hedgeMap[_dealID];
 
-        IERC20 token = IERC20(_token);
+        ERC20 token = ERC20(hedge.token);
 
         // Get token decimal for calculations
         uint tokenDecimals = token.decimals();
@@ -725,13 +743,14 @@ contract oXEONVAULT {
         topupMap[topupRequestID].requester = msg.sender;
 
         // Determine the token associated with the hedging option
-        address token = hedge.token;
+        address tokenAddr = hedge.token;
         uint256 pairedAmount;
 
         // Calculate the paired amount based on the sender (owner or taker)
         if (msg.sender == hedge.owner) {
             // Owner tops up with tokens, increment startValue directly
-            pairedAmount = amount * (10**tokenDecimals) / getUnderlyingValue(token, 1);
+            (uint256 underlyingValue,) = getUnderlyingValue(tokenAddr, 1);
+            pairedAmount = amount * (10**tokenDecimals) / underlyingValue;
             topupMap[topupRequestID].amountWriter += amount;
         } else {
             // Taker tops up with paired currency, increment startValue directly
@@ -746,7 +765,7 @@ contract oXEONVAULT {
         hedgeMap[_dealID] = hedge;
 
         // Emit an event indicating that a top-up has been requested
-        emit topupRequested(msg.sender, _dealID, amount);
+        emit TopupRequested(msg.sender, _dealID, amount);
     }
     
     /**
@@ -765,11 +784,11 @@ contract oXEONVAULT {
     * @param _dealID The unique identifier of the hedging option.
     */
     function acceptRequest(uint _requestID, uint _dealID) external nonReentrant {
-        topupRequest storage request = topupMap[_requestID];
+        topupData storage request = topupMap[_requestID];
         hedgingOption storage hedge = hedgeMap[_dealID];
 
         // Get token decimal for calculations
-        IERC20 token = IERC20(_token);
+        ERC20 token = ERC20(hedge.token);
         uint tokenDecimals = token.decimals();
         
         // Ensure the caller's authority and the state of the top-up request
@@ -778,19 +797,22 @@ contract oXEONVAULT {
         require(msg.sender != request.requester, "Requester can't accept the topup");
         
         // Determine the token associated with the hedging option
-        address token = hedge.token;
+        address tokenAddr = hedge.token;
         uint256 pairedAmount;
+        uint256 underlyingValue;
         
         // Calculate the paired amount based on the sender (owner or taker)
         if (msg.sender == hedge.owner) {
             // Owner accepts top-up with tokens
-            pairedAmount = request.amountTaker * (10**tokenDecimals) / getUnderlyingValue(token, 1);
+            (underlyingValue,) = getUnderlyingValue(tokenAddr, 1);
+            pairedAmount = request.amountTaker * (10**tokenDecimals) / underlyingValue;
             // Update the hedging option balances and start value for the owner
             hedge.amount += pairedAmount;
             request.amountWriter += pairedAmount;
         } else {
             // Taker accepts top-up with paired currency
-            pairedAmount = request.amountWriter * getUnderlyingValue(token, 1) / (10**tokenDecimals);
+            (underlyingValue,) = getUnderlyingValue(tokenAddr, 1);
+            pairedAmount = request.amountWriter * underlyingValue / (10**tokenDecimals);
             // Update the hedging option balances and start value for the taker
             hedge.cost += pairedAmount;
             request.amountTaker += pairedAmount;
@@ -802,25 +824,23 @@ contract oXEONVAULT {
         uint256 ownerAmountToUse = request.amountWriter;
         uint256 takerAmountToUse = request.amountTaker;
         
-        // Ensure that the parties has sufficient balance to cover the top-up
-        require(getUserTokenBalances(ownerToken, hedge.owner).withdrawable >= ownerAmountToUse, "Insufficient owner collateral");
-        userBalance storage ownerBalance = userBalanceMap[ownerToken][hedge.owner];
-        ownerBalance.lockedinuse += ownerAmountToUse;// lock collateral in deal
-        ownerBalance.deposited += takerAmountToUse;//receive cost from taker
-        userBalanceMap[ownerToken][hedge.owner] = ownerBalance;
+        // Ensure that the parties have sufficient balance to cover the top-up
+        (, , , uint256 ownerWithdrawable, ,) = getUserTokenBalances(ownerToken, hedge.owner);
+        require(ownerWithdrawable >= ownerAmountToUse, "Insufficient owner collateral");
+        userBalanceMap[ownerToken][hedge.owner].lockedInUse += ownerAmountToUse; // lock collateral in deal
+        userBalanceMap[ownerToken][hedge.owner].deposited += takerAmountToUse; // receive cost from taker
         
-        // Taker liquidity withdrawn not lockedInUse
-        require(getUserTokenBalances(takerToken, hedge.taker).withdrawable >= takerAmountToUse, "Insufficient taker collateral");
-        userBalance storage takerBalance = userBalanceMap[takerToken][hedge.taker];
-        takerBalance.withdrawn += takerAmountToUse;//send cost to taker
-        userBalanceMap[takerToken][hedge.taker] = takerBalance;
+        (, , , uint256 takerWithdrawable, ,) = getUserTokenBalances(takerToken, hedge.taker);
+        require(takerWithdrawable >= takerAmountToUse, "Insufficient taker collateral");
+        userBalanceMap[takerToken][hedge.taker].withdrawn += takerAmountToUse; // send cost to taker
+        
         
         // Update the state of the top-up request to indicate acceptance and record the acceptance time
         request.state = 1;
         request.acceptTime = block.timestamp;
         
         // Emit an event indicating that the top-up request has been accepted
-        emit topupAccepted(msg.sender, _dealID, _requestID, pairedAmount);
+        emit TopupAccepted(msg.sender, _dealID, _requestID, pairedAmount);
     }
 
     /**
@@ -874,7 +894,11 @@ contract oXEONVAULT {
     * Requirements:
     * - The caller must be either the owner or the taker of the hedging option.
     * - The hedging option must have already been taken.
-    * - The hedge must be Equity Swap type. Call and Put options are excerised at Taker's discretion before expiry.
+    * - The hedge must be Equity Swap type to benefit from the "zap". 
+    * - Call & Put options are excerised at Taker's discretion before expiry, zap benefits Writer to end sooner
+    * - If both parties agree to Zap, expiry date on the deal is updated to now: 
+    * ---Taker loses right to exercise Call or Put Option.
+    * ---Equity Swaps are unaffected. Setllement can now be triggered sooner.
     * 
     * @param _dealID The unique identifier of the hedging option.
     */
@@ -891,9 +915,14 @@ contract oXEONVAULT {
         } else {
             hedge.zapTaker = true;
         }
+
+        // Update expiry date to now if flags are true for both parties
+        if(hedge.zapWriter && hedge.zapTaker) {
+            hedge.dt_expiry = block.timestamp;
+        }
         
         // Emit an event indicating that a "zap" has been requested
-        emit zapRequested(_dealID, msg.sender);
+        emit ZapRequested(_dealID, msg.sender);
     }
 
     /**
@@ -903,27 +932,32 @@ contract oXEONVAULT {
     * The settlement involves determining the payoff based on the underlying value, updating user balances, and distributing fees.
     * 
     * Settlement Process Overview:
-    * - The value is calculated using the 'getOptionValue' function.
+    * - The value is always measured in paired currency, token value is calculated using the 'getUnderlyingValue' function.
     * - The strike value is set by the writer, establishing the strike price. The start value is set when the hedge is initiated.
     * - Premium is the cost and is paid in the pair currency of the underlying token.
     * - For swaps, the cost equals 100% of the underlying start value, acting as collateral rather than hedge premium.
-    * - The payoff, which is the difference between the start and strike value, is paid in underlying or pair currency.
+    * - The payoff, which is the difference between the market value and strike value, is paid in underlying or pair currency.
     * - Losses are immediately debited from withdrawn funds. For winners, profits are credited directly to the deposited balance.
     * - Initials for both parties are restored by moving funds from locked in use to deposit, which is the reverse of creating or buying.
-    * - Fees are collected in paired tokens if the option cost was paid to the owner as winning, or in swap cost used as PayOff.
+    * - Fees are collected in paired tokens if option and swap PayOffs were done in paired tokens.
     * - Fees are collected in underlying tokens if option and swap PayOffs were done in underlying tokens.
-    * - Hedge fees are collected into 'address(this)' userBalanceMap and manually distributed as dividends to a staking contract.
-    * - Miners can settle deals after expiry by staking tokens.
+    * - Settlement fees are collected into 'address(this)' userBalanceMap and manually distributed as dividends to a staking contract.
+    * - Miners can settle deals after they expire, important for Equity Swaps not Options. For options Miners can only delete unexercised options.
+    * - Miners have no right to validate or settle Equity Swaps. But for Options and Loans (in our lending platform) they can after expiry.
     * - Miners can pick deals with tokens and amounts they wish to mine to avoid accumulating mining rewards in unwanted tokens.
     * - Each wallet has to log each token interacted with for the sake of pulling all balances credited to it on settlement. This allows for net worth valuations on wallets.
     * - Protocol revenues are stored under 'userBalanceMap[address(this)]' storage. On revenue, protocol revenue is withdrawn manually and sent to the staking wallet.
     * - Takers only can settle/exercise open call options and put options before expiry. After expiry, it's deleted and taxed.
-    * - Owners have the ability to settle equity swaps, but only after expiry. Takers have no right to settle after options expire; they are deleted.
+    * - Both parties have the ability to settle equity swaps, but only after expiry. 
     * 
     * Conditions and Rules:
     * - Call and put options can only be settled by miners or the taker.
     * - Only the taker can settle before expiry; after expiry, the option is deleted.
     * - Swaps require fast settlement after expiry and can be settled by the miner or any of the parties in the deal.
+    * - If a hedge has Zap request consesus on experdited settlement, the expiry date is updated to now.
+    * - If the loser of a deal does not have enough collateral to pay the winner PayOff, all the losers collateral is used to pay the winner.
+    * - For Put Options, Takers must take care to excerice the option whilst the collateral from the Owner still has value to cover the PayOff.
+    * - After the PayOff is deducted from losers collateral, any remaining value or balance locked in the deal is restored to the loser.
     * 
     * Requirements:
     * - The caller must be either the owner or the taker of the hedging option.
@@ -947,17 +981,17 @@ contract oXEONVAULT {
         require(_dealID < dealID, "Invalid option ID");
         hedgingOption storage option = hedgeMap[_dealID];
         require(option.status == 2, "Hedge already settled");
+
+        // Validate caller's authority based on hedge type and timing
         if (option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
-            // require settler be miner or taker only
             require(msg.sender == option.taker || isMiner(msg.sender), "Invalid party to settle");
             if (block.timestamp < option.dt_expiry) {
                 require(msg.sender == option.taker, "Only the taker can settle before expiry");
             } else {
-                //taker cant settle after expiry, its deleted, taker risks losing money coz cost already paid to writer
-                deleteHedge(_dealID);
+                deleteHedge(_dealID); // Taker cannot settle after expiry, hedge is deleted
+                return;
             }
         } else if (option.hedgeType == HedgeType.SWAP) {
-            // require settler == miner or any of the parties in the deal. swaps require fast settlement after expiry
             require(msg.sender == option.owner || msg.sender == option.taker || isMiner(msg.sender), "Invalid party to settle");
             require(option.zapWriter && option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
         }
@@ -975,6 +1009,7 @@ contract oXEONVAULT {
         
         hedgeInfo.newAddressFlag = ttiU.deposited == 0;
 
+        // Settlement logic for CALLs
         if (option.hedgeType == HedgeType.CALL) {
             hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > option.strikeValue + option.cost;
             if (hedgeInfo.marketOverStart) {
@@ -984,30 +1019,33 @@ contract oXEONVAULT {
                 hedgeInfo.payOff = hedgeInfo.underlyingValue - (option.strikeValue + option.cost);
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff / hedgeInfo.priceNow;
-                if (otiU.lockedinuse < hedgeInfo.tokensDue){
-                    hedgeInfo.tokensDue = otiU.lockedinuse;
+                if (otiU.lockedInUse < hedgeInfo.tokensDue){
+                    hedgeInfo.tokensDue = otiU.lockedInUse;
                 }
                 hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
                 // Move payoff - in underlying, take payoff from owner, credit taxed payoff to taker, finalize owner loss
                 ttiU.deposited += hedgeInfo.tokensDue - hedgeInfo.tokenFee;
-                otiU.lockedinuse -= option.amount - hedgeInfo.tokensDue;
+                otiU.lockedInUse -= option.amount - hedgeInfo.tokensDue;
                 otiU.withdrawn += hedgeInfo.tokensDue;
                 // Restore taker collateral from lockedInUse - not applicable, taker won & cost was paid to owner
                 //
                 // Move fees - credit taxes in both, as profit is in underlying and cost is in pair
-                ccUT.deposited += (hedgeInfo.tokenFee * 85) / 100;
-                // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
-                minrT.deposited += (hedgeInfo.tokenFee * 15) / 100;
+                ccUT.deposited += (hedgeInfo.tokenFee * protocolFeeRate) / 100;
+                // Miner fee - X% of protocol fee for settling option. Mining call options always come with 2 token fees
+                minrT.deposited += (hedgeInfo.tokenFee * validatorFeeRate) / 100;
                 // Log wallet PL: 0 - owner won, 1 taker won
                 logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
             } else {
                 // Move payoff - owner wins cost & losses nothing. Mining not required as cost already paid to writer
                 // Restore winners collateral - underlying to owner. none to taker.
-                oti.lockedinuse -= option.amount;
+                oti.lockedInUse -= option.amount;
                 // Log wallet PL: 0 - owner won, 1 taker won
                 logPL(option.cost, option.paired, option.owner, option.taker, 0);
             }
-        } else if (option.hedgeType == HedgeType.PUT) {
+        } 
+        
+        // Settlement logic for PUTs
+        else if (option.hedgeType == HedgeType.PUT) {
             hedgeInfo.isBelowStrikeValue = option.strikeValue > hedgeInfo.underlyingValue + option.cost;
             if (hedgeInfo.isBelowStrikeValue) {
                 // Taker profit in paired = underlying value - strike value
@@ -1016,29 +1054,30 @@ contract oXEONVAULT {
                 hedgeInfo.payOff = option.strikeValue - hedgeInfo.underlyingValue + option.cost;
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff / hedgeInfo.priceNow;
-                if (otiU.lockedinuse < hedgeInfo.tokensDue){
-                    hedgeInfo.tokensDue = otiU.lockedinuse;
+                if (otiU.lockedInUse < hedgeInfo.tokensDue){
+                    hedgeInfo.tokensDue = otiU.lockedInUse;
                 }
                 // Get protocol settlement fee in tokens
                 hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
                 // Move payoff - in underlying, take payoff from writer, credit taxed payoff to taker, finalize writer loss
-                otiU.lockedinuse -= option.amount - hedgeInfo.tokensDue;
+                otiU.lockedInUse -= option.amount - hedgeInfo.tokensDue;
                 ttiU.deposited += hedgeInfo.tokensDue - hedgeInfo.tokenFee;
                 otiU.withdrawn += hedgeInfo.tokensDue;
                 // Restore taker collateral from lockedInUse - not applicable, taker won & cost already paid to owner
-                //
                 // Move fees - credit taxes in both, as profit is in underlying and cost is in paired
-                ccUT.deposited += (hedgeInfo.tokenFee * 85) / 100;
-                minrT.deposited += (hedgeInfo.tokenFee * 15) / 100;
+                ccUT.deposited += (hedgeInfo.tokenFee * protocolFeeRate) / 100;
+                minrT.deposited += (hedgeInfo.tokenFee * validatorFeeRate) / 100;
                 logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
             } else {
                 // Writer wins cost & losses nothing. Mining not required as cost already paid to writer
                 // Restore winners collateral - underlying to owner. none to taker
-                oti.lockedinuse -= option.amount;
-                // Log wallet PL: 0 - owner won, 1 taker won
+                oti.lockedInUse -= option.amount;
                 logPL(option.cost, option.paired, option.owner, option.taker, 0);
             }
-        } else if (option.hedgeType == HedgeType.SWAP) {
+        } 
+        
+        // Settlement logic for SWAP
+        else if (option.hedgeType == HedgeType.SWAP) {
             // if price if higher than start, payoff in token to taker
             // if price is lower than start, payoff in paired token to writer
             if (hedgeInfo.underlyingValue > option.startValue) {
@@ -1054,14 +1093,14 @@ contract oXEONVAULT {
                 hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
                 // Move payoff - in underlying, take full gains from writer, credit taxed amount to taker, pocket difference
                 ttiU.deposited += hedgeInfo.tokensDue - hedgeInfo.tokenFee;
-                otiU.lockedinuse -= option.amount;
+                otiU.lockedInUse -= option.amount;
                 otiU.withdrawn += hedgeInfo.tokensDue;
                 // Restore winner collateral - for taker restore cost (swaps have no premium)
-                tti.lockedinuse -= option.cost;
+                tti.lockedInUse -= option.cost;
                 // Move fees - take taxes from profits in underlying. none in paired because taker won underlying tokens
-                ccUT.deposited += (hedgeInfo.tokenFee * 85) / 100;
-                // Miner fee - 15% of protocol fee for settling option. none in paired because taker won underlying tokens
-                minrT.deposited += (hedgeInfo.tokenFee * 15) / 100;
+                ccUT.deposited += (hedgeInfo.tokenFee * protocolFeeRate) / 100;
+                // Miner fee - X% of protocol fee for settling option. none in paired because taker won underlying tokens
+                minrT.deposited += (hedgeInfo.tokenFee * validatorFeeRate) / 100;
                 logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 0);
             } else {                
                 hedgeInfo.payOff = option.startValue - hedgeInfo.underlyingValue;
@@ -1075,14 +1114,14 @@ contract oXEONVAULT {
                 // 1. credit equivalent payoff in paired to writer
                 // 2. credit takers full cost back & then debit loss using withrawn instantly
                 oti.deposited += hedgeInfo.payOff - hedgeInfo.pairedFee;
-                tti.lockedinuse -= option.cost;
+                tti.lockedInUse -= option.cost;
                 tti.withdrawn += hedgeInfo.payOff;
                 // Restore winner collateral - for owner, all underlying tokens
-                otiU.lockedinuse -= option.amount;
+                otiU.lockedInUse -= option.amount;
                 // Move fees - profits in pair so only paired fees credited
-                ccBT.deposited += (hedgeInfo.pairedFee * 85) / 100;
-                // Miner fee - 15% of protocol fee for settling option. none in underlying tokens
-                minrB.deposited += (hedgeInfo.pairedFee * 15) / 100;
+                ccBT.deposited += (hedgeInfo.pairedFee * protocolFeeRate) / 100;
+                // Miner fee - X% of protocol fee for settling option. none in underlying tokens
+                minrB.deposited += (hedgeInfo.pairedFee * validatorFeeRate) / 100;
                 logPL(hedgeInfo.payOff, option.paired, option.owner, option.taker, 1);
             }
         }
@@ -1106,8 +1145,8 @@ contract oXEONVAULT {
             userERC20s[option.taker].push(option.token);            
         }
     
-        emit hedgeSettled(option.token, _dealID, hedgeInfo.underlyingValue, hedgeInfo.payOff, msg.sender);
-        emit minedHedge(_dealID, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
+        emit HedgeSettled(option.token, _dealID, hedgeInfo.underlyingValue, hedgeInfo.payOff, msg.sender);
+        emit MinedHedge(_dealID, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
     }
 
     /**
@@ -1138,7 +1177,7 @@ contract oXEONVAULT {
     * @param endValue The end value of the settlement.
     */
     function logAnalyticsFees(address token, uint256 tokenFee, uint256 pairedFee, uint256 tokenProfit, uint256 pairProfit, uint256 endValue) internal {
-        (address paired, ) = getPairAddressZK(token);
+        (address paired, ) = getPairAddress(token);
         // All profits made by traders
         protocolProfitsTokens[token] += tokenProfit; 
         protocolPairProfits[paired] += pairProfit;
@@ -1180,6 +1219,23 @@ contract oXEONVAULT {
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner external {
         feeNumerator = numerator;
         feeDenominator = denominator;
+        emit FeeUpdated(numerator, denominator);
+    }
+    
+    /**
+    * @notice Updates the validator fee.
+    * 
+    * This function updates the validator fee as a pecentage
+    * 
+    * @param protocolPercent The percentage amount of protocol fee.
+    * @param validatorPercent The percentage amount of validator fee.
+    */
+    function updateValidatorFee(uint256 protocolPercent, uint256 validatorPercent) onlyOwner external {
+        // check that protocolFeeRate + validatorFeeRate == 100
+        require (protocolPercent + validatorPercent == 100, "Total fee rate must be 100");
+        protocolFeeRate = protocolPercent;
+        validatorFeeRate = validatorPercent;
+        emit ValidatorFeeUpdated(protocolFeeRate, validatorFeeRate);
     }
     
     /**
@@ -1188,7 +1244,7 @@ contract oXEONVAULT {
     * This function calculates the fee based on the given amount and the fee numerator and denominator.
     * 
     * @param amount The amount for which the fee is calculated.
-    * @return The calculated fee.
+    * @return The calculated fee amount.
     */
     function calculateFee(uint256 amount) public view returns (uint256) {
         require(amount >= feeDenominator, "Revenue is too small");    
@@ -1208,7 +1264,7 @@ contract oXEONVAULT {
     function bookmarkHedge(uint256 _dealID) external {
         bool bookmarked = bookmarks[msg.sender][_dealID];
         bookmarks[msg.sender][_dealID] = !bookmarked;
-        emit bookmarkToggle(msg.sender, _dealID, !bookmarked);
+        emit BookmarkToggle(msg.sender, _dealID, !bookmarked);
         // Update bookmarkedOptions array for wallet
         if (!bookmarked) {
             bookmarkedOptions[msg.sender].push(_dealID);
@@ -1271,47 +1327,83 @@ contract oXEONVAULT {
     // paired value is always the pair address of the token provided. 
     // TWAP oracle is used to get the price.
     function getUnderlyingValue(address _tokenAddress, uint256 _tokenAmount) public view returns (uint256, address) {
-        (address poolAddress, address pairedCurrency) = getPairAddressZK(_tokenAddress);
+        (address poolAddress, address pairedCurrency) = getPairAddress(_tokenAddress);
         require(poolAddress != address(0), "Pool doesn't exist");
         
         // Uniswap V3 TWAP Oracle
         uint32 period = 3600; // attempting 1hr
-        (int24 tick, ) = OracleLibrary.consult(poolAddress, period);
+        uint256 priceX96 = IPriceOracle(priceOracle).getTWAP(poolAddress, period);
         
-        uint256 priceX96 = OracleLibrary.getQuoteAtTick(tick, uint128(_tokenAmount), _tokenAddress, pairedCurrency);
+        uint256 value = (priceX96 * _tokenAmount) / (1 << 96); // Adjust for fixed-point division
         
-        return (priceX96, pairedCurrency);
+        return (value, pairedCurrency);
     }
 
-    // Zero Knowledge pair address generator
-    function getPairAddressZK(address tokenAddress) public view returns (address poolAddress, address pairedCurrency) {
-        address wethPoolAddress = uniswapV3Factory.getPool(tokenAddress, wethAddress, 3000); // 0.3% fee tier assumed
-        address usdtPoolAddress = uniswapV3Factory.getPool(tokenAddress, usdtAddress, 3000); // 0.3% fee tier
-        address usdcPoolAddress = uniswapV3Factory.getPool(tokenAddress, usdcAddress, 3000); // 0.3% fee tier
-        if (wethPoolAddress != address(0)) {
-            return (wethPoolAddress, wethAddress);
-        } else if (usdtPoolAddress != address(0)) {
-            return (usdtPoolAddress, usdtAddress);
-        } else if (usdcPoolAddress != address(0)) {
-            return (usdcPoolAddress, usdcAddress);
-        } else {
-            revert("Token is not paired with WETH, USDT, or USDC");
+// Get pair address for a given token across multiple fee tiers
+function getPairAddress(address tokenAddress) public view returns (address poolAddress, address pairedCurrency) {
+    uint24[] memory feeTiers = new uint24[](3);
+    feeTiers[0] = 500; // 0.05% fee tier
+    feeTiers[1] = 3000; // 0.3% fee tier
+    feeTiers[2] = 10000; // 1% fee tier
+
+    // Check for WETH pairs first in Uniswap V2
+    address wethPoolAddressV2 = uniswapV2Factory.getPair(tokenAddress, wethAddress);
+    if (wethPoolAddressV2 != address(0)) {
+        return (wethPoolAddressV2, wethAddress);
+    }
+
+    // Check for WETH pairs in Uniswap V3
+    for (uint256 i = 0; i < feeTiers.length; i++) {
+        address wethPoolAddressV3 = uniswapV3Factory.getPool(tokenAddress, wethAddress, feeTiers[i]);
+        if (wethPoolAddressV3 != address(0)) {
+            return (wethPoolAddressV3, wethAddress);
         }
     }
 
+    // Check for USDT pairs in Uniswap V2
+    address usdtPoolAddressV2 = uniswapV2Factory.getPair(tokenAddress, usdtAddress);
+    if (usdtPoolAddressV2 != address(0)) {
+        return (usdtPoolAddressV2, usdtAddress);
+    }
+
+    // Check for USDT pairs in Uniswap V3
+    for (uint256 i = 0; i < feeTiers.length; i++) {
+        address usdtPoolAddressV3 = uniswapV3Factory.getPool(tokenAddress, usdtAddress, feeTiers[i]);
+        if (usdtPoolAddressV3 != address(0)) {
+            return (usdtPoolAddressV3, usdtAddress);
+        }
+    }
+
+    // Check for USDC pairs in Uniswap V2
+    address usdcPoolAddressV2 = uniswapV2Factory.getPair(tokenAddress, usdcAddress);
+    if (usdcPoolAddressV2 != address(0)) {
+        return (usdcPoolAddressV2, usdcAddress);
+    }
+
+    // Check for USDC pairs in Uniswap V3
+    for (uint256 i = 0; i < feeTiers.length; i++) {
+        address usdcPoolAddressV3 = uniswapV3Factory.getPool(tokenAddress, usdcAddress, feeTiers[i]);
+        if (usdcPoolAddressV3 != address(0)) {
+            return (usdcPoolAddressV3, usdcAddress);
+        }
+    }
+
+    revert("Token is not paired with WETH, USDT, or USDC");
+}
+
     // Token balances breakdown for wallet
-    function getUserTokenBalances (address token, address user) public view returns (uint256 deposited, uint256 withdrawn, uint256 lockedinuse, uint256 withdrawable, uint256 withdrawableValue, address paired) {
+    function getUserTokenBalances (address token, address user) public view returns (uint256 deposited, uint256 withdrawn, uint256 lockedInUse, uint256 withdrawable, uint256 withdrawableValue, address paired) {
         userBalance memory uto = userBalanceMap[address(token)][address(user)];
         deposited = uto.deposited;
         withdrawn = uto.withdrawn;
-        lockedinuse = uto.lockedinuse;
-        withdrawable = uto.deposited - uto.withdrawn - uto.lockedinuse;
+        lockedInUse = uto.lockedInUse;
+        withdrawable = uto.deposited - uto.withdrawn - uto.lockedInUse;
         if(token != usdtAddress && token != usdcAddress ){
             (withdrawableValue, paired) = getUnderlyingValue(token, withdrawable);
         }else{
             (withdrawableValue, paired) = (withdrawable, address(0));
         }
-        return (deposited, withdrawn, lockedinuse, withdrawable, withdrawableValue, paired);
+        return (deposited, withdrawn, lockedInUse, withdrawable, withdrawableValue, paired);
     }
     
     // Internal function to retrieve a subset of an array based on startIndex and limit
@@ -1477,6 +1569,17 @@ contract oXEONVAULT {
 
     // Receive function to accept Ether
     receive() external payable {
-        emit received(msg.sender, msg.value);
+        emit Received(msg.sender, msg.value);
+    }
+
+    function withdrawEther(address payable to, uint256 amount) external onlyOwner nonReentrant {
+        require(to != address(0), "Invalid address");
+        require(amount > 0, "Amount must be greater than 0");
+        require(address(this).balance >= amount, "Insufficient balance");
+
+        (bool success, ) = to.call{value: amount}("");
+        require(success, "Transfer failed");
+
+        emit EtherWithdrawn(to, amount);
     }
 }
