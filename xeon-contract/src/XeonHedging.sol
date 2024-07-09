@@ -1011,12 +1011,12 @@ contract XeonHedging {
 
         // Settlement logic for CALLs
         if (option.hedgeType == HedgeType.CALL) {
-            hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > option.strikeValue + option.cost;
+            hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > option.strikeValue;
             if (hedgeInfo.marketOverStart) {
                 // Taker profit in pair currency = underlying - cost - strike value
                 // Convert to equivalent tokens lockedInUse by owner, factor fee
                 // Check if collateral is enough, otherwise use max balance from Owner lockedInUse
-                hedgeInfo.payOff = hedgeInfo.underlyingValue - (option.strikeValue + option.cost);
+                hedgeInfo.payOff = hedgeInfo.underlyingValue - option.strikeValue;
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff / hedgeInfo.priceNow;
                 if (otiU.lockedInUse < hedgeInfo.tokensDue){
@@ -1046,12 +1046,12 @@ contract XeonHedging {
         
         // Settlement logic for PUTs
         else if (option.hedgeType == HedgeType.PUT) {
-            hedgeInfo.isBelowStrikeValue = option.strikeValue > hedgeInfo.underlyingValue + option.cost;
+            hedgeInfo.isBelowStrikeValue = option.strikeValue > hedgeInfo.underlyingValue;
             if (hedgeInfo.isBelowStrikeValue) {
                 // Taker profit in paired = underlying value - strike value
                 // Convert to equivalent tokens lockedInUse by writer, factor fee
                 // Check if writer collateral is enough, otherwise use max balance from writer lockedInUse
-                hedgeInfo.payOff = option.strikeValue - hedgeInfo.underlyingValue + option.cost;
+                hedgeInfo.payOff = option.strikeValue - hedgeInfo.underlyingValue;
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff / hedgeInfo.priceNow;
                 if (otiU.lockedInUse < hedgeInfo.tokensDue){
