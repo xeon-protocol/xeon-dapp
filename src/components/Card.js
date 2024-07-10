@@ -325,7 +325,7 @@ function Card() {
 
           <div className={"bg-black py-3 flex justify-center"}>
             <button
-              className="text-white bg-black px-8 py-2 mr-4 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
+              className="text-white text-base bg-black px-8 py-2 mr-4 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
               mr={3}
               onClick={onClose}
             >
