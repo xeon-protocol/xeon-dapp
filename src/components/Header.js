@@ -25,7 +25,7 @@ function Header() {
       </Link>
 
       <nav className="hidden md:flex space-x-6">
-        <Link href={"/silkroad"}>Silkroad</Link>
+        <Link href={"/"}>Silkroad</Link>
         <Link href={"/wallet"}>Wallet</Link>
         <Link href={"/pnalytics"}>Analytics</Link>
         <Link href={"/guide"}>Guide</Link>
@@ -45,7 +45,7 @@ function Header() {
 
       {isMenuOpen && (
         <nav className="absolute top-16 left-0 w-full bg-gray-800 text-white flex flex-col items-center space-y-4 p-4 md:hidden">
-          <Link href="/silkroad">
+          <Link href="/">
             <p className="hover:text-gray-400">Silkroad</p>
           </Link>
           <Link href="/wallet">

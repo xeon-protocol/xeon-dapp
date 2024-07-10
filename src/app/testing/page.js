@@ -17,6 +17,8 @@ import WriteHedges from "@/components/testing/WriteHedges";
 import WithdrawTokens from "@/components/testing/WithdrawTokens";
 import SoftwareVersions from "@/components/testing/Versions";
 import { motion } from "framer-motion";
+import Footer from "@/components/Footer";
+
 function Page() {
   const glitchVariants = {
     visible: {
@@ -188,6 +190,7 @@ function Page() {
       <WriteHedges />
       <WithdrawTokens />
       <SoftwareVersions />
+      <Footer />
     </>
   );
 }

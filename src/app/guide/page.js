@@ -11,6 +11,7 @@ import Deposit from "@/components/guide/Deposit";
 import UseCases from "@/components/guide/UseCases";
 import HowItWorks from "@/components/guide/HowItWorks";
 import WhyOTC from "@/components/guide/WhyOTC";
+import Footer from "@/components/Footer";
 function Page() {
   return (
     <>
@@ -98,6 +99,7 @@ function Page() {
       <UseCases />
       <HowItWorks />
       <WhyOTC />
+      <Footer />
     </>
   );
 }
