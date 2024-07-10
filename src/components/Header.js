@@ -51,7 +51,7 @@ function Header() {
           <Link href="/wallet">
             <p className="hover:text-gray-400">Wallet</p>
           </Link>
-          <Link href="/pnalytics">
+          <Link href="/alytics">
             <p className="hover:text-gray-400">Analytics</p>
           </Link>
           <Link href="/guide">
@@ -60,7 +60,10 @@ function Header() {
           <Link href="/testing">
             <p className="hover:text-gray-400">Testing</p>
           </Link>
-          <Link href="/docs">
+          <Link
+            target="_blank"
+            href="https://xeonprotocol.gitbook.io/xeon-protocol"
+          >
             <p className="hover:text-gray-400">Docs</p>
           </Link>
         </nav>
