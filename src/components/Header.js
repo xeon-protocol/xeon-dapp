@@ -27,7 +27,7 @@ function Header() {
       <nav className="hidden md:flex space-x-6">
         <Link href={"/"}>Silkroad</Link>
         <Link href={"/wallet"}>Wallet</Link>
-        <Link href={"/pnalytics"}>Analytics</Link>
+        <Link href={"/analytics"}>Analytics</Link>
         <Link href={"/guide"}>Guide</Link>
         <Link href={"/testing"}>Testing</Link>
         <Link href={"/docs"}>Docs</Link>
@@ -51,7 +51,7 @@ function Header() {
           <Link href="/wallet">
             <p className="hover:text-gray-400">Wallet</p>
           </Link>
-          <Link href="/alytics">
+          <Link href="/analytics">
             <p className="hover:text-gray-400">Analytics</p>
           </Link>
           <Link href="/guide">

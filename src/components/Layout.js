@@ -38,7 +38,7 @@ const Layout = ({
       setActiveSection("positions");
       setActiveSideTab("Loans { Coming Soon ... }");
     } else if (section === "positions" && button === "Options") {
-      setShowPositions(true);
+      setShowPositions(false);
       setShowDiscover(false);
       setShowBookmarks(false);
       setActiveSection("positions");
@@ -92,7 +92,7 @@ const Layout = ({
           <div className="absolute top-0 lg:top-4 left-2 lg:left-6 w-full h-full hidden md:block">
             <p className="md:text-sm lg:text-lg">{`{ >OTC_SILKROAD }`}</p>
           </div>
-          <div className="absolute top-4 lg:top-[5%] left-6 w-full h-full hidden md:block">
+          <div className="absolute top-4 lg:top-[70px] left-6 w-full h-full hidden md:block">
             <LeftBarButton
               active={activeSideTab === "Options" ? true : false}
               title="Options"
