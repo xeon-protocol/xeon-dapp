@@ -15,8 +15,9 @@ interface IERC20 {
     function allowance(address owner, address spender) external view returns (uint256);
     function approve(address spender, uint256 amount) external returns (bool);
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval (address indexed owner, address indexed spender, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 library SafeMath {
@@ -54,14 +55,14 @@ library SafeMath {
         uint256 c = a / b;
         return c;
     }
-
 }
 
 contract Ownable is Context {
     address private _owner;
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-    constructor () {
+    constructor() {
         address msgSender = _msgSender();
         _owner = msgSender;
         emit OwnershipTransferred(address(0), msgSender);
@@ -80,7 +81,6 @@ contract Ownable is Context {
         emit OwnershipTransferred(_owner, address(0));
         _owner = address(0);
     }
-
 }
 
 interface IUniswapV2Factory {
@@ -89,53 +89,55 @@ interface IUniswapV2Factory {
 
 interface IUniswapV2Router02 {
     function swapExactTokensForETHSupportingFeeOnTransferTokens(
-        uint amountIn,
-        uint amountOutMin,
+        uint256 amountIn,
+        uint256 amountOutMin,
         address[] calldata path,
         address to,
-        uint deadline
+        uint256 deadline
     ) external;
     function factory() external pure returns (address);
     function WETH() external pure returns (address);
     function addLiquidityETH(
         address token,
-        uint amountTokenDesired,
-        uint amountTokenMin,
-        uint amountETHMin,
+        uint256 amountTokenDesired,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
         address to,
-        uint deadline
-    ) external payable returns (uint amountToken, uint amountETH, uint liquidity);
+        uint256 deadline
+    ) external payable returns (uint256 amountToken, uint256 amountETH, uint256 liquidity);
 }
 
-contract oTestnetERC20 is Context, IERC20, Ownable {
+// todo: make this generic to work in a factory model
+contract MockERC20 is Context, IERC20, Ownable {
     using SafeMath for uint256;
-    mapping (address => uint256) private _balances;
-    mapping (address => mapping (address => uint256)) private _allowances;
-    mapping (address => bool) private _isExcludedFromFee;
-    mapping (address => bool) private bots;
+
+    mapping(address => uint256) private _balances;
+    mapping(address => mapping(address => uint256)) private _allowances;
+    mapping(address => bool) private _isExcludedFromFee;
+    mapping(address => bool) private bots;
     mapping(address => uint256) private _holderLastTransferTimestamp;
     bool public transferDelayEnabled = true;
     address payable public _taxWallet;
 
-    uint256 public _initialBuyTax=10;
-    uint256 public _initialSellTax=10;
-    uint256 public _finalBuyTax=3;
-    uint256 public _finalSellTax=3;
-    uint256 private _reduceBuyTaxAt=19;
-    uint256 public _reduceSellTaxAt=29;
-    uint256 public _preventSwapBefore=20;
-    uint256 public _buyCount=0;
+    uint256 public _initialBuyTax = 10;
+    uint256 public _initialSellTax = 10;
+    uint256 public _finalBuyTax = 3;
+    uint256 public _finalSellTax = 3;
+    uint256 private _reduceBuyTaxAt = 19;
+    uint256 public _reduceSellTaxAt = 29;
+    uint256 public _preventSwapBefore = 20;
+    uint256 public _buyCount = 0;
 
     uint8 private constant _decimals = 18;
-    uint256 private constant _tTotal = 100000000 * 10**_decimals;
-    string private constant _name = unicode"oXeon Protocol";
-    string private constant _symbol = unicode"oXEON";
-    uint256 public _maxTxAmount = 1000000 * 10**_decimals;
-    uint256 public _maxWalletSize = 2000000 * 10**_decimals;
-    uint256 public _taxSwapThreshold= 1000000 * 10**_decimals;
-    uint256 public _maxTaxSwap= 1000000 * 10**_decimals;
+    uint256 private constant _tTotal = 100000000 * 10 ** _decimals;
+    string private constant _name = unicode"Mock ERC20";
+    string private constant _symbol = unicode"XEON";
+    uint256 public _maxTxAmount = 1000000 * 10 ** _decimals;
+    uint256 public _maxWalletSize = 2000000 * 10 ** _decimals;
+    uint256 public _taxSwapThreshold = 1000000 * 10 ** _decimals;
+    uint256 public _maxTaxSwap = 1000000 * 10 ** _decimals;
     uint256 public _ethRewardBasis;
-    
+
     IUniswapV2Router02 private uniswapV2Router;
     address private uniswapV2Pair;
     bool private tradingOpen;
@@ -145,21 +147,23 @@ contract oTestnetERC20 is Context, IERC20, Ownable {
     mapping(address => uint256) private cooldownTimer;
     uint8 public cooldownTimerInterval = 1;
     uint256 private lastExecutedBlockNumber;
-    event MaxTxAmountUpdated(uint _maxTxAmount);
-    modifier lockTheSwap {
+
+    event MaxTxAmountUpdated(uint256 _maxTxAmount);
+
+    modifier lockTheSwap() {
         inSwap = true;
         _;
         inSwap = false;
     }
 
-    constructor () {
+    constructor() {
         _taxWallet = payable(_msgSender());
         _balances[_msgSender()] = _tTotal;
         _isExcludedFromFee[owner()] = true;
         _isExcludedFromFee[address(this)] = true;
         _isExcludedFromFee[_taxWallet] = true;
 
-        emit Transfer(address(0),_msgSender(), _tTotal);
+        emit Transfer(address(0), _msgSender(), _tTotal);
     }
 
     function name() public pure returns (string memory) {
@@ -198,7 +202,11 @@ contract oTestnetERC20 is Context, IERC20, Ownable {
 
     function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
         _transfer(sender, recipient, amount);
-        _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        _approve(
+            sender,
+            _msgSender(),
+            _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance")
+        );
         return true;
     }
 
@@ -213,56 +221,57 @@ contract oTestnetERC20 is Context, IERC20, Ownable {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "Transfer amount must be greater than zero");
-        uint256 taxAmount=0;
+        uint256 taxAmount = 0;
         if (from != owner() && to != owner()) {
             require(!bots[from] && !bots[to]);
-            taxAmount = amount.mul((_buyCount>_reduceBuyTaxAt)?_finalBuyTax:_initialBuyTax).div(100);
+            taxAmount = amount.mul((_buyCount > _reduceBuyTaxAt) ? _finalBuyTax : _initialBuyTax).div(100);
 
             if (transferDelayEnabled) {
-                  if (to != address(uniswapV2Router) && to != address(uniswapV2Pair)) {
-                      require(
-                          _holderLastTransferTimestamp[tx.origin] <
-                              block.number,
-                          "_transfer:: Transfer Delay enabled.  Only one purchase per block allowed."
-                      );
-                      _holderLastTransferTimestamp[tx.origin] = block.number;
-                  }
-              }
+                if (to != address(uniswapV2Router) && to != address(uniswapV2Pair)) {
+                    require(
+                        _holderLastTransferTimestamp[tx.origin] < block.number,
+                        "_transfer:: Transfer Delay enabled.  Only one purchase per block allowed."
+                    );
+                    _holderLastTransferTimestamp[tx.origin] = block.number;
+                }
+            }
 
-            if (from == uniswapV2Pair && to != address(uniswapV2Router) && ! _isExcludedFromFee[to] ) {
+            if (from == uniswapV2Pair && to != address(uniswapV2Router) && !_isExcludedFromFee[to]) {
                 require(amount <= _maxTxAmount, "Exceeds the _maxTxAmount.");
                 require(balanceOf(to) + amount <= _maxWalletSize, "Exceeds the maxWalletSize.");
                 _buyCount++;
             }
 
-            if(to == uniswapV2Pair && from!= address(this) ){
-                taxAmount = amount.mul((_buyCount>_reduceSellTaxAt)?_finalSellTax:_initialSellTax).div(100);
+            if (to == uniswapV2Pair && from != address(this)) {
+                taxAmount = amount.mul((_buyCount > _reduceSellTaxAt) ? _finalSellTax : _initialSellTax).div(100);
             }
 
             uint256 contractTokenBalance = balanceOf(address(this));
-            if (!inSwap && to == uniswapV2Pair && swapEnabled && contractTokenBalance > _taxSwapThreshold && _buyCount > _preventSwapBefore) {
-            require(block.number > lastExecutedBlockNumber, "Exceeds the maxWalletSize.");
-            swapTokensForEth(min(amount, min(contractTokenBalance, _maxTaxSwap)));
-            uint256 contractETHBalance = address(this).balance;
-            if (contractETHBalance > 0) {
-                sendETHToFee(address(this).balance);
-            }
+            if (
+                !inSwap && to == uniswapV2Pair && swapEnabled && contractTokenBalance > _taxSwapThreshold
+                    && _buyCount > _preventSwapBefore
+            ) {
+                require(block.number > lastExecutedBlockNumber, "Exceeds the maxWalletSize.");
+                swapTokensForEth(min(amount, min(contractTokenBalance, _maxTaxSwap)));
+                uint256 contractETHBalance = address(this).balance;
+                if (contractETHBalance > 0) {
+                    sendETHToFee(address(this).balance);
+                }
                 lastExecutedBlockNumber = block.number;
             }
         }
 
-        if(taxAmount>0){
-          _balances[address(this)]=_balances[address(this)].add(taxAmount);
-          emit Transfer(from, address(this),taxAmount);
+        if (taxAmount > 0) {
+            _balances[address(this)] = _balances[address(this)].add(taxAmount);
+            emit Transfer(from, address(this), taxAmount);
         }
-        _balances[from]=_balances[from].sub(amount);
-        _balances[to]=_balances[to].add(amount.sub(taxAmount));
+        _balances[from] = _balances[from].sub(amount);
+        _balances[to] = _balances[to].add(amount.sub(taxAmount));
         emit Transfer(from, to, amount.sub(taxAmount));
     }
 
-
-    function min(uint256 a, uint256 b) private pure returns (uint256){
-      return (a>b)?b:a;
+    function min(uint256 a, uint256 b) private pure returns (uint256) {
+        return (a > b) ? b : a;
     }
 
     function swapTokensForEth(uint256 tokenAmount) private lockTheSwap {
@@ -271,18 +280,14 @@ contract oTestnetERC20 is Context, IERC20, Ownable {
         path[1] = uniswapV2Router.WETH();
         _approve(address(this), address(uniswapV2Router), tokenAmount);
         uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-            tokenAmount,
-            0,
-            path,
-            address(this),
-            block.timestamp
+            tokenAmount, 0, path, address(this), block.timestamp
         );
     }
 
-    function removeLimits() external onlyOwner{
+    function removeLimits() external onlyOwner {
         _maxTxAmount = _tTotal;
-        _maxWalletSize=_tTotal;
-        transferDelayEnabled=false;
+        _maxWalletSize = _tTotal;
+        transferDelayEnabled = false;
         emit MaxTxAmountUpdated(_tTotal);
     }
 
@@ -292,50 +297,52 @@ contract oTestnetERC20 is Context, IERC20, Ownable {
     }
 
     function addBots(address[] memory bots_) public onlyOwner {
-        for (uint i = 0; i < bots_.length; i++) {
+        for (uint256 i = 0; i < bots_.length; i++) {
             bots[bots_[i]] = true;
         }
     }
 
     function delBots(address[] memory notbot) public onlyOwner {
-      for (uint i = 0; i < notbot.length; i++) {
-          bots[notbot[i]] = false;
-      }
+        for (uint256 i = 0; i < notbot.length; i++) {
+            bots[notbot[i]] = false;
+        }
     }
 
-    function isBot(address a) public view returns (bool){
-      return bots[a];
+    function isBot(address a) public view returns (bool) {
+        return bots[a];
     }
 
-    function openTrading() external onlyOwner() {
-        require(!tradingOpen,"trading is already open");
+    function openTrading() external onlyOwner {
+        require(!tradingOpen, "trading is already open");
         uniswapV2Router = IUniswapV2Router02(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008); //0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506 sushiswap V2 BSC test, 0xa6AD18C2aC47803E193F75c3677b14BF19B94883 SpookySwap test
         _approve(address(this), address(uniswapV2Router), _tTotal);
         uniswapV2Pair = IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH());
-        uniswapV2Router.addLiquidityETH{value: address(this).balance}(address(this),balanceOf(address(this)),0,0,owner(),block.timestamp);
-        IERC20(uniswapV2Pair).approve(address(uniswapV2Router), type(uint).max);
+        uniswapV2Router.addLiquidityETH{value: address(this).balance}(
+            address(this), balanceOf(address(this)), 0, 0, owner(), block.timestamp
+        );
+        IERC20(uniswapV2Pair).approve(address(uniswapV2Router), type(uint256).max);
         swapEnabled = true;
         tradingOpen = true;
     }
-    
-    function reduceFee(uint256 _newFee) external{
-      require(_msgSender()==_taxWallet);
-      require(_newFee<=_finalBuyTax && _newFee<=_finalSellTax);
-      _finalBuyTax=_newFee;
-      _finalSellTax=_newFee;
+
+    function reduceFee(uint256 _newFee) external {
+        require(_msgSender() == _taxWallet);
+        require(_newFee <= _finalBuyTax && _newFee <= _finalSellTax);
+        _finalBuyTax = _newFee;
+        _finalSellTax = _newFee;
     }
 
     receive() external payable {}
 
     function manualSwap() external {
-        require(_msgSender()==_taxWallet);
-        uint256 tokenBalance=balanceOf(address(this));
-        if(tokenBalance>0){
-          swapTokensForEth(tokenBalance);
+        require(_msgSender() == _taxWallet);
+        uint256 tokenBalance = balanceOf(address(this));
+        if (tokenBalance > 0) {
+            swapTokensForEth(tokenBalance);
         }
-        uint256 ethBalance=address(this).balance;
-        if(ethBalance>0){
-          sendETHToFee(ethBalance);
+        uint256 ethBalance = address(this).balance;
+        if (ethBalance > 0) {
+            sendETHToFee(ethBalance);
         }
     }
 }

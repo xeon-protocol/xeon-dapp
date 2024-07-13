@@ -9,9 +9,20 @@
 # testing
 /coverage
 
+# development broadcast logs
+!/broadcast
+/broadcast/*
+
+# docs
+docs/
+
 # next.js
 /.next/
 /out/
+
+# compiler files
+cache/
+out/
 
 # production
 /build
@@ -27,6 +38,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
 
 # vercel
 .vercel
