@@ -57,7 +57,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Setting up Foundry for Smart Contract Development
 
-The `xeon-contracts` directory contains the Solidity contracts and related files.
+The `contracts` directory contains the Solidity contracts and related files.
 To work with these contracts, you need to set up Foundry.
 
 1. Install Foundry:
@@ -69,7 +69,7 @@ curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
 
-2. Navigate to the `xeon-contracts` directory and follow the instructions in [`xeon-contracts/README.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/xeon-contract/README.md) directory to build, run, and test.
+2. Navigate to the `/contracts` directory and follow the instructions in [`/contracts/README.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/xeon-contract/README.md) to continue with Foundry.
 
 ## Directory Structure
 
