@@ -1,6 +1,6 @@
-# XEON Protocol
+# Xeon Protocol dApp
 
-This repository contains the XEON Protocol dAapp, which includes both the Node.js application and the Foundry Solidity contracts.
+This repository contains the Xeon Protocol dApp, which includes both the Node.js frontend and Solidity contracts, tests, and scripts built with Foundry.
 
 ## Prerequisites
 
@@ -73,15 +73,17 @@ foundryup
 
 ## Directory Structure
 
-- `xeon-contract` - Contains the Solidity contracts and related files. The `foundry.toml` file is used to configure Foundry.
+- `contracts` - Contains the Solidity contracts and related files. The `foundry.toml` file is used to configure Foundry
 - `src` - Source code for the Next.js application
+- Ensure sensitive data is stored in `.env.local`
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Foundry Documentation](https://book.getfoundry.sh/) - learn about Foundry.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
+- [Foundry Documentation](https://book.getfoundry.sh/) - learn about Foundry
 
 ## Current Work
 
-Please update and follow along with the current development progress on [Trello](https://trello.com/b/F13JtDx1/development).
+- Internal development progress is tracked on [Trello | Development](https://trello.com/b/F13JtDx1/development)
+- For an overview of the project please see [Trello | Public](https://trello.com/invite/b/mW198hKo/ATTIc305ea03ad04139d54ef382b7a276d651224A655/xeon-protocol-board)
