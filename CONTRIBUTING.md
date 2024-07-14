@@ -44,6 +44,8 @@ Adhering to these will keep things running smoothly, reduce the risk of conflict
 - **Testing:** Write and maintain unit and integration tests for all new features and bug fixes. Ensure that all tests pass before submitting a pull request.
 - **Documentation:** Keep the documentation up-to-date with any code changes. This includes comments within the code, as well as external documentation like the `README.md` and any additional guides.
 
+---
+
 # Commit Guidelines
 
 Xeon Protocol uses **The Conventional Commits** specification across the codebase. Refer to the complete [documentation](https://www.conventionalcommits.org/en/v1.0.0/#summary) for details.
@@ -51,7 +53,7 @@ Xeon Protocol uses **The Conventional Commits** specification across the codebas
 Commit messages should be structured as follows:
 
 ```
-<type>[optional scope]: <description>
+<type>(optional scope): <description>
 
 [optional body]
 
@@ -64,23 +66,21 @@ This commit structure communicates intent to consumers of the codebase, and auto
 
 Main commit types are `fix` for bug patches and `feat` for new features. Other types are allowed, but must be one of the following:
 
-`build:` Changes that affect the build system or external dependencies (example scopes: `scripts`, `foundry`, `npm`, `docker`)
+`build:` a change that affect the build system or external dependencies (example scopes: `scripts`, `foundry`, `npm`, `docker`)
 
-`ci:` Changes to our CI configuration files and scripts
+`chore:` a code change that neither fixes a bug nor adds a feature
 
-`docs:` Documentation only changes
+`docs:` documentation only changes
 
-`feat:` A new feature
+`feat:` a new feature
 
-`fix:` A bug fix
+`fix:` a bug fix
 
-`perf:` A code change that improves performance
+`perf:` a code change that improves performance
 
-`refactor:` A code change that neither fixes a bug nor adds a feature
+`style:` a change that does not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
 
-`style:` Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-
-`test:` Adding missing tests or correcting existing tests
+`test:` adding missing tests or correcting existing tests
 
 ## Scope
 
@@ -123,6 +123,12 @@ Remove obsolete dependencies for multiple networks.
 
 Reviewed-by: Jon
 Refs: #123
+```
+
+If a commit fixes a specific issue, indicate the number after the description.
+
+```
+fix: resolve network not switching (#69)
 ```
 
 ---
