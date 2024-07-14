@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  font-family: 'Nippo', sans-serif !important;
+  background-color: #000 !important;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+li{
+  list-style: none;
+}
+@keyframes border-animation {
+  0% {
+    border-color: lime;
+  }
+  25% {
+    border-color: floral;
+  }
+  50% {
+    border-color: purple;
+  }
+  75% {
+    border-color: lightblue;
+  }
+  100% {
+    border-color: lime;
+  }
+}
+
+.hover\\:border-animate:hover {
+  animation: border-animation 2s infinite;
+  border-width: 2px;
+}
