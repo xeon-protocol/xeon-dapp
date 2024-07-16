@@ -3,7 +3,7 @@ pragma solidity 0.8.20;
 
 import "../src/MockERC20Factory.sol";
 
-contract XeonTestnetAirdropper {
+contract ClaimHelper {
 // --
 // airdrop functionality
 // handle all ERC20 tokens

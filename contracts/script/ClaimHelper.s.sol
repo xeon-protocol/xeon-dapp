@@ -2,9 +2,9 @@
 pragma solidity 0.8.20;
 
 import {Script, console2} from "forge-std/Script.sol";
-import {XeonTestnetAirdropper} from "../src/XeonTestnetAirdropper.sol";
+import {ClaimHelper} from "../src/ClaimHelper.sol";
 
-contract XeonTestnetAirdropperScript is Script {
+contract ClaimHelperScript is Script {
     function setUp() public {}
 
     function run() public {
@@ -12,7 +12,7 @@ contract XeonTestnetAirdropperScript is Script {
 
         // deploy hedging
         console2.log("deploying Airdropper contract...");
-        XeonTestnetAirdropper airdropper = new XeonTestnetAirdropper();
+        ClaimHelper claimHelper = new ClaimHelper();
 
         vm.stopBroadcast();
     }

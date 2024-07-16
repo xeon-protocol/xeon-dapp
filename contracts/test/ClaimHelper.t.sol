@@ -2,10 +2,10 @@
 pragma solidity 0.8.20;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {MockERC20} from "../src/MockERC20.sol";
+import {ClaimHelper} from "../src/ClaimHelper.sol";
 
-contract MockERC20Test is Test {
-    MockERC20 public mockERC20;
+contract ClaimHelperTest is Test {
+    ClaimHelper public claimHelper;
 
     function setUp() public {}
 }
