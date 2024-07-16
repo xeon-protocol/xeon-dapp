@@ -27,6 +27,12 @@ If Foundry has already been installed globally, ensure that Foundry is initializ
 foundryup
 ```
 
+Install dependencies. Foundry will automatically fetch required libraries from github
+
+```shell
+forge install
+```
+
 ## Documentation
 
 https://book.getfoundry.sh/
