@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.20;
+pragma solidity 0.7.6;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {PriceOracle} from "../src/PriceOracle.sol";
-import {MockERC20Factory} from "../src/MockERC20Factory.sol";
 // import UniPool Interface
 
 contract PriceOracleTest is Test {
@@ -14,7 +13,6 @@ contract PriceOracleTest is Test {
     // test WETH price
     // fuzz test all ERC20 tokens deployed
     PriceOracle public priceOracle;
-    MockERC20Factory public mockERC20Factory;
 
     function setUp() public {}
 }

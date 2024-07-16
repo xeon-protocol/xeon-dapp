@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.20;
+pragma solidity 0.7.6;
 
 import "uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "uniswap/v3-periphery/contracts/libraries/OracleLibrary.sol";
