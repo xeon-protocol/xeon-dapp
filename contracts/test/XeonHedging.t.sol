@@ -9,9 +9,6 @@ import {XeonHedging} from "../src/XeonHedging.sol";
 
 contract XeonHedgingTest is Test {
     // test hedging core logic
-    // test rebase token
-    // test stablecoin
-    // test token that gets rugged (zero liquidity)
     // test broken price oracle on open and close
     MockERC20 public mockERC20;
     XeonToken public xeonToken;
@@ -19,4 +16,19 @@ contract XeonHedgingTest is Test {
     XeonHedging public xeonHedging;
 
     function setUp() public {}
+
+    function text_withdrawHedgeEarly() public {
+        // TODO
+    }
+
+    /**
+     * @notice test handling token with no liquidity
+     */
+    function test_ruggedToken() public {
+        // TODO
+        // 1. try creating hedge with zero-liquidity token
+        // 2. open hedge with liquid token
+        //    remove liquidity
+        //    try to close hedge
+    }
 }
