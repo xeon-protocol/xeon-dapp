@@ -13,7 +13,7 @@ contract MockERC20Test is Test {
         token = new MockERC20("MockToken", "MTK", 18, 1_000_000 * 10 ** 18, admin);
     }
 
-    function test_initialSupply() public {
+    function test_initialSupply() public view {
         console2.log("Testing initial supply...");
         uint256 expectedSupply = 1_000_000 * 10 ** 18;
         uint256 actualSupply = token.totalSupply();
