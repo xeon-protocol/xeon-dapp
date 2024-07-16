@@ -9,4 +9,21 @@ contract MockERC20FactoryTest is Test {
     MockERC20Factory public mockERC20Factory;
 
     function setUp() public {}
+
+    function test_createToken() public {
+        // TODO
+    }
+
+    function test_mintAdditionalTokens() public {
+        // TODO
+    }
+
+    function test_setAdminRole() public {
+        // TODO
+    }
+
+    function test_onlyAdminCanMint() public {
+        // try to have non-admin account mint
+        // expect revert
+    }
 }
