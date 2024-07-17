@@ -20,7 +20,7 @@ function ScrollCard() {
         <div className=" top-16 md:left-[30px] w-full h-full">
           <Image
             borderRadius={"md"}
-            src="https://dapp.xeon-protocol.io/imgs/screenshots/write-hedge.webp"
+            src="write-hedges.png"
             // w={"100%"}
 
             alt="container"
