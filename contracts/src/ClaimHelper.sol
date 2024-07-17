@@ -73,16 +73,18 @@ contract ClaimHelper is AccessControl {
     /**
      * @dev claim initial tokens for testnet onboarding with referral
      * @notice initial claim can only be performed once
-     * @notice referral bonus is +5% of claim amount to both accounts
+     * @notice referral bonus is +10% of claim amount to both accounts
      * @param token address of token to claim
      * @param referredBy address of account that referred the user
      */
     function claimInitialWithReferral(address token, address referredBy) external {
+        // you can only claim once, nice try...
         require(!hasClaimedInitial[msg.sender], "ClaimHelper: Already claimed initial tokens");
         require(referredBy != msg.sender, "ClaimHelper: Cannot refer yourself");
 
         uint256 availableAmount = internalBalances[address(this)][token];
-        uint256 referralBonus = claimAmount / 20; // 5% bonus
+        // 10% bonus for referrals, tell your friends!
+        uint256 referralBonus = claimAmount / 10; // 10% bonus
         uint256 totalClaimAmount = claimAmount + referralBonus;
 
         require(
