@@ -23,11 +23,10 @@ contract ClaimHelperTest is Test {
         claimHelper.addAdmin(admin);
         vm.stopPrank();
 
-        // Deploy mock ERC20 token and mint initial supply to ClaimHelper
+        // Deploy mock ERC20 token
         vm.startPrank(admin);
-        address tokenAddress = mockERC20Factory.deploy("MockToken", "MTK", 18, 1_000_000 * 10 ** 18);
+        address tokenAddress = mockERC20Factory.deploy("MockToken", "MTK", 18, 0); // Initial supply is 0
         mockERC20 = MockERC20(tokenAddress);
-        mockERC20.mint(address(claimHelper), 1_000_000 * 10 ** 18);
         vm.stopPrank();
     }
 
@@ -100,11 +99,6 @@ contract ClaimHelperTest is Test {
         address referrer = claimHelper.getReferrer(user1);
         assertEq(referrer, admin, "User1's referrer should be Admin");
 
-        // Test getTokenBalance
-        uint256 balance = claimHelper.getTokenBalance(user1, address(mockERC20));
-        uint256 expectedBalance = 10_000 * 10 ** 18;
-        assertEq(balance, expectedBalance, "User1's token balance should be 10_000 MTK");
-
         // Test hasUserClaimedInitial
         bool hasClaimed = claimHelper.hasUserClaimedInitial(user1);
         assertTrue(hasClaimed, "User1 should have claimed initial tokens");
@@ -126,21 +120,6 @@ contract ClaimHelperTest is Test {
 
         vm.expectRevert("ClaimHelper: Claim only allowed once per week");
         claimHelper.claimTokens(address(mockERC20));
-        vm.stopPrank();
-    }
-
-    function test_depositTokens() public {
-        console2.log("Testing admin depositing tokens...");
-        uint256 amount = 50_000 * 10 ** 18;
-
-        vm.startPrank(admin);
-        mockERC20.mint(admin, amount);
-        mockERC20.approve(address(claimHelper), amount);
-        claimHelper.depositTokens(address(mockERC20), amount);
-
-        uint256 expectedBalance = 1_000_000 * 10 ** 18 + amount;
-        uint256 actualBalance = claimHelper.getTokenBalance(address(claimHelper), address(mockERC20));
-        assertEq(expectedBalance, actualBalance, "ClaimHelper balance should be 1_050_000 MTK after deposit");
         vm.stopPrank();
     }
 

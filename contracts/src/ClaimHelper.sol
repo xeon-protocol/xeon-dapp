@@ -11,7 +11,6 @@ contract ClaimHelper is AccessControl {
     uint256 public claimAmount = 10_000 * 10 ** 18;
     mapping(address => bool) public hasClaimedInitial;
     mapping(address => uint256) public referralCount;
-    mapping(address => mapping(address => uint256)) public internalBalances;
     mapping(address => uint256) public lastClaimTime;
     mapping(address => address[]) public referrals;
     mapping(address => address) public referrerOf;
@@ -59,11 +58,7 @@ contract ClaimHelper is AccessControl {
     function claimInitial(address token) external {
         require(!hasClaimedInitial[msg.sender], "ClaimHelper: Already claimed initial tokens");
 
-        uint256 availableAmount = internalBalances[address(this)][token];
-        require(availableAmount >= claimAmount, "ClaimHelper: No tokens available for initial claim");
-
-        internalBalances[address(this)][token] -= claimAmount;
-        internalBalances[msg.sender][token] += claimAmount;
+        MockERC20(token).mint(msg.sender, claimAmount);
 
         hasClaimedInitial[msg.sender] = true;
 
@@ -82,26 +77,15 @@ contract ClaimHelper is AccessControl {
         require(!hasClaimedInitial[msg.sender], "ClaimHelper: Already claimed initial tokens");
         require(referredBy != msg.sender, "ClaimHelper: Cannot refer yourself");
 
-        uint256 availableAmount = internalBalances[address(this)][token];
-        // 10% bonus for referrals, tell your friends!
         uint256 referralBonus = claimAmount / 10; // 10% bonus
         uint256 totalClaimAmount = claimAmount + referralBonus;
 
-        require(
-            availableAmount >= totalClaimAmount + referralBonus, "ClaimHelper: No tokens available for initial claim"
-        );
+        MockERC20(token).mint(msg.sender, claimAmount);
+        MockERC20(token).mint(referredBy, referralBonus);
 
-        internalBalances[address(this)][token] -= totalClaimAmount;
-        internalBalances[msg.sender][token] += claimAmount;
-
-        if (referredBy != address(0)) {
-            internalBalances[address(this)][token] -= referralBonus;
-            internalBalances[referredBy][token] += referralBonus;
-            referrals[referredBy].push(msg.sender);
-            referrerOf[msg.sender] = referredBy;
-            referralCount[referredBy]++;
-            emit ReferralReward(referredBy, msg.sender, referralBonus);
-        }
+        referrals[referredBy].push(msg.sender);
+        referrerOf[msg.sender] = referredBy;
+        referralCount[referredBy]++;
 
         hasClaimedInitial[msg.sender] = true;
 
@@ -113,36 +97,16 @@ contract ClaimHelper is AccessControl {
         require(block.timestamp >= lastClaimTime[msg.sender] + 1 weeks, "ClaimHelper: Claim only allowed once per week");
         lastClaimTime[msg.sender] = block.timestamp;
 
-        uint256 amount = claimAmount;
-        if (internalBalances[address(this)][token] < amount) {
-            MockERC20(token).mint(address(this), amount);
-        }
+        MockERC20(token).mint(msg.sender, claimAmount);
 
-        internalBalances[address(this)][token] -= amount;
-        require(IERC20(token).transfer(msg.sender, amount), "ClaimHelper: Transfer failed");
-
-        emit TokensClaimed(msg.sender, token, amount);
-    }
-
-    // admin function to deposit tokens to the contract
-    function depositTokens(address token, uint256 amount) external onlyRole(ADMIN_ROLE) {
-        require(IERC20(token).transferFrom(msg.sender, address(this), amount), "ClaimHelper: Transfer failed");
-        internalBalances[address(this)][token] += amount;
+        emit TokensClaimed(msg.sender, token, claimAmount);
     }
 
     // admin function to manually airdrop tokens to a user
     function airdropTokens(address user, address token, uint256 amount) external onlyRole(ADMIN_ROLE) {
-        require(internalBalances[address(this)][token] >= amount, "ClaimHelper: Insufficient balance");
-
-        internalBalances[address(this)][token] -= amount;
-        internalBalances[user][token] += amount;
+        MockERC20(token).mint(user, amount);
 
         emit TokensClaimed(user, token, amount);
-    }
-
-    // get the balance of a specific token for a user
-    function getTokenBalance(address user, address token) external view returns (uint256) {
-        return internalBalances[user][token];
     }
 
     // check if a user has claimed their initial tokens
