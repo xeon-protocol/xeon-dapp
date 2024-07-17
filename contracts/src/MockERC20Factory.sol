@@ -5,9 +5,11 @@ import "openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin/contracts/access/AccessControl.sol";
 
 contract MockERC20 is ERC20, AccessControl {
+    /* ============ State Variabies ============ */
     uint8 private _decimals;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
+    /* ============ Constructor ============ */
     constructor(string memory name, string memory symbol, uint8 decimals_, uint256 initialSupply, address admin)
         ERC20(name, symbol)
     {
@@ -17,6 +19,7 @@ contract MockERC20 is ERC20, AccessControl {
         _grantRole(MINTER_ROLE, admin);
     }
 
+    /* ============ External Functions ============ */
     function mint(address to, uint256 amount) external {
         require(hasRole(MINTER_ROLE, msg.sender), "MockERC20: must have minter role to mint");
         _mint(to, amount);
@@ -28,8 +31,12 @@ contract MockERC20 is ERC20, AccessControl {
 }
 
 contract MockERC20Factory is AccessControl {
+    /* ============ State Variables ============ */
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    address[] public admins;
+    TokenInfo[] public tokens;
 
+    /* ============ Structs ============ */
     struct TokenInfo {
         address tokenAddress;
         string name;
@@ -38,17 +45,17 @@ contract MockERC20Factory is AccessControl {
         uint256 totalSupply;
     }
 
+    /* ============ Events ============ */
     event NewTokenDeployed(address indexed token, string name, string symbol, uint8 decimals, uint256 initialSupply);
 
-    address[] public admins;
-    TokenInfo[] public tokens;
-
+    /* ============ Constructor ============ */
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ADMIN_ROLE, msg.sender);
         admins.push(msg.sender);
     }
 
+    /* ============ External Functions ============ */
     function addAdmin(address admin) external {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "MockERC20Factory: must have default admin role to add admin");
         grantRole(ADMIN_ROLE, admin);
@@ -95,17 +102,13 @@ contract MockERC20Factory is AccessControl {
         MockERC20(token).grantRole(MockERC20(token).MINTER_ROLE(), account);
     }
 
-    /**
-     * @notice return list of admin addresses
-     */
+    /* ============ Getters ============ */
+
     function getAdmins() external view returns (address[] memory) {
         return admins;
     }
 
-    /**
-     * @notice return list of deployed tokens with their details
-     */
-    function getTokens() external view returns (TokenInfo[] memory) {
+    function getDeployedTokens() external view returns (TokenInfo[] memory) {
         return tokens;
     }
 
@@ -118,9 +121,6 @@ contract MockERC20Factory is AccessControl {
         revert("Token not found");
     }
 
-    /**
-     * @notice returns list of addresses holding a specific token
-     */
     function getTokenHolders(address tokenAddress) external view returns (address[] memory) {
         uint256 count = 0;
         uint256 index = 0;
