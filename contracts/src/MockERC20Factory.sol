@@ -12,7 +12,7 @@ contract MockERC20 is ERC20, AccessControl {
         ERC20(name, symbol)
     {
         _decimals = decimals_;
-        _mint(msg.sender, initialSupply);
+        _mint(admin, initialSupply);
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(MINTER_ROLE, admin);
     }
@@ -88,6 +88,11 @@ contract MockERC20Factory is AccessControl {
         );
         emit NewTokenDeployed(address(token), name, symbol, decimals, initialSupply);
         return address(token);
+    }
+
+    function grantMinterRole(address token, address account) external {
+        require(hasRole(ADMIN_ROLE, msg.sender), "MockERC20Factory: must have admin role to grant minter role");
+        MockERC20(token).grantRole(MockERC20(token).MINTER_ROLE(), account);
     }
 
     /**
