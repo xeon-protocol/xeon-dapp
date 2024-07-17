@@ -43,7 +43,7 @@ contract TokenFactoryScript is Script {
             claimHelper.addAdmin(admin[i]);
         }
 
-        // deploy tokens, mint to claim helper address
+        // deploy tokens, mint to deployer address
         string[] memory tokenNames = new string[](6);
         string[] memory tokenSymbols = new string[](6);
         tokenNames[0] = "TestROR";
@@ -65,7 +65,7 @@ contract TokenFactoryScript is Script {
             console2.log(string(abi.encodePacked("token deployed at: ", address(tokenAddress))));
             MockERC20 token = MockERC20(tokenAddress);
             token.grantRole(token.MINTER_ROLE(), address(claimHelper));
-            token.mint(address(claimHelper), 1_000_000 * 10 ** 18);
+            token.mint(address(deployer), 1_000_000 * 10 ** 18);
         }
 
         vm.stopBroadcast();

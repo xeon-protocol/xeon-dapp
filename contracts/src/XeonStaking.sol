@@ -341,8 +341,7 @@ contract XeonStaking is Ownable {
     }
 
     function getTotalAssigned() public view returns (uint256) {
-        return totalMiningRewards + totalLiquidityRewards;
-        +totalCollateralRewards;
+        return totalMiningRewards + totalLiquidityRewards + totalCollateralRewards;
     }
 
     function getTotalUnassigned() public view returns (uint256) {
