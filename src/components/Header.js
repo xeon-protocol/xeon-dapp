@@ -61,8 +61,9 @@ function Header() {
             <p className="hover:text-gray-400">Testing</p>
           </Link>
           <Link
+            href="https://docs.xeon-protocol.io/documentation"
             target="_blank"
-            href="https://xeonprotocol.gitbook.io/xeon-protocol"
+            rel="noopener noreferrer"
           >
             <p className="hover:text-gray-400">Docs</p>
           </Link>

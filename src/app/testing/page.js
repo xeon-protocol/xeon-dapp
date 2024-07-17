@@ -124,6 +124,8 @@ function Page() {
               >
                 <motion.a
                   href="https://neon-hedge.gitbook.io/xeon-protocol-documentation/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
                   variants={itemVariants}
                   transition={{ duration: 0.6, delay: 0.2 }}
@@ -140,6 +142,8 @@ function Page() {
                 </motion.a>
                 <motion.a
                   href="https://t.me/xeon_protocol"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
                   variants={itemVariants}
                   transition={{ duration: 0.6, delay: 0.6 }}
@@ -188,8 +192,7 @@ function Page() {
 
       <TokenDeposit />
       <WriteHedges />
-      <WithdrawTokens />
-      <SoftwareVersions />
+
       <Footer />
     </>
   );

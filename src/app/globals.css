@@ -174,3 +174,35 @@ h1{
   font-weight: 400 !important;
   
 }
+.footer-social{
+  height:100%;
+  display:-webkit-box;
+  display:-ms-flexbox;
+  display:flex;
+  -webkit-box-align:center;
+  -ms-flex-align:center;
+  align-items:center;
+  gap:.8rem;
+  margin-top:.18rem}
+  .footer-social a{
+    display:-webkit-box;
+    display:-ms-flexbox;
+    display:flex}
+    .footer-social a svg{
+      width:2.32rem;
+      height:2.32rem
+    }
+      .footer-social a svg .line{
+        stroke:#b1b1b1;
+        -webkit-transition:all .3s ease;
+        transition:all .3s ease}
+        .footer-social a:hover svg .line{
+          stroke:#aa79e5;
+        }
+        .footer-social a  .line{
+        stroke:#b1b1b1;
+        -webkit-transition:all .3s ease;
+        transition:all .3s ease}
+        .footer-social a:hover  .line{
+          stroke:#aa79e5;
+        }
