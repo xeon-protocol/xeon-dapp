@@ -5,6 +5,10 @@ import {Test, console2} from "forge-std/Test.sol";
 import {MockERC20, MockERC20Factory} from "../src/MockERC20Factory.sol";
 import {ClaimHelper} from "../src/ClaimHelper.sol";
 
+/**
+ * @dev tests for ClaimHelper and MockERC20Factory contracts
+ * @notice normal testnet workflow handles minting tokens through the ClaimHelper contract
+ */
 contract OnboardingTest is Test {
     MockERC20Factory public mockERC20Factory;
     ClaimHelper public claimHelper;

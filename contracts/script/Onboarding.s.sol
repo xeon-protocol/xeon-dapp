@@ -15,12 +15,10 @@ contract TokenFactoryScript is Script {
     ];
 
     // base sepolia
-    // simulate: forge script script/MockERC20Factory.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv
-    // broadcast: forge script script/MockERC20Factory.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv --broadcast
+    // simulate: forge script script/Onboarding.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv
+    // broadcast: forge script script/Onboarding.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv --broadcast
 
-    function setUp() public {
-        console2.log("deployer.balance", deployer.balance);
-    }
+    function setUp() public {}
 
     function run() public {
         vm.startBroadcast(vm.envUint("DEPLOYER_PRIVATE_KEY"));
@@ -31,7 +29,7 @@ contract TokenFactoryScript is Script {
 
         // deploy claim helper
         console2.log("deploying ClaimHelper contract...");
-        ClaimHelper claimHelper = new ClaimHelper();
+        ClaimHelper claimHelper = new ClaimHelper(tokenFactory);
 
         // add admin accounts to token factory
         console2.log("adding admin accounts to token factory...");
@@ -44,10 +42,6 @@ contract TokenFactoryScript is Script {
         for (uint256 i = 0; i < admin.length; i++) {
             claimHelper.addAdmin(admin[i]);
         }
-
-        // add token factory address to claim helper
-        console2.log("adding token factory address to claim helper...");
-        claimHelper.setTokenFactory(address(tokenFactory));
 
         // deploy tokens, mint to claim helper address
         string[] memory tokenNames = new string[](6);
@@ -67,8 +61,8 @@ contract TokenFactoryScript is Script {
 
         for (uint256 i = 0; i < tokenNames.length; i++) {
             console2.log(string(abi.encodePacked("deploying token: ", tokenNames[i], " (", tokenSymbols[i], ")")));
-            address tokenAddress = tokenFactory.deploy(tokenNames[i], tokenSymbols[i], 18, 1_000_000 * 10 ** 18);
-            console2.log(string(abi.encodePacked("token deployed at: ", tokenAddress)));
+            address tokenAddress = tokenFactory.deploy(tokenNames[i], tokenSymbols[i], 18, 0);
+            console2.log(string(abi.encodePacked("token deployed at: ", address(tokenAddress))));
             MockERC20 token = MockERC20(tokenAddress);
             token.grantRole(token.MINTER_ROLE(), address(claimHelper));
             token.mint(address(claimHelper), 1_000_000 * 10 ** 18);
