@@ -6,6 +6,9 @@ import "../src/MockERC20Factory.sol";
 contract ClaimHelper {
 // --
 // airdrop functionality
+// admin functionality, so admin can perform manual operations
+// 'addAdmin' function
+// 'removeAdmin' function
 // handle all ERC20 tokens
 // -- users claim XEON
 // -- users claim ERC20
@@ -15,6 +18,7 @@ contract ClaimHelper {
 // user cannot set themselves as referredBy
 // if user has a referral, they receive an additional 5%, and the referral receives an additional 5%
 // user can only do claimInitial once
+// mapping for admin addresses
 // mapping for referrals [address][referralCount]
 // mapping for internal tokens [tokens]
 // mapping for internal balances [address][balance]
