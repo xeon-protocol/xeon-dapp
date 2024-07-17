@@ -45,6 +45,10 @@ contract TokenFactoryScript is Script {
             claimHelper.addAdmin(admin[i]);
         }
 
+        // add token factory address to claim helper
+        console2.log("adding token factory address to claim helper...");
+        claimHelper.setTokenFactory(address(tokenFactory));
+
         // deploy tokens, mint to claim helper address
         string[] memory tokenNames = new string[](6);
         string[] memory tokenSymbols = new string[](6);

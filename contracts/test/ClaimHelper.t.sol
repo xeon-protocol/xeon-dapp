@@ -8,4 +8,8 @@ contract ClaimHelperTest is Test {
     ClaimHelper public claimHelper;
 
     function setUp() public {}
+
+    // test user claiming initial with referral address
+
+    // test user claiming initial without referral address
 }
