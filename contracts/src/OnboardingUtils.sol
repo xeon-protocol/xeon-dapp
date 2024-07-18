@@ -5,7 +5,7 @@ import "openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin/contracts/access/AccessControl.sol";
 import "./MockERC20Factory.sol";
 
-contract ClaimHelper is AccessControl {
+contract OnboardingUtils is AccessControl {
     /* ============ State Variables ============ */
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     MockERC20Factory public tokenFactory;
@@ -18,6 +18,7 @@ contract ClaimHelper is AccessControl {
 
     /* ============ Events ============ */
 
+    event TokensAirdropped(address indexed user, address indexed token, uint256 amount);
     event TokensClaimed(address indexed user, address indexed token, uint256 amount);
     event InitialTokensClaimed(address indexed user, uint256 amount);
     event InitialTokensClaimedWithReferral(
@@ -58,7 +59,7 @@ contract ClaimHelper is AccessControl {
      * @param token address of token to claim
      */
     function claimInitial(address token) external {
-        require(!hasClaimedInitial[msg.sender], "ClaimHelper: Already claimed initial tokens");
+        require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
 
         MockERC20(token).mint(msg.sender, claimAmount);
 
@@ -76,8 +77,8 @@ contract ClaimHelper is AccessControl {
      */
     function claimInitialWithReferral(address token, address referredBy) external {
         // you can only claim once, nice try...
-        require(!hasClaimedInitial[msg.sender], "ClaimHelper: Already claimed initial tokens");
-        require(referredBy != msg.sender, "ClaimHelper: Cannot refer yourself");
+        require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
+        require(referredBy != msg.sender, "OnboardingUtils: Cannot refer yourself");
 
         // 10% bonus for referrals, tell your friends!
         uint256 referralBonus = claimAmount / 10;
@@ -99,7 +100,9 @@ contract ClaimHelper is AccessControl {
      * @dev after initial claim, users can claim additional tokens weekly
      */
     function claimTokens(address token) external {
-        require(block.timestamp >= lastClaimTime[msg.sender] + 1 weeks, "ClaimHelper: Claim only allowed once per week");
+        require(
+            block.timestamp >= lastClaimTime[msg.sender] + 1 weeks, "OnboardingUtils: Claim only allowed once per week"
+        );
         lastClaimTime[msg.sender] = block.timestamp;
 
         MockERC20(token).mint(msg.sender, claimAmount);
@@ -113,7 +116,7 @@ contract ClaimHelper is AccessControl {
     function airdropTokens(address user, address token, uint256 amount) external onlyRole(ADMIN_ROLE) {
         MockERC20(token).mint(user, amount);
 
-        emit TokensClaimed(user, token, amount);
+        emit TokensAirdropped(user, token, amount);
     }
 
     /* ============ Getters ============ */

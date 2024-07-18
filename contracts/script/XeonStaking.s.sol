@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
-import {Script, console2} from "forge-std/Script.sol";
+import {Script} from "forge-std/Script.sol";
+import {console2} from "forge-std/console2.sol";
 import {XeonStaking} from "../src/XeonStaking.sol";
 
 contract XeonStakingScript is Script {
-    // address public deployer = 0x.....
+    address public xeonToken = 0x0000000000000000000000000000000000000000;
 
     function setUp() public {}
 
@@ -14,7 +15,7 @@ contract XeonStakingScript is Script {
 
         // deploy staking
         console2.log("deploying XeonStaking contract...");
-        XeonStaking staking = new XeonStaking();
+        XeonStaking staking = new XeonStaking(xeonToken);
 
         vm.stopBroadcast();
     }

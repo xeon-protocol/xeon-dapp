@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
-import {Test, console2} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
+import {console2} from "forge-std/console2.sol";
 import {MockERC20, MockERC20Factory} from "../src/MockERC20Factory.sol";
-import {ClaimHelper} from "../src/ClaimHelper.sol";
+import {OnboardingUtils} from "../src/OnboardingUtils.sol";
 
 /**
- * @dev tests for ClaimHelper and MockERC20Factory contracts
- * @notice normal testnet workflow handles minting tokens through the ClaimHelper contract
+ * @dev tests for OnboardingUtils and MockERC20Factory contracts
+ * @notice normal testnet workflow handles minting tokens through the OnboardingUtils contract
  */
 contract OnboardingTest is Test {
     MockERC20Factory public mockERC20Factory;
-    ClaimHelper public claimHelper;
+    OnboardingUtils public onboardingUtils;
     MockERC20 public mockERC20;
     address public admin = address(0x1);
     address public nonAdmin = address(0x2);
@@ -20,19 +21,19 @@ contract OnboardingTest is Test {
 
     function setUp() public {
         mockERC20Factory = new MockERC20Factory();
-        claimHelper = new ClaimHelper(mockERC20Factory);
+        onboardingUtils = new OnboardingUtils(mockERC20Factory);
 
         // Add admin role to deployer
         vm.startPrank(admin);
         mockERC20Factory.addAdmin(admin);
-        claimHelper.addAdmin(admin);
+        onboardingUtils.addAdmin(admin);
         vm.stopPrank();
 
         // Deploy mock ERC20 token
         vm.startPrank(admin);
         address tokenAddress = mockERC20Factory.deploy("MockToken", "MTK", 18, 0); // Initial supply is 0
         mockERC20 = MockERC20(tokenAddress);
-        mockERC20Factory.grantMinterRole(tokenAddress, address(claimHelper)); // Grant MINTER_ROLE to ClaimHelper
+        mockERC20Factory.grantMinterRole(tokenAddress, address(onboardingUtils)); // Grant MINTER_ROLE to OnboardingUtils
         vm.stopPrank();
     }
 
@@ -130,7 +131,7 @@ contract OnboardingTest is Test {
         address tokenAddress = mockERC20Factory.deploy("TestToken1", "TTK1", 18, 1_000_000 * 10 ** 18);
         mockERC20Factory.deploy("TestToken2", "TTK2", 18, 2_000_000 * 10 ** 18);
 
-        MockERC20Factory.TokenInfo[] memory tokens = mockERC20Factory.getTokens();
+        MockERC20Factory.TokenInfo[] memory tokens = mockERC20Factory.getDeployedTokens();
         assertEq(tokens.length, 2, "There should be 2 tokens");
         assertEq(tokens[0].tokenAddress, tokenAddress, "First token address should match");
         assertEq(tokens[0].name, "TestToken1", "First token name should be 'TestToken1'");
@@ -173,12 +174,12 @@ contract OnboardingTest is Test {
         assertEq(holders[1], nonAdmin, "Second holder should be the non-admin");
     }
 
-    // ClaimHelper Tests
+    // OnboardingUtils Tests
 
     function test_claimInitialWithReferral() public {
         console2.log("Testing user claiming initial tokens with referral...");
         vm.startPrank(user1);
-        claimHelper.claimInitialWithReferral(address(mockERC20), admin);
+        onboardingUtils.claimInitialWithReferral(address(mockERC20), admin);
         uint256 expectedBalance = 10_000 * 10 ** 18;
         uint256 actualBalance = mockERC20.balanceOf(user1);
         assertEq(expectedBalance, actualBalance, "User1 balance should be 10_000 MTK after initial claim with referral");
@@ -195,7 +196,7 @@ contract OnboardingTest is Test {
     function test_claimInitial() public {
         console2.log("Testing user claiming initial tokens without referral...");
         vm.startPrank(user2);
-        claimHelper.claimInitial(address(mockERC20));
+        onboardingUtils.claimInitial(address(mockERC20));
         uint256 expectedBalance = 10_000 * 10 ** 18;
         uint256 actualBalance = mockERC20.balanceOf(user2);
         assertEq(expectedBalance, actualBalance, "User2 balance should be 10_000 MTK after initial claim");
@@ -205,9 +206,9 @@ contract OnboardingTest is Test {
     function test_claimInitialAlreadyClaimed() public {
         console2.log("Testing user trying to claim initial tokens after already claiming...");
         vm.startPrank(user1);
-        claimHelper.claimInitial(address(mockERC20));
-        vm.expectRevert("ClaimHelper: Already claimed initial tokens");
-        claimHelper.claimInitial(address(mockERC20));
+        onboardingUtils.claimInitial(address(mockERC20));
+        vm.expectRevert("OnboardingUtils: Already claimed initial tokens");
+        onboardingUtils.claimInitial(address(mockERC20));
         vm.stopPrank();
     }
 
@@ -216,13 +217,13 @@ contract OnboardingTest is Test {
         vm.startPrank(admin);
 
         // Add new admin
-        claimHelper.addAdmin(user1);
-        bool isAdmin = claimHelper.hasRole(claimHelper.ADMIN_ROLE(), user1);
+        onboardingUtils.addAdmin(user1);
+        bool isAdmin = onboardingUtils.hasRole(onboardingUtils.ADMIN_ROLE(), user1);
         assertTrue(isAdmin, "User1 should be an admin");
 
         // Remove admin
-        claimHelper.removeAdmin(user1);
-        isAdmin = claimHelper.hasRole(claimHelper.ADMIN_ROLE(), user1);
+        onboardingUtils.removeAdmin(user1);
+        isAdmin = onboardingUtils.hasRole(onboardingUtils.ADMIN_ROLE(), user1);
         assertFalse(isAdmin, "User1 should not be an admin");
 
         vm.stopPrank();
@@ -233,23 +234,23 @@ contract OnboardingTest is Test {
         vm.startPrank(admin);
 
         // Set up initial claims with referral
-        claimHelper.claimInitialWithReferral(address(mockERC20), admin);
+        onboardingUtils.claimInitialWithReferral(address(mockERC20), admin);
 
         // Test getReferrals
-        address[] memory referrals = claimHelper.getReferrals(admin);
+        address[] memory referrals = onboardingUtils.getReferralsBy(admin);
         assertEq(referrals.length, 1, "Admin should have 1 referral");
         assertEq(referrals[0], user1, "Admin's referral should be User1");
 
         // Test getReferrer
-        address referrer = claimHelper.getReferrer(user1);
+        address referrer = onboardingUtils.getReferrerOf(user1);
         assertEq(referrer, admin, "User1's referrer should be Admin");
 
         // Test hasUserClaimedInitial
-        bool hasClaimed = claimHelper.hasUserClaimedInitial(user1);
+        bool hasClaimed = onboardingUtils.hasUserClaimedInitial(user1);
         assertTrue(hasClaimed, "User1 should have claimed initial tokens");
 
         // Test getReferralCount
-        uint256 referralCount = claimHelper.getReferralCount(admin);
+        uint256 referralCount = onboardingUtils.getReferralCount(admin);
         assertEq(referralCount, 1, "Admin should have 1 referral");
 
         vm.stopPrank();
@@ -258,13 +259,13 @@ contract OnboardingTest is Test {
     function test_claimTokens() public {
         console2.log("Testing claiming tokens once per week...");
         vm.startPrank(user1);
-        claimHelper.claimTokens(address(mockERC20));
+        onboardingUtils.claimTokens(address(mockERC20));
         uint256 expectedBalance = 10_000 * 10 ** 18;
         uint256 actualBalance = mockERC20.balanceOf(user1);
         assertEq(expectedBalance, actualBalance, "User1 balance should be 10_000 MTK after claiming tokens");
 
-        vm.expectRevert("ClaimHelper: Claim only allowed once per week");
-        claimHelper.claimTokens(address(mockERC20));
+        vm.expectRevert("OnboardingUtils: Claim only allowed once per week");
+        onboardingUtils.claimTokens(address(mockERC20));
         vm.stopPrank();
     }
 
@@ -273,7 +274,7 @@ contract OnboardingTest is Test {
         uint256 amount = 20_000 * 10 ** 18;
 
         vm.startPrank(admin);
-        claimHelper.airdropTokens(user2, address(mockERC20), amount);
+        onboardingUtils.airdropTokens(user2, address(mockERC20), amount);
 
         uint256 expectedBalance = 20_000 * 10 ** 18;
         uint256 actualBalance = mockERC20.balanceOf(user2);
@@ -286,8 +287,10 @@ contract OnboardingTest is Test {
         MockERC20Factory newFactory = new MockERC20Factory();
 
         vm.startPrank(admin);
-        claimHelper.setTokenFactory(newFactory);
-        assertEq(address(claimHelper.tokenFactory()), address(newFactory), "Token factory address should be updated");
+        onboardingUtils.setTokenFactory(newFactory);
+        assertEq(
+            address(onboardingUtils.tokenFactory()), address(newFactory), "Token factory address should be updated"
+        );
         vm.stopPrank();
     }
 }

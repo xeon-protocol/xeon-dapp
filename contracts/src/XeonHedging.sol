@@ -193,7 +193,7 @@ contract XeonHedging {
     // core addresses
     IUniswapV2Factory public uniswapV2Factory;
     IUniswapV3Factory public uniswapV3Factory;
-    xeonStaking public stakingContract;
+    XeonStaking public stakingContract;
     address public priceOracle;
     address public wethAddress;
     address public usdtAddress;
@@ -241,7 +241,7 @@ contract XeonHedging {
         address _uniswapV2Factory,
         address _uniswapV3Factory,
         address _priceOracle,
-        xeonStaking _stakingContract
+        XeonStaking _stakingContract
     ) {
         require(_uniswapV2Factory != address(0), "Invalid UniswapV2Factory address");
         require(_uniswapV3Factory != address(0), "Invalid UniswapV3Factory address");

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
-import {Script, console2} from "forge-std/Script.sol";
+import {Script} from "forge-std/Script.sol";
+import {console2} from "forge-std/console2.sol";
 import {MockERC20, MockERC20Factory} from "../src/MockERC20Factory.sol";
-import {ClaimHelper} from "../src/ClaimHelper.sol";
+import {OnboardingUtils} from "../src/OnboardingUtils.sol";
 
 contract TokenFactoryScript is Script {
     address public deployer = 0x56557c3266d11541c2D939BF6C05BFD29e881e55;
@@ -27,9 +28,9 @@ contract TokenFactoryScript is Script {
         console2.log("deploying MockERC20Factory contract...");
         MockERC20Factory tokenFactory = new MockERC20Factory();
 
-        // deploy claim helper
-        console2.log("deploying ClaimHelper contract...");
-        ClaimHelper claimHelper = new ClaimHelper(tokenFactory);
+        // deploy onboarding utils
+        console2.log("deploying OnboardingUtils contract...");
+        OnboardingUtils onboardingUtils = new OnboardingUtils(tokenFactory);
 
         // add admin accounts to token factory
         console2.log("adding admin accounts to token factory...");
@@ -40,7 +41,7 @@ contract TokenFactoryScript is Script {
         // add admin accounts to claim helper
         console2.log("adding admin accounts to claim helper...");
         for (uint256 i = 0; i < admin.length; i++) {
-            claimHelper.addAdmin(admin[i]);
+            onboardingUtils.addAdmin(admin[i]);
         }
 
         // deploy tokens, mint to deployer address
@@ -64,7 +65,7 @@ contract TokenFactoryScript is Script {
             address tokenAddress = tokenFactory.deploy(tokenNames[i], tokenSymbols[i], 18, 0);
             console2.log(string(abi.encodePacked("token deployed at: ", address(tokenAddress))));
             MockERC20 token = MockERC20(tokenAddress);
-            token.grantRole(token.MINTER_ROLE(), address(claimHelper));
+            token.grantRole(token.MINTER_ROLE(), address(onboardingUtils));
             token.mint(address(deployer), 1_000_000 * 10 ** 18);
         }
 
