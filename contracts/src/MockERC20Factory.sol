@@ -5,9 +5,11 @@ import "openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin/contracts/access/AccessControl.sol";
 
 contract MockERC20 is ERC20, AccessControl {
-    /* ============ State Variabies ============ */
+    /* ============ State Variables ============ */
     uint8 private _decimals;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    mapping(address => bool) private _holders;
+    address[] private _allHolders;
 
     /* ============ Constructor ============ */
     constructor(string memory name, string memory symbol, uint8 decimals_, uint256 initialSupply, address admin)
@@ -17,16 +19,40 @@ contract MockERC20 is ERC20, AccessControl {
         _mint(admin, initialSupply);
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(MINTER_ROLE, admin);
+        _addHolder(admin);
     }
 
     /* ============ External Functions ============ */
     function mint(address to, uint256 amount) external {
         require(hasRole(MINTER_ROLE, msg.sender), "MockERC20: must have minter role to mint");
         _mint(to, amount);
+        _addHolder(to);
     }
 
     function decimals() public view virtual override returns (uint8) {
         return _decimals;
+    }
+
+    function transfer(address recipient, uint256 amount) public override returns (bool) {
+        _addHolder(recipient);
+        return super.transfer(recipient, amount);
+    }
+
+    function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
+        _addHolder(recipient);
+        return super.transferFrom(sender, recipient, amount);
+    }
+
+    function getAllHolders() external view returns (address[] memory) {
+        return _allHolders;
+    }
+
+    /* ============ Internal Functions ============ */
+    function _addHolder(address holder) internal {
+        if (!_holders[holder]) {
+            _holders[holder] = true;
+            _allHolders.push(holder);
+        }
     }
 }
 
@@ -122,25 +148,6 @@ contract MockERC20Factory is AccessControl {
     }
 
     function getTokenHolders(address tokenAddress) external view returns (address[] memory) {
-        uint256 count = 0;
-        uint256 index = 0;
-
-        // Count the number of holders
-        for (uint256 i = 0; i < tokens.length; i++) {
-            if (tokens[i].tokenAddress == tokenAddress) {
-                count++;
-            }
-        }
-
-        address[] memory holders = new address[](count);
-
-        // Collect the holders' addresses
-        for (uint256 i = 0; i < tokens.length; i++) {
-            if (tokens[i].tokenAddress == tokenAddress) {
-                holders[index] = tokens[i].tokenAddress;
-                index++;
-            }
-        }
-        return holders;
+        return MockERC20(tokenAddress).getAllHolders();
     }
 }
