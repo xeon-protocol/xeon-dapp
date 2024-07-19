@@ -6,6 +6,8 @@ import "openzeppelin/contracts/access/AccessControl.sol";
 import "./MockERC20Factory.sol";
 
 contract OnboardingUtils is AccessControl {
+    /* ============ State Variables ============ */
+
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     MockERC20Factory public tokenFactory;
     address public weth;
@@ -17,6 +19,8 @@ contract OnboardingUtils is AccessControl {
     mapping(address => uint256) public lastClaimTime;
     mapping(address => address[]) public referrals;
     mapping(address => address) public referrerOf;
+
+    /* ============ Events ============ */
 
     event TokensAirdropped(address indexed user, address indexed token, uint256 amount);
     event TokensClaimed(address indexed user, address indexed token, uint256 amount);
@@ -30,6 +34,7 @@ contract OnboardingUtils is AccessControl {
     event AdminRemoved(address indexed admin);
     event WETHUpdated(address indexed oldWETH, address indexed newWETH);
 
+    /* ============ Constructor ============ */
     constructor(MockERC20Factory _tokenFactory, address _weth) {
         tokenFactory = _tokenFactory;
         weth = _weth;
@@ -37,6 +42,7 @@ contract OnboardingUtils is AccessControl {
         _grantRole(ADMIN_ROLE, msg.sender);
     }
 
+    /* ============ External Functions ============ */
     function addAdmin(address admin) external onlyRole(ADMIN_ROLE) {
         grantRole(ADMIN_ROLE, admin);
         emit AdminAdded(admin);
@@ -59,6 +65,12 @@ contract OnboardingUtils is AccessControl {
         emit WETHUpdated(oldWETH, weth);
     }
 
+    /**
+     * @dev claim initial tokens for testnet onboarding, allowed once
+     *  @notice initial claim can only be performed once
+     * @notice user receives 1 WETH + 100k tokens
+     * @param token address of the token to claim
+     */
     function claimInitial(address token) external {
         require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
 
@@ -71,6 +83,13 @@ contract OnboardingUtils is AccessControl {
         emit InitialTokensClaimed(msg.sender, initialClaimAmount);
     }
 
+    /**
+     * @dev claim initial tokens for testnet onboarding with referral
+     * @notice initial claim can only be performed once
+     * @notice referral bonus is +10% of claim amount to both accounts
+     * @param token address of the token to claim
+     * @param referredBy address of the referee
+     */
     function claimInitialWithReferral(address token, address referredBy) external {
         require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
         require(referredBy != msg.sender, "OnboardingUtils: Cannot refer yourself");
@@ -91,6 +110,11 @@ contract OnboardingUtils is AccessControl {
         emit InitialTokensClaimedWithReferral(msg.sender, referredBy, initialClaimAmount, referralBonus);
     }
 
+    /**
+     * @dev weekly token claim
+     * @notice user receives 10k tokens
+     * @param token address of the token to claim
+     */
     function claimTokens(address token) external {
         require(hasClaimedInitial[msg.sender], "OnboardingUtils: Must perform initial claim first");
         require(
@@ -104,12 +128,19 @@ contract OnboardingUtils is AccessControl {
         emit TokensClaimed(msg.sender, token, claimAmount);
     }
 
+    /**
+     * @dev allow admins to airdrop tokens to users
+     * @param user address of the user
+     * @param token address of the token to claim
+     * @param amount amount of tokens to airdrop
+     */
     function airdropTokens(address user, address token, uint256 amount) external onlyRole(ADMIN_ROLE) {
         MockERC20(token).mint(user, amount);
 
         emit TokensAirdropped(user, token, amount);
     }
 
+    /* ============ Getters ============ */
     function hasUserClaimedInitial(address user) external view returns (bool) {
         return hasClaimedInitial[user];
     }

@@ -2,16 +2,16 @@
 pragma solidity 0.8.20;
 
 import {Script, console2} from "forge-std/Script.sol";
-import {MockERC20, MockERC20Factory} from "../src/MockERC20Factory.sol";
+import {MockERC20, MockERC20Factory, MockWETH} from "../src/MockERC20Factory.sol";
 import {OnboardingUtils} from "../src/OnboardingUtils.sol";
 
 contract OnboardingScript is Script {
     address public deployer = 0x56557c3266d11541c2D939BF6C05BFD29e881e55;
 
     address[] public admin = [
-        0xFc09CA87a0E58C8d9e01bC3060CBEB60Ad434cd4, // jon
-        0x212dB369d8C032c3D319e2136eA85F34742Ea399, // welly
-        0x5Fb8EfD425C3eBB85C0773CE33820abC28d1b858 // byte
+        0xFc09CA87a0E58C8d9e01bC3060CBEB60Ad434cd4,
+        0x212dB369d8C032c3D319e2136eA85F34742Ea399,
+        0x5Fb8EfD425C3eBB85C0773CE33820abC28d1b858
     ];
 
     // base sepolia
@@ -23,38 +23,29 @@ contract OnboardingScript is Script {
     function run() public {
         vm.startBroadcast(vm.envUint("DEPLOYER_PRIVATE_KEY"));
 
-        // deploy token factory
         console2.log("deploying MockERC20Factory contract...");
         MockERC20Factory tokenFactory = new MockERC20Factory();
 
-        // deploy onboarding utils
         console2.log("deploying OnboardingUtils contract...");
-        OnboardingUtils onboardingUtils = new OnboardingUtils(tokenFactory);
+        address wethAddress = tokenFactory.deployMockWETH(0);
+        OnboardingUtils onboardingUtils = new OnboardingUtils(tokenFactory, wethAddress);
 
-        // add admin accounts to token factory
         console2.log("adding admin accounts to token factory...");
         for (uint256 i = 0; i < admin.length; i++) {
             tokenFactory.addAdmin(admin[i]);
         }
 
-        // add admin accounts to onboarding utils
         console2.log("adding admin accounts to onboarding utils...");
         for (uint256 i = 0; i < admin.length; i++) {
             onboardingUtils.addAdmin(admin[i]);
         }
 
-        // deploy tokens without initial supply
         deployToken(tokenFactory, onboardingUtils, "Vela Exchange", "oVELA");
         deployToken(tokenFactory, onboardingUtils, "Pepe", "oPEPE");
         deployToken(tokenFactory, onboardingUtils, "Degen", "oDEGEN");
         deployToken(tokenFactory, onboardingUtils, "Higher", "oHIGHER");
         deployToken(tokenFactory, onboardingUtils, "Rorschach", "oROR");
 
-        // deploy WETH token and set it in OnboardingUtils
-        address wethAddress = deployToken(tokenFactory, onboardingUtils, "Wrapped Ether", "WETH");
-        onboardingUtils.setWETH(wethAddress);
-
-        // Fetch and log deployed tokens
         logDeployedTokens(tokenFactory);
 
         vm.stopBroadcast();
@@ -65,13 +56,11 @@ contract OnboardingScript is Script {
         OnboardingUtils onboardingUtils,
         string memory name,
         string memory symbol
-    ) internal returns (address) {
+    ) internal {
         console2.log(string(abi.encodePacked("deploying token: ", name, " (", symbol, ")")));
         address tokenAddress = tokenFactory.deploy(name, symbol, 18, 0);
         MockERC20 token = MockERC20(tokenAddress);
         token.grantRole(token.MINTER_ROLE(), address(onboardingUtils));
-        console2.log("token deployed at:", tokenAddress);
-        return tokenAddress;
     }
 
     function logDeployedTokens(MockERC20Factory tokenFactory) internal view {
