@@ -54,6 +54,19 @@ contract OnboardingTest is Test {
         // Grant minter role to OnboardingUtils
         mockERC20.grantRole(mockERC20.MINTER_ROLE(), address(onboardingUtils));
         console2.log("Granted MINTER_ROLE to OnboardingUtils");
+
+        // Perform initial claims
+        onboardingUtils.claimInitial(address(mockERC20)); // Admin claims initial tokens
+
+        vm.stopPrank();
+
+        // User1 refers User2
+        vm.startPrank(user1);
+        onboardingUtils.claimInitialWithReferral(address(mockERC20), admin);
+        vm.stopPrank();
+
+        vm.startPrank(user2);
+        onboardingUtils.claimInitialWithReferral(address(mockERC20), user1);
         vm.stopPrank();
     }
 
@@ -336,104 +349,108 @@ contract OnboardingTest is Test {
         vm.stopPrank();
     }
 
-    function test_getterMethods() public {
+    function test_getterMethods() public view {
         console2.log("Testing getter methods...");
-        vm.startPrank(admin);
-        console2.log("Current account:", admin);
-
-        // Set up initial claims with referral
-        onboardingUtils.claimInitialWithReferral(address(mockERC20), admin);
 
         // Test getReferrals
-        address[] memory referrals = onboardingUtils.getReferralsBy(admin);
-        console2.log("Number of referrals by admin:", referrals.length);
-        assertEq(referrals.length, 1, "Admin should have 1 referral");
-        console2.log("Admin's referral:", referrals[0]);
-        assertEq(referrals[0], user1, "Admin's referral should be User1");
+        address[] memory referrals = onboardingUtils.getReferralsBy(user1);
+        console2.log("Number of referrals by user1:", referrals.length);
+        assertEq(referrals.length, 1, "User1 should have 1 referral");
+        console2.log("User1's referral:", referrals[0]);
+        assertEq(referrals[0], user2, "User1's referral should be User2");
 
         // Test getReferrer
-        address referrer = onboardingUtils.getReferrerOf(user1);
-        console2.log("User1's referrer:", referrer);
-        assertEq(referrer, admin, "User1's referrer should be Admin");
+        address referrer = onboardingUtils.getReferrerOf(user2);
+        console2.log("User2's referrer:", referrer);
+        assertEq(referrer, user1, "User2's referrer should be User1");
 
         // Test hasUserClaimedInitial
         bool hasClaimed = onboardingUtils.hasUserClaimedInitial(user1);
         console2.log("User1 has claimed initial tokens:", hasClaimed);
         assertTrue(hasClaimed, "User1 should have claimed initial tokens");
 
+        hasClaimed = onboardingUtils.hasUserClaimedInitial(user2);
+        console2.log("User2 has claimed initial tokens:", hasClaimed);
+        assertTrue(hasClaimed, "User2 should have claimed initial tokens");
+
         // Test getReferralCount
-        uint256 referralCount = onboardingUtils.getReferralCount(admin);
-        console2.log("Admin's referral count:", referralCount);
-        assertEq(referralCount, 1, "Admin should have 1 referral");
-        vm.stopPrank();
+        uint256 referralCount = onboardingUtils.getReferralCount(user1);
+        console2.log("User1's referral count:", referralCount);
+        assertEq(referralCount, 1, "User1 should have 1 referral");
     }
 
     function test_claimTokens() public {
-        console2.log("Testing claiming tokens once per week...");
+        address newUser = address(0x5);
+        console2.log("Testing claiming tokens once per week for a new user...");
 
         // Try to claim tokens without performing initial claim
-        vm.startPrank(user1);
-        console2.log("Current account:", user1);
+        vm.startPrank(newUser);
+        console2.log("Current account:", newUser);
         vm.expectRevert("OnboardingUtils: Must perform initial claim first");
         onboardingUtils.claimTokens(address(mockERC20));
         vm.stopPrank();
 
         // Perform initial claim
-        vm.startPrank(user1);
-        console2.log("Performing initial claim for user1");
+        vm.startPrank(newUser);
+        console2.log("Performing initial claim for newUser");
         onboardingUtils.claimInitial(address(mockERC20));
         vm.stopPrank();
 
-        vm.warp(block.timestamp + 1 weeks);
+        // Fast forward one week...
+        vm.warp(block.timestamp + 7 days);
 
-        // Claim tokens after initial claim
-        vm.startPrank(user1);
-        console2.log("Claiming tokens after initial claim for user1");
+        // Claim more tokens one week later
+        vm.startPrank(newUser);
+        console2.log("Claiming tokens after initial claim for newUser");
         onboardingUtils.claimTokens(address(mockERC20));
         uint256 expectedBalance = 110_000 * 10 ** 18; // 100,000 initial + 10,000 weekly
-        uint256 actualBalance = mockERC20.balanceOf(user1);
+        uint256 actualBalance = mockERC20.balanceOf(newUser);
         console2.log("Expected balance:", expectedBalance);
         console2.log("Actual balance:", actualBalance);
-        assertEq(expectedBalance, actualBalance, "User1 balance should be 110_000 MTK after claiming tokens");
+        assertEq(expectedBalance, actualBalance, "newUser balance should be 110_000 MTK after claiming tokens");
         vm.stopPrank();
 
-        // Attempt to claim again immediately, expecting a revert
-        vm.startPrank(user1);
+        // Try to claim immediately, should revert
+        vm.startPrank(newUser);
         console2.log("Attempting to claim again immediately, expecting a revert");
         vm.expectRevert("OnboardingUtils: Claim only allowed once per week");
         onboardingUtils.claimTokens(address(mockERC20));
         vm.stopPrank();
 
-        // Simulate the passage of one week
-        vm.warp(block.timestamp + 1 weeks);
+        // Fast forward one week...
+        vm.warp(block.timestamp + 7 days);
 
-        // Claim tokens again after one week
-        vm.startPrank(user1);
-        console2.log("Claiming tokens again after one week for user1");
+        // Claim weekly tokens
+        vm.startPrank(newUser);
+        console2.log("Claiming tokens again after one week for newUser");
         onboardingUtils.claimTokens(address(mockERC20));
         uint256 newExpectedBalance = 120_000 * 10 ** 18; // 110,000 previous + 10,000 weekly
-        uint256 newActualBalance = mockERC20.balanceOf(user1);
+        uint256 newActualBalance = mockERC20.balanceOf(newUser);
         console2.log("New expected balance:", newExpectedBalance);
         console2.log("New actual balance:", newActualBalance);
         assertEq(
-            newExpectedBalance, newActualBalance, "User1 balance should be 120_000 MTK after claiming tokens again"
+            newExpectedBalance, newActualBalance, "newUser balance should be 120_000 MTK after claiming tokens again"
         );
         vm.stopPrank();
     }
 
     function test_airdropTokens() public {
+        address newUser = address(0x5);
         console2.log("Testing admin airdropping tokens...");
-        uint256 amount = 20_000 * 10 ** 18;
+
+        uint256 airdropAmount = 20_000 * 10 ** 18;
 
         vm.startPrank(admin);
         console2.log("Current account:", admin);
-        onboardingUtils.airdropTokens(user2, address(mockERC20), amount);
 
-        uint256 expectedBalance = amount;
-        uint256 actualBalance = mockERC20.balanceOf(user2);
+        // Perform the airdrop to newUser
+        onboardingUtils.airdropTokens(newUser, address(mockERC20), airdropAmount);
+
+        uint256 expectedBalance = airdropAmount;
+        uint256 actualBalance = mockERC20.balanceOf(newUser);
         console2.log("Expected balance after airdrop:", expectedBalance);
         console2.log("Actual balance after airdrop:", actualBalance);
-        assertEq(expectedBalance, actualBalance, "User2 balance should be 20_000 MTK after airdrop");
+        assertEq(expectedBalance, actualBalance, "newUser balance should be 20_000 MTK after airdrop");
         vm.stopPrank();
     }
 

@@ -61,9 +61,6 @@ contract OnboardingUtils is AccessControl {
      */
     function claimInitial(address token) external {
         require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
-        require(
-            block.timestamp >= lastClaimTime[msg.sender] + 1 weeks, "OnboardingUtils: Claim only allowed once per week"
-        );
 
         MockERC20(token).mint(msg.sender, initialClaimAmount);
         hasClaimedInitial[msg.sender] = true;
@@ -82,9 +79,6 @@ contract OnboardingUtils is AccessControl {
     function claimInitialWithReferral(address token, address referredBy) external {
         require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
         require(referredBy != msg.sender, "OnboardingUtils: Cannot refer yourself");
-        require(
-            block.timestamp >= lastClaimTime[msg.sender] + 1 weeks, "OnboardingUtils: Claim only allowed once per week"
-        );
 
         uint256 referralBonus = initialClaimAmount / 10; // 10% bonus
 
