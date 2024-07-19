@@ -15,6 +15,7 @@ contract OnboardingTest is Test {
     MockERC20Factory public mockERC20Factory;
     OnboardingUtils public onboardingUtils;
     MockERC20 public mockERC20;
+    MockERC20 public wethToken;
     address public admin = address(0x1);
     address public nonAdmin = address(0x2);
     address public user1 = address(0x3);
@@ -40,8 +41,17 @@ contract OnboardingTest is Test {
         mockERC20Factory.addAdmin(admin);
         mockERC20Factory.grantRole(mockERC20Factory.DEFAULT_ADMIN_ROLE(), admin);
         onboardingUtils.addAdmin(admin);
-        onboardingUtils.grantRole(onboardingUtils.DEFAULT_ADMIN_ROLE(), admin); // Grant DEFAULT_ADMIN_ROLE in OnboardingUtils
+        onboardingUtils.grantRole(onboardingUtils.DEFAULT_ADMIN_ROLE(), admin);
         console2.log("Granted roles to admin in both contracts");
+
+        // Deploy WETH token
+        address wethTokenAddress = mockERC20Factory.deploy("Wrapped Ether", "WETH", 18, 0);
+        wethToken = MockERC20(wethTokenAddress);
+        console2.log("Deployed WETH token at:", wethTokenAddress);
+
+        // Grant minter role for WETH to OnboardingUtils
+        wethToken.grantRole(wethToken.MINTER_ROLE(), address(onboardingUtils));
+        console2.log("Granted MINTER_ROLE to OnboardingUtils for WETH");
 
         vm.stopPrank();
 
@@ -53,7 +63,7 @@ contract OnboardingTest is Test {
 
         // Grant minter role to OnboardingUtils
         mockERC20.grantRole(mockERC20.MINTER_ROLE(), address(onboardingUtils));
-        console2.log("Granted MINTER_ROLE to OnboardingUtils");
+        console2.log("Granted MINTER_ROLE to OnboardingUtils for MockToken");
         vm.stopPrank();
     }
 
@@ -282,6 +292,17 @@ contract OnboardingTest is Test {
             actualUserBalance,
             "User1 balance should be 110_000 MTK after initial claim with referral"
         );
+
+        uint256 expectedWethBalance = 1 * 10 ** 18;
+        uint256 actualWethBalance = wethToken.balanceOf(user1);
+        console2.log("Expected WETH balance:", expectedWethBalance);
+        console2.log("Actual WETH balance:", actualWethBalance);
+        assertEq(
+            expectedWethBalance,
+            actualWethBalance,
+            "User1 WETH balance should be 1 WETH after initial claim with referral"
+        );
+
         vm.stopPrank();
 
         vm.startPrank(admin);
@@ -304,6 +325,13 @@ contract OnboardingTest is Test {
         console2.log("Expected balance:", expectedBalance);
         console2.log("Actual balance:", actualBalance);
         assertEq(expectedBalance, actualBalance, "User2 balance should be 100_000 MTK after initial claim");
+
+        uint256 expectedWethBalance = 1 * 10 ** 18;
+        uint256 actualWethBalance = wethToken.balanceOf(user2);
+        console2.log("Expected WETH balance:", expectedWethBalance);
+        console2.log("Actual WETH balance:", actualWethBalance);
+        assertEq(expectedWethBalance, actualWethBalance, "User2 WETH balance should be 1 WETH after initial claim");
+
         vm.stopPrank();
     }
 
