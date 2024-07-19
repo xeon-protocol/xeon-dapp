@@ -14,7 +14,10 @@ import WhyOTC from "@/components/guide/WhyOTC";
 import TokenTable from "@/components/testing/TokenTable";
 import TokenDeposit from "@/components/testing/TokenDeposits";
 import WriteHedges from "@/components/testing/WriteHedges";
-import WithdrawTokens from "@/components/testing/WithdrawTokens";
+import 
+
+
+from "@/components/testing/WithdrawTokens";
 import SoftwareVersions from "@/components/testing/Versions";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
@@ -55,16 +58,20 @@ function Page() {
         <Header />
         <div className="flex flex-col md:gap-12 md:flex-row justify-between 2xl:mt-[20%] mt-[18%]">
           <div className="md:w-[40%] lg:w-[100%] md:px-0 lg:px-18 flex items-center md:block">
+
             <motion.h3
+
               className="text-light-purple text-3xl md:text-5xl lg:text-7xl  lg:mt-14"
               initial="hidden"
               animate="visible"
               variants={headingVariants}
               transition={{ duration: 0.6 }}
             >
+
               Xeon
             </motion.h3>
             <motion.h3
+
               className="text-grey text-3xl ml-1 md:ml-0  md:text-5xl lg:text-7xl"
               initial="hidden"
               animate="visible"
@@ -72,8 +79,11 @@ function Page() {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               Testnet
+
             </motion.h3>
             <motion.h3
+
+
               className="text-grey text-3xl md:text-5xl ml-1 md:ml-0 lg:text-7xl"
               initial="hidden"
               animate="visible"
@@ -81,7 +91,9 @@ function Page() {
               transition={{ duration: 0.6, delay: 0.4 }}
             >
               Guide
+
             </motion.h3>
+
 
             <Image
               src="/dotted.webp"
@@ -124,8 +136,10 @@ function Page() {
               >
                 <motion.a
                   href="https://neon-hedge.gitbook.io/xeon-protocol-documentation/"
+
                   target="_blank"
                   rel="noopener noreferrer"
+
                   className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
                   variants={itemVariants}
                   transition={{ duration: 0.6, delay: 0.2 }}
@@ -142,8 +156,10 @@ function Page() {
                 </motion.a>
                 <motion.a
                   href="https://t.me/xeon_protocol"
+
                   target="_blank"
                   rel="noopener noreferrer"
+
                   className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
                   variants={itemVariants}
                   transition={{ duration: 0.6, delay: 0.6 }}
@@ -192,6 +208,9 @@ function Page() {
 
       <TokenDeposit />
       <WriteHedges />
+
+      <WithdrawTokens />
+      <SoftwareVersions />
 
       <Footer />
     </>

@@ -5,6 +5,7 @@ import { FaBars, FaTimes } from "react-icons/fa";
 import Link from "next/link";
 import { client } from "@/components/ConnectWallet/client";
 import { ConnectButton } from "thirdweb/react";
+
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -38,6 +39,8 @@ function Header() {
           MENU
         </p>
       </div>
+
+  
       <div className=" md:flex gap-4">
         {/* <button className="text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue">
           Switch Network
@@ -67,6 +70,7 @@ function Header() {
           }}
           client={client}
         />
+
       </div>
 
       {isMenuOpen && (
@@ -87,9 +91,11 @@ function Header() {
             <p className="hover:text-gray-400">Testing</p>
           </Link>
           <Link
+
             href="https://docs.xeon-protocol.io/documentation"
             target="_blank"
             rel="noopener noreferrer"
+
           >
             <p className="hover:text-gray-400">Docs</p>
           </Link>

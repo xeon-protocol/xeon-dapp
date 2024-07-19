@@ -52,6 +52,7 @@ li{
 .hover\\:border-animate:hover {
   animation: border-animation 2s infinite;
   border-width: 2px;
+
 }
 
 
@@ -206,3 +207,6 @@ h1{
         .footer-social a:hover  .line{
           stroke:#aa79e5;
         }
+
+}
+
