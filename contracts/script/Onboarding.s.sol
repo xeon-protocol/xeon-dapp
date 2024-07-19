@@ -15,8 +15,8 @@ contract OnboardingScript is Script {
     ];
 
     // base sepolia
-    // simulate: forge script script/Onboarding.s.sol:OnboardingScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv
-    // broadcast: forge script script/Onboarding.s.sol:OnboardingScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv --broadcast
+    // simulate: forge script script/Onboarding.s.sol:OnboardingScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vvvv
+    // broadcast: forge script script/Onboarding.s.sol:OnboardingScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv --broadcast --verify
 
     function setUp() public {}
 
@@ -49,7 +49,10 @@ contract OnboardingScript is Script {
         deployToken(tokenFactory, onboardingUtils, "Degen", "oDEGEN");
         deployToken(tokenFactory, onboardingUtils, "Higher", "oHIGHER");
         deployToken(tokenFactory, onboardingUtils, "Rorschach", "oROR");
-        deployToken(tokenFactory, onboardingUtils, "Wrapped Ether", "WETH");
+
+        // deploy WETH token and set it in OnboardingUtils
+        address wethAddress = deployToken(tokenFactory, onboardingUtils, "Wrapped Ether", "WETH");
+        onboardingUtils.setWETH(wethAddress);
 
         // Fetch and log deployed tokens
         logDeployedTokens(tokenFactory);
@@ -62,11 +65,13 @@ contract OnboardingScript is Script {
         OnboardingUtils onboardingUtils,
         string memory name,
         string memory symbol
-    ) internal {
+    ) internal returns (address) {
         console2.log(string(abi.encodePacked("deploying token: ", name, " (", symbol, ")")));
         address tokenAddress = tokenFactory.deploy(name, symbol, 18, 0);
         MockERC20 token = MockERC20(tokenAddress);
         token.grantRole(token.MINTER_ROLE(), address(onboardingUtils));
+        console2.log("token deployed at:", tokenAddress);
+        return tokenAddress;
     }
 
     function logDeployedTokens(MockERC20Factory tokenFactory) internal view {

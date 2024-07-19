@@ -9,8 +9,10 @@ contract OnboardingUtils is AccessControl {
     /* ============ State Variables ============ */
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     MockERC20Factory public tokenFactory;
+    address public weth;
     uint256 public initialClaimAmount = 100_000 * 10 ** 18;
     uint256 public claimAmount = 10_000 * 10 ** 18;
+    uint256 public wethClaimAmount = 1 * 10 ** 18;
     mapping(address => bool) public hasClaimedInitial;
     mapping(address => uint256) public referralCount;
     mapping(address => uint256) public lastClaimTime;
@@ -29,6 +31,7 @@ contract OnboardingUtils is AccessControl {
     event MockERC20FactoryUpdated(address indexed oldFactory, address indexed newFactory);
     event AdminAdded(address indexed admin);
     event AdminRemoved(address indexed admin);
+    event WETHUpdated(address indexed oldWETH, address indexed newWETH);
 
     /* ============ Constructor ============ */
     constructor(MockERC20Factory _tokenFactory) {
@@ -54,6 +57,12 @@ contract OnboardingUtils is AccessControl {
         emit MockERC20FactoryUpdated(oldFactory, address(tokenFactory));
     }
 
+    function setWETH(address _weth) external onlyRole(ADMIN_ROLE) {
+        address oldWETH = weth;
+        weth = _weth;
+        emit WETHUpdated(oldWETH, weth);
+    }
+
     /**
      * @dev claim initial tokens for testnet onboarding, allowed once
      * @notice initial claim can only be performed once
@@ -63,6 +72,8 @@ contract OnboardingUtils is AccessControl {
         require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
 
         MockERC20(token).mint(msg.sender, initialClaimAmount);
+        MockERC20(weth).mint(msg.sender, wethClaimAmount);
+
         hasClaimedInitial[msg.sender] = true;
         lastClaimTime[msg.sender] = block.timestamp;
 
@@ -84,6 +95,7 @@ contract OnboardingUtils is AccessControl {
 
         MockERC20(token).mint(msg.sender, initialClaimAmount + referralBonus);
         MockERC20(token).mint(referredBy, referralBonus);
+        MockERC20(weth).mint(msg.sender, wethClaimAmount);
 
         referrals[referredBy].push(msg.sender);
         referrerOf[msg.sender] = referredBy;
