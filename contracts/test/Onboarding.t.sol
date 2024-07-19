@@ -54,19 +54,6 @@ contract OnboardingTest is Test {
         // Grant minter role to OnboardingUtils
         mockERC20.grantRole(mockERC20.MINTER_ROLE(), address(onboardingUtils));
         console2.log("Granted MINTER_ROLE to OnboardingUtils");
-
-        // Perform initial claims
-        onboardingUtils.claimInitial(address(mockERC20)); // Admin claims initial tokens
-
-        vm.stopPrank();
-
-        // User1 refers User2
-        vm.startPrank(user1);
-        onboardingUtils.claimInitialWithReferral(address(mockERC20), admin);
-        vm.stopPrank();
-
-        vm.startPrank(user2);
-        onboardingUtils.claimInitialWithReferral(address(mockERC20), user1);
         vm.stopPrank();
     }
 
@@ -349,8 +336,17 @@ contract OnboardingTest is Test {
         vm.stopPrank();
     }
 
-    function test_getterMethods() public view {
+    function test_getterMethods() public {
         console2.log("Testing getter methods...");
+
+        // User1 refers User2
+        vm.startPrank(user1);
+        onboardingUtils.claimInitialWithReferral(address(mockERC20), admin);
+        vm.stopPrank();
+
+        vm.startPrank(user2);
+        onboardingUtils.claimInitialWithReferral(address(mockERC20), user1);
+        vm.stopPrank();
 
         // Test getReferrals
         address[] memory referrals = onboardingUtils.getReferralsBy(user1);
