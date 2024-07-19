@@ -5,7 +5,7 @@ import {Script, console2} from "forge-std/Script.sol";
 import {MockERC20, MockERC20Factory} from "../src/MockERC20Factory.sol";
 import {OnboardingUtils} from "../src/OnboardingUtils.sol";
 
-contract TokenFactoryScript is Script {
+contract OnboardingScript is Script {
     address public deployer = 0x56557c3266d11541c2D939BF6C05BFD29e881e55;
 
     address[] public admin = [
@@ -15,8 +15,8 @@ contract TokenFactoryScript is Script {
     ];
 
     // base sepolia
-    // simulate: forge script script/Onboarding.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv
-    // broadcast: forge script script/Onboarding.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv --broadcast
+    // simulate: forge script script/Onboarding.s.sol:OnboardingScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv
+    // broadcast: forge script script/Onboarding.s.sol:OnboardingScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv --broadcast
 
     function setUp() public {}
 
