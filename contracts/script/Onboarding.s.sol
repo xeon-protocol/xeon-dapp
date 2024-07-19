@@ -44,29 +44,37 @@ contract OnboardingScript is Script {
         }
 
         // deploy tokens without initial supply
-        string[] memory tokenNames = new string[](6);
-        string[] memory tokenSymbols = new string[](6);
-        tokenNames[0] = "Vela Exchange";
-        tokenSymbols[0] = "oVELA";
-        tokenNames[1] = "Pepe";
-        tokenSymbols[1] = "oPEPE";
-        tokenNames[2] = "Degen";
-        tokenSymbols[2] = "oDEGEN";
-        tokenNames[3] = "Higher";
-        tokenSymbols[3] = "oHIGHER";
-        tokenNames[4] = "Rorschach";
-        tokenSymbols[4] = "oROR";
-        tokenNames[5] = "Wrapped Ether";
-        tokenSymbols[5] = "WETH";
+        deployToken(tokenFactory, onboardingUtils, "Vela Exchange", "oVELA");
+        deployToken(tokenFactory, onboardingUtils, "Pepe", "oPEPE");
+        deployToken(tokenFactory, onboardingUtils, "Degen", "oDEGEN");
+        deployToken(tokenFactory, onboardingUtils, "Higher", "oHIGHER");
+        deployToken(tokenFactory, onboardingUtils, "Rorschach", "oROR");
+        deployToken(tokenFactory, onboardingUtils, "Wrapped Ether", "WETH");
 
-        for (uint256 i = 0; i < tokenNames.length; i++) {
-            console2.log(string(abi.encodePacked("deploying token: ", tokenNames[i], " (", tokenSymbols[i], ")")));
-            address tokenAddress = tokenFactory.deploy(tokenNames[i], tokenSymbols[i], 18, 0);
-            console2.log(string(abi.encodePacked("token deployed at: ", tokenAddress)));
-            MockERC20 token = MockERC20(tokenAddress);
-            token.grantRole(token.MINTER_ROLE(), address(onboardingUtils));
-        }
+        // Fetch and log deployed tokens
+        logDeployedTokens(tokenFactory);
 
         vm.stopBroadcast();
+    }
+
+    function deployToken(
+        MockERC20Factory tokenFactory,
+        OnboardingUtils onboardingUtils,
+        string memory name,
+        string memory symbol
+    ) internal {
+        console2.log(string(abi.encodePacked("deploying token: ", name, " (", symbol, ")")));
+        address tokenAddress = tokenFactory.deploy(name, symbol, 18, 0);
+        MockERC20 token = MockERC20(tokenAddress);
+        token.grantRole(token.MINTER_ROLE(), address(onboardingUtils));
+    }
+
+    function logDeployedTokens(MockERC20Factory tokenFactory) internal view {
+        MockERC20Factory.TokenInfo[] memory tokens = tokenFactory.getDeployedTokens();
+        for (uint256 i = 0; i < tokens.length; i++) {
+            console2.log("Token Name:", tokens[i].name);
+            console2.log("Token Symbol:", tokens[i].symbol);
+            console2.log("Token Address:", tokens[i].tokenAddress);
+        }
     }
 }
