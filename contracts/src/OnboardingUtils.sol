@@ -76,13 +76,10 @@ contract OnboardingUtils is AccessControl {
      * @param referredBy address of account that referred the user
      */
     function claimInitialWithReferral(address token, address referredBy) external {
-        // you can only claim once, nice try...
         require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
         require(referredBy != msg.sender, "OnboardingUtils: Cannot refer yourself");
 
-        // 10% bonus for referrals, tell your friends!
-        uint256 referralBonus = claimAmount / 10;
-        uint256 totalClaimAmount = claimAmount + referralBonus;
+        uint256 referralBonus = claimAmount / 10; // 10% bonus
 
         MockERC20(token).mint(msg.sender, claimAmount);
         MockERC20(token).mint(referredBy, referralBonus);
@@ -111,7 +108,7 @@ contract OnboardingUtils is AccessControl {
     }
 
     /**
-     * @dev allow admins to manually distrubute tokens to users
+     * @dev allow admins to manually distribute tokens to users
      */
     function airdropTokens(address user, address token, uint256 amount) external onlyRole(ADMIN_ROLE) {
         MockERC20(token).mint(user, amount);

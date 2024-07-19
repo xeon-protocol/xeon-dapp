@@ -63,7 +63,7 @@ contract XeonStaking is Ownable {
         _;
     }
 
-    constructor(address xeonToken) {
+    constructor(address xeonToken) Ownable(msg.sender) {
         require(xeonToken != address(0), "Invalid token address.");
         stakingToken = IERC20(xeonToken);
         nextUnstakeTimestamp = 0;

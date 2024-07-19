@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
-import {Script} from "forge-std/Script.sol";
-import {console2} from "forge-std/console2.sol";
+import {Script, console2} from "forge-std/Script.sol";
 import {MockERC20, MockERC20Factory} from "../src/MockERC20Factory.sol";
 import {OnboardingUtils} from "../src/OnboardingUtils.sol";
 
@@ -19,7 +18,9 @@ contract TokenFactoryScript is Script {
     // simulate: forge script script/Onboarding.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv
     // broadcast: forge script script/Onboarding.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv --broadcast
 
-    function setUp() public {}
+    function setUp() public {
+        console2.log("deployer.balance", deployer.balance);
+    }
 
     function run() public {
         vm.startBroadcast(vm.envUint("DEPLOYER_PRIVATE_KEY"));
@@ -38,13 +39,13 @@ contract TokenFactoryScript is Script {
             tokenFactory.addAdmin(admin[i]);
         }
 
-        // add admin accounts to claim helper
-        console2.log("adding admin accounts to claim helper...");
+        // add admin accounts to onboarding utils
+        console2.log("adding admin accounts to onboarding utils...");
         for (uint256 i = 0; i < admin.length; i++) {
             onboardingUtils.addAdmin(admin[i]);
         }
 
-        // deploy tokens, mint to deployer address
+        // deploy tokens without initial supply
         string[] memory tokenNames = new string[](6);
         string[] memory tokenSymbols = new string[](6);
         tokenNames[0] = "TestROR";
@@ -66,7 +67,6 @@ contract TokenFactoryScript is Script {
             console2.log(string(abi.encodePacked("token deployed at: ", address(tokenAddress))));
             MockERC20 token = MockERC20(tokenAddress);
             token.grantRole(token.MINTER_ROLE(), address(onboardingUtils));
-            token.mint(address(deployer), 1_000_000 * 10 ** 18);
         }
 
         vm.stopBroadcast();
