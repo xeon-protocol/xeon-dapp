@@ -9,6 +9,7 @@ contract OnboardingUtils is AccessControl {
     /* ============ State Variables ============ */
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     MockERC20Factory public tokenFactory;
+    uint256 public initialClaimAmount = 100_000 * 10 ** 18;
     uint256 public claimAmount = 10_000 * 10 ** 18;
     mapping(address => bool) public hasClaimedInitial;
     mapping(address => uint256) public referralCount;
@@ -61,11 +62,11 @@ contract OnboardingUtils is AccessControl {
     function claimInitial(address token) external {
         require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
 
-        MockERC20(token).mint(msg.sender, claimAmount);
-
+        MockERC20(token).mint(msg.sender, initialClaimAmount);
         hasClaimedInitial[msg.sender] = true;
+        lastClaimTime[msg.sender] = block.timestamp;
 
-        emit InitialTokensClaimed(msg.sender, claimAmount);
+        emit InitialTokensClaimed(msg.sender, initialClaimAmount);
     }
 
     /**
@@ -79,9 +80,9 @@ contract OnboardingUtils is AccessControl {
         require(!hasClaimedInitial[msg.sender], "OnboardingUtils: Already claimed initial tokens");
         require(referredBy != msg.sender, "OnboardingUtils: Cannot refer yourself");
 
-        uint256 referralBonus = claimAmount / 10; // 10% bonus
+        uint256 referralBonus = initialClaimAmount / 10; // 10% bonus
 
-        MockERC20(token).mint(msg.sender, claimAmount);
+        MockERC20(token).mint(msg.sender, initialClaimAmount + referralBonus);
         MockERC20(token).mint(referredBy, referralBonus);
 
         referrals[referredBy].push(msg.sender);
@@ -89,19 +90,21 @@ contract OnboardingUtils is AccessControl {
         referralCount[referredBy]++;
 
         hasClaimedInitial[msg.sender] = true;
+        lastClaimTime[msg.sender] = block.timestamp;
 
-        emit InitialTokensClaimedWithReferral(msg.sender, referredBy, claimAmount, referralBonus);
+        emit InitialTokensClaimedWithReferral(msg.sender, referredBy, initialClaimAmount, referralBonus);
     }
 
     /**
      * @dev after initial claim, users can claim additional tokens weekly
      */
     function claimTokens(address token) external {
+        require(hasClaimedInitial[msg.sender], "OnboardingUtils: Must perform initial claim first");
         require(
             block.timestamp >= lastClaimTime[msg.sender] + 1 weeks, "OnboardingUtils: Claim only allowed once per week"
         );
-        lastClaimTime[msg.sender] = block.timestamp;
 
+        lastClaimTime[msg.sender] = block.timestamp;
         MockERC20(token).mint(msg.sender, claimAmount);
 
         emit TokensClaimed(msg.sender, token, claimAmount);
