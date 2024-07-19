@@ -18,9 +18,7 @@ contract TokenFactoryScript is Script {
     // simulate: forge script script/Onboarding.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv
     // broadcast: forge script script/Onboarding.s.sol:TokenFactoryScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv --broadcast
 
-    function setUp() public {
-        console2.log("deployer.balance", deployer.balance);
-    }
+    function setUp() public {}
 
     function run() public {
         vm.startBroadcast(vm.envUint("DEPLOYER_PRIVATE_KEY"));
@@ -48,23 +46,23 @@ contract TokenFactoryScript is Script {
         // deploy tokens without initial supply
         string[] memory tokenNames = new string[](6);
         string[] memory tokenSymbols = new string[](6);
-        tokenNames[0] = "TestROR";
-        tokenSymbols[0] = "tROR";
-        tokenNames[1] = "TestDegen";
-        tokenSymbols[1] = "tDEGEN";
-        tokenNames[2] = "TestPepe";
-        tokenSymbols[2] = "tPEPE";
-        tokenNames[3] = "JonToken";
-        tokenSymbols[3] = "tJON";
-        tokenNames[4] = "WellyToken";
-        tokenSymbols[4] = "tWELLY";
-        tokenNames[5] = "ByteToken";
-        tokenSymbols[5] = "tBYTE";
+        tokenNames[0] = "Vela Exchange";
+        tokenSymbols[0] = "oVELA";
+        tokenNames[1] = "Pepe";
+        tokenSymbols[1] = "oPEPE";
+        tokenNames[2] = "Degen";
+        tokenSymbols[2] = "oDEGEN";
+        tokenNames[3] = "Higher";
+        tokenSymbols[3] = "oHIGHER";
+        tokenNames[4] = "Rorschach";
+        tokenSymbols[4] = "oROR";
+        tokenNames[5] = "Wrapped Ether";
+        tokenSymbols[5] = "WETH";
 
         for (uint256 i = 0; i < tokenNames.length; i++) {
             console2.log(string(abi.encodePacked("deploying token: ", tokenNames[i], " (", tokenSymbols[i], ")")));
             address tokenAddress = tokenFactory.deploy(tokenNames[i], tokenSymbols[i], 18, 0);
-            console2.log(string(abi.encodePacked("token deployed at: ", address(tokenAddress))));
+            console2.log(string(abi.encodePacked("token deployed at: ", tokenAddress)));
             MockERC20 token = MockERC20(tokenAddress);
             token.grantRole(token.MINTER_ROLE(), address(onboardingUtils));
         }
