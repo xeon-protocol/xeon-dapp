@@ -1,9 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaCopy } from "react-icons/fa";
-import { motion, useInView } from "framer-motion";
+import { color, motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { ethers } from "ethers";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Spinner,
+  useDisclosure,
+} from "@chakra-ui/react";
+import BookmarkAdded from "../BookmarkAdded";
 
 const TokenTable = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const tokens = [
     {
       name: "oVela Exchange",
@@ -58,6 +77,42 @@ const TokenTable = () => {
         alert("Failed to copy the address.");
       }
     );
+  };
+
+  const handleClaim = async (tokenAddress, referredByAddress = null) => {
+    setLoading(true);
+    setError(null);
+    onOpen();
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
+
+      const contractAddress = "0xf527b037e30d8764e8e24b7ed7a6158488c6a758";
+      const abi = [
+        "function claimInitial(address tokenAddress) public",
+        "function claimInitialWithReferral(address tokenAddress, address referredByAddress) public",
+      ];
+
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      if (referredByAddress) {
+        await contract.claimInitialWithReferral(
+          tokenAddress,
+          referredByAddress
+        );
+      } else {
+        await contract.claimInitial(tokenAddress);
+      }
+      setShowPopup(true);
+      setMessage("Token claimed successfully!");
+      setStatus("success");
+    } catch (err) {
+      setError(err.message);
+      setMessage("Failed to claim token.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const tableVariants = {
@@ -140,7 +195,6 @@ const TokenTable = () => {
                 >
                   {token.address.slice(0, 14)}...
                 </a>
-
                 <button
                   className="ml-2 bg-black text-white px-2 py-1 rounded hover:text-lime-400"
                   onClick={() => copyToClipboard(token.address)}
@@ -171,7 +225,11 @@ const TokenTable = () => {
                   </p>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <button className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400">
+                    <button
+                      className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400"
+                      onClick={() => handleClaim(token.address)}
+                      disabled={loading}
+                    >
                       Claim
                     </button>
                     <button className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400">
@@ -184,6 +242,49 @@ const TokenTable = () => {
           ))}
         </motion.tbody>
       </motion.table>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent bg={"#000"}>
+          <ModalHeader bg={"#000"} color={"white"}>
+            Claim Token
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody bg={"#000"}>
+            {loading ? (
+              <Spinner />
+            ) : (
+              <BookmarkAdded
+                message={message}
+                status={status}
+                setShowPopup={setShowPopup}
+              />
+            )}
+          </ModalBody>
+
+          <ModalFooter>
+            <button
+              className="
+              bg-gradient-button text-white px-4 py-2 rounded mt-4
+              "
+              onClick={onClose}
+            >
+              Close
+            </button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {showPopup && (
+        <Modal isOpen={showPopup} onClose={() => setShowPopup(false)}>
+          <BookmarkAdded
+            message={message}
+            status={status}
+            setShowPopup={setShowPopup}
+          />
+        </Modal>
+      )}
+
       <p className="text-grey text-lg mt-5">
         We require: Metamask, Sepolia WETH, and Testnet ERC20 tokens to test the
         platform. Make sure to claim ETH from{" "}
