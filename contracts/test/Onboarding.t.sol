@@ -23,38 +23,35 @@ contract OnboardingTest is Test {
     function setUp() public {
         console2.log("Setting up the environment...");
 
-        // deploy MockERC20Factory contract
+        // Deploy MockERC20Factory contract
         mockERC20Factory = new MockERC20Factory();
         console2.log("Deployed MockERC20Factory contract");
 
-        // set deployer as admin
+        // Set deployer as admin
         mockERC20Factory.grantRole(mockERC20Factory.DEFAULT_ADMIN_ROLE(), address(this));
         console2.log("Granted DEFAULT_ADMIN_ROLE to deployer");
 
-        // initialize with token factory
+        // Initialize with token factory
         onboardingUtils = new OnboardingUtils(mockERC20Factory);
         console2.log("Initialized OnboardingUtils with MockERC20Factory");
 
-        // set admin address
+        // Grant roles to admin in both contracts
         vm.startPrank(address(this));
         mockERC20Factory.addAdmin(admin);
-        onboardingUtils.addAdmin(admin);
-        console2.log("Added admin address:", admin);
-
-        // grant DEFAULT_ADMIN_ROLE to admin
         mockERC20Factory.grantRole(mockERC20Factory.DEFAULT_ADMIN_ROLE(), admin);
-        onboardingUtils.grantRole(onboardingUtils.ADMIN_ROLE(), admin); // Grant ADMIN_ROLE in OnboardingUtils
-        console2.log("Granted DEFAULT_ADMIN_ROLE and ADMIN_ROLE to admin");
+        onboardingUtils.addAdmin(admin);
+        onboardingUtils.grantRole(onboardingUtils.DEFAULT_ADMIN_ROLE(), admin); // Grant DEFAULT_ADMIN_ROLE in OnboardingUtils
+        console2.log("Granted roles to admin in both contracts");
 
         vm.stopPrank();
 
-        // deploy ERC20 token
+        // Deploy ERC20 token
         vm.startPrank(admin);
         address tokenAddress = mockERC20Factory.deploy("MockToken", "MTK", 18, 0); // Initial supply is 0
         mockERC20 = MockERC20(tokenAddress);
         console2.log("Deployed MockERC20 token at:", tokenAddress);
 
-        // grant minter role to OnboardingUtils
+        // Grant minter role to OnboardingUtils
         mockERC20.grantRole(mockERC20.MINTER_ROLE(), address(onboardingUtils));
         console2.log("Granted MINTER_ROLE to OnboardingUtils");
         vm.stopPrank();
