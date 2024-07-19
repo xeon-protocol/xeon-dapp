@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.6;
 pragma abicoder v2;
 
@@ -14,7 +14,8 @@ contract PriceOracleTest is Test {
     // test stablecoin price
     // test WETH price
     // fuzz test all ERC20 tokens deployed
-    PriceOracle public priceOracle;
+
+    // PriceOracle public priceOracle;
 
     function setUp() public {}
 }

@@ -5,6 +5,9 @@ import "uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "uniswap/v3-periphery/contracts/libraries/OracleLibrary.sol";
 
 contract PriceOracle {
+    // todo: ensure price oracle will work on testnet
+    // todo: add chainlink oracle
+    // todo: add custom oracle
     // Fetch the time-weighted average price (TWAP) from the Uniswap V3 pool
     function getTWAP(address pool, uint32 interval) external view returns (uint256) {
         (int24 tick,) = OracleLibrary.consult(pool, interval);
