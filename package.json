@@ -10,16 +10,19 @@
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
+    "@coinbase/onchainkit": "^0.25.5",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@openzeppelin/contracts": "^5.0.2",
     "@tanstack/react-query": "^5.51.1",
     "@teller-protocol/teller-widget": "^1.2.0",
     "@teller-protocol/v2-contracts": "^3.1.13",
+    "@thirdweb-dev/sdk": "^4.0.99",
     "@uniswap/v2-core": "^1.0.1",
     "@uniswap/v3-core": "^1.0.1",
     "@uniswap/v3-periphery": "^1.4.4",
     "alchemy-sdk": "^3.3.1",
+    "ethers": "5",
     "framer-motion": "^11.2.12",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
@@ -29,7 +32,9 @@
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.1",
     "react-lottie-player": "^2.0.0",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "thirdweb": "^5.36.0",
+    "wagmi": "^2.11.2"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",

@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { Button, IconButton, Image } from "@chakra-ui/react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import Link from "next/link";
-
+import { client } from "@/components/ConnectWallet/client";
+import { ConnectButton } from "thirdweb/react";
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -37,10 +38,35 @@ function Header() {
           MENU
         </p>
       </div>
-      <div className=" md:block">
-        <button className="text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue">
+      <div className=" md:flex gap-4">
+        {/* <button className="text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue">
           Switch Network
-        </button>
+        </button> */}
+        <ConnectButton
+          connectButton={{
+            className:
+              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+            style: {
+              borderRadius: "50px",
+              backgroundColor: "#3253FB",
+              color: "white",
+            },
+          }}
+          signInButton={{
+            className:
+              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+          }}
+          detailsButton={{
+            className:
+              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+            style: {
+              borderRadius: "50px",
+              backgroundColor: "#3253FB",
+              color: "white",
+            },
+          }}
+          client={client}
+        />
       </div>
 
       {isMenuOpen && (
