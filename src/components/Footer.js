@@ -4,7 +4,6 @@ import React from "react";
 
 import { MdMail } from "react-icons/md";
 
-
 function Footer() {
   return (
     <Box fontWeight={"400"} position="relative" width="100%">
@@ -31,7 +30,6 @@ function Footer() {
           <p>Xeon Protocol.</p>
           <p>ERC20 Hedging & Lending Ecosystem.</p>
 
-
           <div className="footer-social">
             <a
               href="https://linktr.ee/XeonProtocol"
@@ -54,10 +52,11 @@ function Footer() {
               </svg>
             </a>
 
-          <Box className="flex items-center gap-4 mt-5">
-
-        
-
+            <a
+              href="https://twitter.com/XeonProtocol"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <svg
                 viewBox="0 0 34 34"
                 fill="none"
@@ -125,10 +124,6 @@ function Footer() {
                 />
               </svg>
 
-              <Image src="/x.webp" alt="twitter" />
-
-         
-
               <svg
                 viewBox="0 0 34 34"
                 fill="none"
@@ -178,25 +173,21 @@ function Footer() {
               <MdMail size={20} className="line" />
             </a>
           </div>
-
         </Box>
         <Box className="w-full md:w-1/6 p-4" textAlign="left">
           <p className="mb-2 text-grey">{`{ READ }`}</p>
           <li className="mb-2 text-grey">
             {" "}
-
             <Link
               href="https://docs.xeon-protocol.io/documentation"
               target="_blank"
               rel="noopener noreferrer"
             >
-
               Documentation
             </Link>
           </li>
 
           <li className="mb-2 text-grey">
-
             <Link
               target="_blank"
               rel="noopener noreferrer"
@@ -213,14 +204,12 @@ function Footer() {
             >
               Medium
             </Link>
-
           </li>
         </Box>
         <Box className="w-full md:w-1/6 p-4" textAlign="left">
           <p className="mb-2 text-grey">{`{ ENGINEERING }`}</p>
           <li className="mb-2 text-grey">
             {" "}
-
             <Link
               target="_blank"
               rel="noopener noreferrer"
@@ -236,18 +225,15 @@ function Footer() {
               rel="noopener noreferrer"
               href="https://docs.xeon-protocol.io/documentation/mechanics/development/deployments"
             >
-
               Smart Contracts
             </Link>
           </li>
           <li className="mb-2 text-grey">
-
             <Link
               target="_blank"
               rel="noopener noreferrer"
               href="https://docs.xeon-protocol.io/documentation/mechanics/development/security-audits"
             >
-
               Secutity Audits
             </Link>
           </li>
@@ -256,36 +242,30 @@ function Footer() {
           <p className="mb-2 text-grey">{`{ REVENUE SHARING }`}</p>
           <li className="mb-2 text-grey">
             {" "}
-
             <Link
               target="_blank"
               rel="noopener noreferrer"
               href="https://docs.xeon-protocol.io/documentation/real-yield/protocol-income"
             >
-
               Protocol Fees
             </Link>
           </li>
 
           <li className="mb-2 text-grey">
-
             <Link
               target="_blank"
               rel="noopener noreferrer"
               href="https://docs.xeon-protocol.io/documentation/earn-with-us/how-to-earn"
             >
-
               Ways to Earn
             </Link>
           </li>
           <li className="mb-2 text-grey">
-
             <Link
               target="_blank"
               rel="noopener noreferrer"
               href="https://docs.xeon-protocol.io/documentation/earn-with-us/hedge-mining"
             >
-
               Miner Program
             </Link>
           </li>

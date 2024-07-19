@@ -8,42 +8,42 @@ const TokenTable = () => {
     {
       name: "oVela Exchange",
       symbol: "oVELA",
-      address: "0x461eBee65e95F92db8bb9f0122B57E946D0245Bc",
+      address: "0xF9e5b8c7cd97BFAa5A953008aC93a4D6625737A4",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
       name: "oPepe",
       symbol: "oPEPE",
-      address: "0x02F992f8F110654869c719bE53a3202F6ab51B08",
+      address: "0x3eC775BC49AdE1f42fD0C76f99544C3af5f21504",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
-      name: "oBlockchain Bets",
-      symbol: "oBCB",
-      address: "0x71F72c8A8F7e94F16EcD21cEc9f789bD5c50Af35",
+      name: "Degen",
+      symbol: "oDEGEN",
+      address: "0x68a2C41C368799fEAaAb93C2C22d2A849D3f4760",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
-      name: "oHarryPotterObamaSonicInu",
-      symbol: "oBITCOIN",
-      address: "0xf588aE424BD3D78f1172Cf37a5a6D604c1FD141c",
+      name: "Higher",
+      symbol: "oHIGHER",
+      address: "0x0E3a79da8C1472937B2e5D1E52aA51d57976E437",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
-      name: "oBanana Gun Bot",
-      symbol: "oBANANA",
-      address: "0x8f2936bEAc38d21c63B21D07E4CBee7E416C565D",
+      name: "Rorschach",
+      symbol: "oROR",
+      address: "0xFB435ABc4C1481280e95A7e1B4b4A5DE7E7096FA",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
-      name: "WETH",
+      name: "Wrapped Ether",
       symbol: "WETH",
-      address: "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
+      address: "0xFA8e7A0CD67e404b0D4D3728A3922e1Dff00cB99",
       pair: "WETH",
       supply: "134,000",
     },
@@ -133,7 +133,14 @@ const TokenTable = () => {
                 {token.symbol}
               </motion.td>
               <motion.td className="py-2 px-4 border-b text-left">
-                {token.address.slice(0, 14)}...
+                <a
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  href={`https://sepolia.basescan.org/address/${token.address}`}
+                >
+                  {token.address.slice(0, 14)}...
+                </a>
+
                 <button
                   className="ml-2 bg-black text-white px-2 py-1 rounded hover:text-lime-400"
                   onClick={() => copyToClipboard(token.address)}
