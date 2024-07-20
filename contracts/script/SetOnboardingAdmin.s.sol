@@ -22,6 +22,10 @@ contract SetOnboardingAdminScript is Script {
         0x5Fb8EfD425C3eBB85C0773CE33820abC28d1b858
     ];
 
+    // uncomment this if only one token is being updated
+    //address public tokenAddress = 0xEb2DCAFFFf1b0d5BA76F14Fe6bB8348126339FcB;
+
+    // comment this if only one token is being updated
     address[] public tokenAddresses = [
         0xb7E16D46f26B1615Dcc501931F28F07fD4b0D7F4, // oVELA
         0x7dC9ecE25dcCA41D8a627cb47ded4a9322f7722b, // oPEPE
@@ -42,6 +46,11 @@ contract SetOnboardingAdminScript is Script {
         console2.log("Granting MINTER_ROLE to OnboardingUtils for WETH...");
         grantMinterRole(wethAddress);
 
+        // uncomment this if only one token is being updated
+        // console2.log("Granting MINTER_ROLE to OnboardingUtils for token:", tokenAddress);
+        // grantMinterRole(tokenAddress);
+
+        // comment this if only one token is being updated
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
             console2.log("Granting MINTER_ROLE to OnboardingUtils for token:", tokenAddresses[i]);
             grantMinterRole(tokenAddresses[i]);
