@@ -31,7 +31,7 @@ function Header() {
         <Link href={"/wallet"}>Wallet</Link>
         <Link href={"/analytics"}>Analytics</Link>
         <Link href={"/guide"}>Guide</Link>
-        <Link href={"/testing"}>Testing</Link>
+        <Link href={"/claim"}>Claim</Link>
         <Link href={"/docs"}>Docs</Link>
       </nav>
       <div className="md:hidden">
@@ -40,7 +40,6 @@ function Header() {
         </p>
       </div>
 
-  
       <div className=" md:flex gap-4">
         {/* <button className="text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue">
           Switch Network
@@ -70,7 +69,6 @@ function Header() {
           }}
           client={client}
         />
-
       </div>
 
       {isMenuOpen && (
@@ -87,15 +85,13 @@ function Header() {
           <Link href="/guide">
             <p className="hover:text-gray-400">Guide</p>
           </Link>
-          <Link href="/testing">
-            <p className="hover:text-gray-400">Testing</p>
+          <Link href="/claim">
+            <p className="hover:text-gray-400">Claim</p>
           </Link>
           <Link
-
             href="https://docs.xeon-protocol.io/documentation"
             target="_blank"
             rel="noopener noreferrer"
-
           >
             <p className="hover:text-gray-400">Docs</p>
           </Link>

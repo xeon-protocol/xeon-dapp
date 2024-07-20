@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaCopy } from "react-icons/fa";
 import { color, motion, useInView } from "framer-motion";
 import { useRef } from "react";
@@ -15,6 +15,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import BookmarkAdded from "../BookmarkAdded";
+import MockERC20FactoryABI from "@/abis/MockERC20FactoryABI.JSON";
+import { constants } from "@/constants";
 
 const TokenTable = () => {
   const [loading, setLoading] = useState(false);
@@ -22,51 +24,56 @@ const TokenTable = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
+  const [referralAddress, setReferralAddress] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const tokens = [
+  console.log(
+    constants.MockERC20FactoryContractAddress,
+    "constants.MockERC20FactoryContractAddress"
+  );
+  const [tokens, setTokens] = useState([
     {
       name: "oVela Exchange",
       symbol: "oVELA",
-      address: "0xF9e5b8c7cd97BFAa5A953008aC93a4D6625737A4",
+      address: "0xb7E16D46f26B1615Dcc501931F28F07fD4b0D7F4",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
       name: "oPepe",
       symbol: "oPEPE",
-      address: "0x3eC775BC49AdE1f42fD0C76f99544C3af5f21504",
+      address: "0x7dC9ecE25dcCA41D8a627cb47ded4a9322f7722b",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
       name: "Degen",
       symbol: "oDEGEN",
-      address: "0x68a2C41C368799fEAaAb93C2C22d2A849D3f4760",
+      address: "0x9B9852A943a570685c3704d70C4F1ebD5EdE109B",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
       name: "Higher",
       symbol: "oHIGHER",
-      address: "0x0E3a79da8C1472937B2e5D1E52aA51d57976E437",
+      address: "0x9855d38b7E6270B9f22F283A0C62330b16Ac909C",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
       name: "Rorschach",
       symbol: "oROR",
-      address: "0xFB435ABc4C1481280e95A7e1B4b4A5DE7E7096FA",
+      address: "0xEb2DCAFFFf1b0d5BA76F14Fe6bB8348126339FcB",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
       name: "Wrapped Ether",
       symbol: "WETH",
-      address: "0xFA8e7A0CD67e404b0D4D3728A3922e1Dff00cB99",
+      address: "0x395cB7753B02A15ed1C099DFc36bF00171F18218",
       pair: "WETH",
       supply: "134,000",
     },
-  ];
+  ]);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(
@@ -77,42 +84,6 @@ const TokenTable = () => {
         alert("Failed to copy the address.");
       }
     );
-  };
-
-  const handleClaim = async (tokenAddress, referredByAddress = null) => {
-    setLoading(true);
-    setError(null);
-    onOpen();
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-
-      const contractAddress = "0xf527b037e30d8764e8e24b7ed7a6158488c6a758";
-      const abi = [
-        "function claimInitial(address tokenAddress) public",
-        "function claimInitialWithReferral(address tokenAddress, address referredByAddress) public",
-      ];
-
-      const contract = new ethers.Contract(contractAddress, abi, signer);
-
-      if (referredByAddress) {
-        await contract.claimInitialWithReferral(
-          tokenAddress,
-          referredByAddress
-        );
-      } else {
-        await contract.claimInitial(tokenAddress);
-      }
-      setShowPopup(true);
-      setMessage("Token claimed successfully!");
-      setStatus("success");
-    } catch (err) {
-      setError(err.message);
-      setMessage("Failed to claim token.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const tableVariants = {
@@ -148,6 +119,94 @@ const TokenTable = () => {
 
   const ref = useRef(null);
   const inView = useInView(ref);
+  useEffect(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const factoryContract = new ethers.Contract(
+      constants.MockERC20FactoryContractAddress,
+      MockERC20FactoryABI,
+      provider
+    );
+
+    const fetchTokenSupply = async () => {
+      try {
+        const updatedTokens = await Promise.all(
+          tokens.map(async (token) => {
+            const totalSupply = await factoryContract.getTotalSupply(
+              token.address
+            );
+            return {
+              ...token,
+              supply: ethers.utils.formatUnits(totalSupply, 18),
+            };
+          })
+        );
+        setTokens(updatedTokens);
+      } catch (error) {
+        console.error("Error fetching token supply:", error);
+      }
+    };
+
+    fetchTokenSupply();
+  }, []);
+  const handleClaim = async (tokenAddress) => {
+    if (!window.ethereum) {
+      setError("Please install MetaMask!");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    onOpen();
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const claimContract = new ethers.Contract(
+        constants.onboardingUtilsContractAddress,
+        [
+          "function claimInitial(address tokenAddress) public",
+          "function claimInitialWithReferral(address tokenAddress, address referredByAddress) public",
+        ],
+        signer
+      );
+
+      let transaction;
+      if (referralAddress) {
+        transaction = await claimContract.claimInitialWithReferral(
+          tokenAddress,
+          referralAddress
+        );
+      } else {
+        transaction = await claimContract.claimInitial(tokenAddress);
+      }
+
+      await transaction.wait();
+      setShowPopup(true);
+      setMessage("Token claimed successfully!");
+      setStatus("success");
+      // Refresh token supply after claim
+      const factoryContract = new ethers.Contract(
+        "0x5A0d5390c45b49505C43A56DA4A4f89b93023F11",
+        MockERC20FactoryABI,
+        provider
+      );
+      const updatedSupply = await factoryContract.getTotalSupply(tokenAddress);
+      const formattedSupply = ethers.utils.formatUnits(updatedSupply, 18);
+      console.log(formattedSupply, "formatted supply");
+      setTokens((prevTokens) =>
+        prevTokens.map((token) =>
+          token.address === tokenAddress
+            ? { ...token, supply: formattedSupply }
+            : token
+        )
+      );
+    } catch (error) {
+      setMessage("Failed to claim token.");
+      console.error("Error claiming token:", error);
+      setError("Failed to claim token. Please try again.");
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div className="overflow-x-auto overflow-y-hidden mt-10 px-8 pt-8 md:px-20 max-w-screen-2xl mx-auto">
@@ -161,6 +220,15 @@ const TokenTable = () => {
         </motion.span>{" "}
         Testnet Tokens
       </motion.h1>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Enter referral address (optional)"
+          value={referralAddress}
+          onChange={(e) => setReferralAddress(e.target.value)}
+          className="w-full bg-[#26222B] p-2 border text-grey border-gray-300 rounded mt-4"
+        />
+      </div>
       <motion.table
         ref={ref}
         initial="hidden"
@@ -195,6 +263,7 @@ const TokenTable = () => {
                 >
                   {token.address.slice(0, 14)}...
                 </a>
+
                 <button
                   className="ml-2 bg-black text-white px-2 py-1 rounded hover:text-lime-400"
                   onClick={() => copyToClipboard(token.address)}
@@ -228,7 +297,6 @@ const TokenTable = () => {
                     <button
                       className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400"
                       onClick={() => handleClaim(token.address)}
-                      disabled={loading}
                     >
                       Claim
                     </button>
@@ -289,21 +357,17 @@ const TokenTable = () => {
         We require: Metamask, Sepolia WETH, and Testnet ERC20 tokens to test the
         platform. Make sure to claim ETH from{" "}
         <a
+          target="_blank"
+          rel="noreferrer noopener"
           className="text-light-purple mx-1 hover:text-lime-400"
-          href="https://www.alchemy.com/faucets/ethereum-sepolia"
+          href="https://www.alchemy.com/faucets/base-sepolia"
         >
           Alchemy Faucet
         </a>{" "}
-        , and convert it to WETH on Uniswap. Use WETH address provided above on
-        <a
-          className="text-light-purple mx-1 hover:text-lime-400"
-          href="https://app.uniswap.org/swap"
-        >
-          Uniswap
-        </a>
         . Then deposit WETH to Vault in order to buy trades. You require WETH as
-        all our testnet tokens are paired with WETH. Please note these are mock
-        tokens with no value outside our testnet. Claim above and proceed below.
+        all our testnet tokens are paired with WETH. These tokens are for
+        testing purposes only and are not associated with existing tokens. They
+        hold no value outside of the Xeon Protocol Testnet.
       </p>
     </div>
   );

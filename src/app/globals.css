@@ -162,6 +162,30 @@ width: 125% !important;
 }
 
 }
+.paragraph{
+  color: #f2f2f2 !important;
+}
+.token-dropdown{
+  background-color: #000 !important;
+}
+.opportunities-list .opportunity-list-item-body{
+  background-color: #000 !important;
+}
+.data-pill{
+  background-color: #2d2d2d !important;
+}
+.opportunities-list .opportunity-list-item-data-value {
+  color: #f2f2f2 !important;
+
+}
+.token-input-container .token-input {
+  background-color: #000 !important;
+  color: #f2f2f2 !important;
+}
+.data-field {
+  color: #f2f2f2 !important;
+  background-color: #000 !important;
+}
 @media (min-width: 1536px) {
   .modal-container {
     position:fixed !important;

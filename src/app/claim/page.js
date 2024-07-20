@@ -189,7 +189,6 @@ function Page() {
         </motion.p>
       </div>
 
-      <TokenDeposit />
       <WriteHedges />
 
       <Footer />
