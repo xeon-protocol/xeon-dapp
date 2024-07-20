@@ -2,15 +2,22 @@
 pragma solidity 0.8.20;
 
 import {Script} from "forge-std/Script.sol";
-
 import {console2} from "forge-std/console2.sol";
 import {XeonToken} from "../src/XeonToken.sol";
 import {XeonStaking} from "../src/XeonStaking.sol";
 import {XeonHedging} from "../src/XeonHedging.sol";
 
+/* ============ Base Sepolia ============ */
+// simulate: forge script script/XeonProtocol.s.sol:XeonProtocolScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vvvv
+// broadcast: forge script script/Onboarding.s.sol:XeonProtocolScript --rpc-url $BASE_SEPOLIA_RPC_URL --chain-id 84532 -vv --broadcast --verify
+
+/* ============ Ethereum ============ */
+// simulate: forge script script/XeonProtocol.s.sol:XeonProtocolScript --rpc-url $ETHEREUM_RPC_URL --chain-id 1 -vvvv
+// broadcast: forge script script/Onboarding.s.sol:XeonProtocolScript --rpc-url $ETHEREUM_RPC_URL --chain-id 1 -vv --broadcast --verify
+
 contract XeonProtocolScript is Script {
-    // uncomment the contracts for the correct chain
-    // first, deploy PriceOracle.sol and fill in address
+    // ensure `PriceOracle.sol` is deployed on required chain
+    // uncomment addresses for that chain
 
     /* ============ Base Sepolia ============ */
     address public priceOracle = 0x0000000000000000000000000000000000000000;
