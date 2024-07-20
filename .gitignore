@@ -11,7 +11,7 @@
 
 # development broadcast logs
 !/broadcast
-/broadcast/*
+contracts/broadcast/*
 
 # docs
 docs/

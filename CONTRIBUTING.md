@@ -68,6 +68,8 @@ Main commit types are `fix` for bug patches and `feat` for new features. Other t
 
 `build:` a change that affect the build system or external dependencies (example scopes: `scripts`, `foundry`, `npm`, `docker`)
 
+`chore:` a code change that neither fixes a bug nor adds a feature
+
 `docs:` documentation only changes
 
 `feat:` a new feature
@@ -75,8 +77,6 @@ Main commit types are `fix` for bug patches and `feat` for new features. Other t
 `fix:` a bug fix
 
 `perf:` a code change that improves performance
-
-`refactor:` a code change that neither fixes a bug nor adds a feature
 
 `style:` a change that does not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
 

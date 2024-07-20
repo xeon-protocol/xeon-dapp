@@ -27,11 +27,19 @@ If Foundry has already been installed globally, ensure that Foundry is initializ
 foundryup
 ```
 
+Install dependencies. Foundry will automatically fetch required libraries from github
+
+```shell
+forge install
+```
+
 ## Documentation
 
 https://book.getfoundry.sh/
 
 ## Usage
+
+Forge tests, builds, and deploys smart contracts.
 
 ### Build
 
@@ -89,7 +97,9 @@ Additional arguments can specity the chain and verbosity of the script
 $ forge script script/Xeon.s.sol:XeonScript --rpc-url <your_rpc_url> --private-key <your_private_key> --chain-id 1 -vv
 ```
 
-You can also use environment variables to pass a private key directly into the `vm.startBroadcast()` function of the script to prevent exposing it in the command line (recommended).
+When required, you can use environment variables to pass a private key directly into script functions to prevent exposing it in the command line (recommended).
+
+**CAUTION: Always ensure you are using a `.env.local` and a proper `.gitignore` to prevent leaked keys.**
 
 ```js
 vm.startBroadcast(vm.envUint('PRIVATE_KEY'));
@@ -101,11 +111,40 @@ Then running the CLI command
 $ forge script script/Xeon.s.sol:XeonScript --rpc-url <your_rpc_url> --chain-id 1 -vv
 ```
 
+### Anvil
+
+Anvil is a local testnet node shipped with Foundry for testing contracts from frontends or for interacting over RPC.
+
+To use Anvil, simply type `anvil` to see a list of accounts and private keys available for use, as well as the address and port that the node is listening on.
+
+```shell
+# number of dev accounts to generate and configure [default: 10]
+anvil -a, --accounts <ACCOUNTS>
+
+# EVM hardfork to use [default: latest]
+anvil --hardfork <HARDFORK>
+
+# port number to listen on [default: 8545]
+anvil -p, --port <PORT>
+```
+
+The `genesis.json` file in Anvil serves a similar purpose as in Geth, defining the network's initial state. All values are to be defined as hexadecimals.
+
+A sample for simulating mainnet via genesis can be found [here](https://github.com/paradigmxyz/reth/blob/8f3e4a15738d8174d41f4aede5570ecead141a77/crates/primitives/res/genesis/mainnet.json)
+
 ### Cast
+
+Cast is a CLI for performing Ethereum RPC calls. You can make contract calls, send transactions, or retrieve any type of onchain data.
 
 ```shell
 $ cast <subcommand>
 ```
+
+### Chisel
+
+Chisel is a Solidity REPL that allows developers to write and test Solidity code snippets.
+
+More details on using `chisel` can be found [here](https://book.getfoundry.sh/reference/chisel/)
 
 ### Help
 
