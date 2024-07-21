@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.20;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "openzeppelin/contracts/access/Ownable.sol";
+import "openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+// @test: inherit pausable vs. internal emergency stop
+//import "openzeppelin/contracts/utils/Pausable.sol";
 
 contract XeonStaking is Ownable {
     using SafeERC20 for IERC20;
 
     IERC20 public stakingToken;
     uint256 public nextUnstakeTimestamp; // The day when stakers can unstake again.
-    uint256 public totalEthRewards;    
+    uint256 public totalEthRewards;
     uint256 public totalEthLiquidityRewards;
     uint256 public totalEthCollateralRewards;
     uint256 public totalMiningRewards;
@@ -22,7 +24,6 @@ contract XeonStaking is Ownable {
     address[] public allStakerAddresses;
     bool public canUnstake;
     bool public emergencyUnstakeEnabled;
-
 
     struct Staker {
         uint256 amount;
@@ -43,21 +44,26 @@ contract XeonStaking is Ownable {
 
     event Staked(address indexed staker, uint256 amount);
     event Unstaked(address indexed staker, uint256 amount);
-    event TokensAssigned(address indexed staker, uint256 amountForMining, uint256 amountForLiquidity, uint256 amountForCollateral);
-    event TokensUnassigned(address indexed staker, uint256 amountFromMining, uint256 amountFromLiquidity, uint256 amountFromCollateral);
-    event RewardClaimed(address indexed staker, uint256 amount, uint indexed poolID);
-    event RewardsDistributed(uint256 amount, uint indexed poolID);
+    event TokensAssigned(
+        address indexed staker, uint256 amountForMining, uint256 amountForLiquidity, uint256 amountForCollateral
+    );
+    event TokensUnassigned(
+        address indexed staker, uint256 amountFromMining, uint256 amountFromLiquidity, uint256 amountFromCollateral
+    );
+    event RewardClaimed(address indexed staker, uint256 amount, uint256 indexed poolID);
+    event RewardsDistributed(uint256 amount, uint256 indexed poolID);
     event EmergencyUnstakeSet(bool enabled);
     event EmergencyUnstaked(address indexed staker, uint256 amount);
 
     modifier stakingWindow() {
-        require(block.timestamp >= nextUnstakeTimestamp
- && block.timestamp <= nextUnstakeTimestamp
- + 3 days, "Staking or assigning features suspended at the moment.");
+        require(
+            block.timestamp >= nextUnstakeTimestamp && block.timestamp <= nextUnstakeTimestamp + 3 days,
+            "Staking or assigning features suspended at the moment."
+        );
         _;
     }
 
-    constructor(address xeonToken) {
+    constructor(address xeonToken) Ownable(msg.sender) {
         require(xeonToken != address(0), "Invalid token address.");
         stakingToken = IERC20(xeonToken);
         nextUnstakeTimestamp = 0;
@@ -74,13 +80,14 @@ contract XeonStaking is Ownable {
 
     function beginUnstakeWindow() external onlyOwner {
         require(block.timestamp >= nextUnstakeTimestamp - 30 days, "30-day staking period has not yet passed.");
-        nextUnstakeTimestamp
- = block.timestamp; // 3 days for people to stake & assign stakes to pools
+        nextUnstakeTimestamp = block.timestamp; // 3 days for people to stake & assign stakes to pools
         canUnstake = true;
     }
 
     function restartPool() external stakingWindow onlyOwner {
-        require(block.timestamp > nextUnstakeTimestamp + 3 days, "Cannot restart pool during the current unstake period.");
+        require(
+            block.timestamp > nextUnstakeTimestamp + 3 days, "Cannot restart pool during the current unstake period."
+        );
         nextUnstakeTimestamp = block.timestamp + 30 days; // Start a new 30-day staking period
         canUnstake = false;
     }
@@ -133,16 +140,22 @@ contract XeonStaking is Ownable {
         stakingToken.transfer(msg.sender, amountToUnstake);
 
         emit Unstaked(msg.sender, amountToUnstake);
-        
+
         if (emergencyUnstakeEnabled) {
-        emit EmergencyUnstaked(msg.sender, amountToUnstake);
-    }
+            emit EmergencyUnstaked(msg.sender, amountToUnstake);
+        }
     }
 
-    function assignTokens(uint256 _percentForMining, uint256 _percentForLiquidity, uint256 _percentForCollateral) external stakingWindow {
+    function assignTokens(uint256 _percentForMining, uint256 _percentForLiquidity, uint256 _percentForCollateral)
+        external
+        stakingWindow
+    {
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
-        require(_percentForMining + _percentForLiquidity + _percentForCollateral <= 100, "Total assigned percentage cannot exceed 100%.");
+        require(
+            _percentForMining + _percentForLiquidity + _percentForCollateral <= 100,
+            "Total assigned percentage cannot exceed 100%."
+        );
 
         uint256 totalStakedAmount = staker.amount;
 
@@ -168,7 +181,10 @@ contract XeonStaking is Ownable {
         emit TokensAssigned(msg.sender, staker.miningRewards, staker.liquidityRewards, staker.collateralRewards);
     }
 
-    function unassignTokens(uint256 _amountFromMining, uint256 _amountFromLiquidity, uint256 _amountFromCollateral) external stakingWindow {
+    function unassignTokens(uint256 _amountFromMining, uint256 _amountFromLiquidity, uint256 _amountFromCollateral)
+        external
+        stakingWindow
+    {
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
 
@@ -192,7 +208,7 @@ contract XeonStaking is Ownable {
 
     function depositRewards() external payable onlyOwner {
         require(msg.value > 0, "Reward amount must be greater than zero.");
-        totalEthRewards = totalEthRewards +msg.value;
+        totalEthRewards = totalEthRewards + msg.value;
         emit RewardsDistributed(msg.value, 1);
     }
 
@@ -210,11 +226,12 @@ contract XeonStaking is Ownable {
     // proposal
     // claim only after 30 days from last stake update
     // claim like rewards share for every token staked (not in existence)
+
     function claimRewards() external {
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
-        require(block.timestamp - staker.stakeStartTimestamp > 3 * 24 * 60 * 60,"Wait 30 days from your last claim" );
-        
+        require(block.timestamp - staker.stakeStartTimestamp > 3 * 24 * 60 * 60, "Wait 30 days from your last claim");
+
         uint256 ethChange = totalEthRewards - lastRewardBasis[msg.sender];
         uint256 stakerRewardShare = ethChange * staker.amount / getTotalStaked();
 
@@ -231,7 +248,7 @@ contract XeonStaking is Ownable {
     function claimLiquidityRewards() external {
         Staker storage staker = stakers[msg.sender];
         require(staker.liquidityRewards > 0, "You have no tokens assigned for liquidity.");
-        
+
         uint256 ethChange = totalEthLiquidityRewards - lastLiquidityRewardBasis[msg.sender];
         uint256 liquidityRewardShare = ethChange * staker.liquidityRewards / totalLiquidityRewards;
 
@@ -248,7 +265,7 @@ contract XeonStaking is Ownable {
     function claimCollateralRewards() external {
         Staker storage staker = stakers[msg.sender];
         require(staker.collateralRewards > 0, "You have no tokens assigned for protocol collateral.");
-        
+
         uint256 ethChange = totalEthCollateralRewards - lastCollateralRewardBasis[msg.sender];
         uint256 collateralRewardShare = ethChange * staker.collateralRewards / totalCollateralRewards;
 
@@ -298,7 +315,16 @@ contract XeonStaking is Ownable {
         return collateralRewardShare;
     }
 
-    function getAssignedAndUnassignedAmounts(address stakerAddress) external view returns (uint256 assignedForMiningRewards, uint256 liquidityRewards, uint256 collateralRewards, uint256 unassigned) {
+    function getAssignedAndUnassignedAmounts(address stakerAddress)
+        external
+        view
+        returns (
+            uint256 assignedForMiningRewards,
+            uint256 liquidityRewards,
+            uint256 collateralRewards,
+            uint256 unassigned
+        )
+    {
         Staker storage staker = stakers[stakerAddress];
         uint256 totalStakedAmount = staker.amount;
         uint256 totalAssignedAmount = staker.miningRewards + staker.liquidityRewards + staker.collateralRewards;
@@ -315,7 +341,7 @@ contract XeonStaking is Ownable {
     }
 
     function getTotalAssigned() public view returns (uint256) {
-        return totalMiningRewards + totalLiquidityRewards; + totalCollateralRewards;
+        return totalMiningRewards + totalLiquidityRewards + totalCollateralRewards;
     }
 
     function getTotalUnassigned() public view returns (uint256) {
@@ -346,8 +372,7 @@ contract XeonStaking is Ownable {
     }
 
     function setEmergencyUnstake(bool _enabled) external onlyOwner {
-    emergencyUnstakeEnabled = _enabled;
-    emit EmergencyUnstakeSet(_enabled);
-}
-
+        emergencyUnstakeEnabled = _enabled;
+        emit EmergencyUnstakeSet(_enabled);
+    }
 }
