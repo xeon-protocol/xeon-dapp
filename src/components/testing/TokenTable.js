@@ -27,19 +27,19 @@ const TokenTable = () => {
   const [referralAddress, setReferralAddress] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   console.log(
-    constants.MockERC20FactoryContractAddress,
-    "constants.MockERC20FactoryContractAddress"
+    constants.testnet.MockERC20FactoryContractAddress,
+    "constants.testnet.MockERC20FactoryContractAddress"
   );
   const [tokens, setTokens] = useState([
     {
-      name: "oVela Exchange",
+      name: "Vela Exchange",
       symbol: "oVELA",
       address: "0xb7E16D46f26B1615Dcc501931F28F07fD4b0D7F4",
       pair: "WETH",
       supply: "100,000,000",
     },
     {
-      name: "oPepe",
+      name: "Pepe",
       symbol: "oPEPE",
       address: "0x7dC9ecE25dcCA41D8a627cb47ded4a9322f7722b",
       pair: "WETH",
@@ -122,7 +122,7 @@ const TokenTable = () => {
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const factoryContract = new ethers.Contract(
-      constants.MockERC20FactoryContractAddress,
+      constants.testnet.MockERC20FactoryContractAddress,
       MockERC20FactoryABI,
       provider
     );
@@ -161,7 +161,7 @@ const TokenTable = () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const claimContract = new ethers.Contract(
-        constants.onboardingUtilsContractAddress,
+        constants.testnet.OnboardingUtilsContractAddress,
         [
           "function claimInitial(address tokenAddress) public",
           "function claimInitialWithReferral(address tokenAddress, address referredByAddress) public",
@@ -286,11 +286,11 @@ const TokenTable = () => {
                     visit
                     <a
                       className="text-light-purple mx-1 hover:text-lime-400"
-                      href="https://www.alchemy.com/faucets/ethereum-sepolia"
+                      href="https://www.alchemy.com/faucets/base-sepolia"
                     >
                       Alchemy Faucet
                     </a>{" "}
-                    to Claim WETH
+                    to claim testnet ETH
                   </p>
                 ) : (
                   <div className="flex items-center gap-2">
@@ -354,7 +354,7 @@ const TokenTable = () => {
       )}
 
       <p className="text-grey text-lg mt-5">
-        We require: Metamask, Sepolia WETH, and Testnet ERC20 tokens to test the
+        We require: Metamask, testnet ETH on Base Sepolia, and Testnet ERC20 tokens to test the
         platform. Make sure to claim ETH from{" "}
         <a
           target="_blank"
@@ -364,10 +364,9 @@ const TokenTable = () => {
         >
           Alchemy Faucet
         </a>{" "}
-        . Then deposit WETH to Vault in order to buy trades. You require WETH as
-        all our testnet tokens are paired with WETH. These tokens are for
-        testing purposes only and are not associated with existing tokens. They
-        hold no value outside of the Xeon Protocol Testnet.
+        . Your initial token claim includes 1 WETH, which is required for
+        opening trades as all tokens are paired with WETH. These tokens are for
+        testing purposes only. They hold no value outside of the Xeon Protocol Testnet.
       </p>
     </div>
   );
