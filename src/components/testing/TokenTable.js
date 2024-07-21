@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import BookmarkAdded from '../BookmarkAdded';
 import MockERC20FactoryABI from '../../../contracts/abi/MockERC20Factory.abi.json';
-import { Constants } from '../../abi/Constants.js';
+import { Constants } from '@/abi/constants';
 
 const TokenTable = () => {
   const [loading, setLoading] = useState(false);
