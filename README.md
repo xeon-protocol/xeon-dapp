@@ -69,7 +69,7 @@ curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
 
-2. Navigate to the `/contracts` directory and follow the instructions in [`/contracts/README.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/xeon-contract/README.md) to continue with Foundry.
+2. Navigate to the `/contracts` directory and follow the instructions in [`/contracts/README.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/contracts/README.md) to continue with Foundry.
 
 ## Directory Structure
 
@@ -85,5 +85,6 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 
 ## Current Work
 
-- Internal development progress is tracked on [Trello | Development](https://trello.com/b/F13JtDx1/development)
-- For an overview of the project please see [Trello | Public](https://trello.com/invite/b/mW198hKo/ATTIc305ea03ad04139d54ef382b7a276d651224A655/xeon-protocol-board)
+Please update and follow along with the current development progress on [Trello](https://trello.com/b/mW198hKo/xeon-protocol-board).
+
+- If unable to access, [request invite](https://trello.com/invite/b/mW198hKo/ATTIc305ea03ad04139d54ef382b7a276d651224A655/xeon-protocol-board)
