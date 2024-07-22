@@ -1,83 +1,195 @@
 "use client";
-import React from "react";
-import Card from "@/components/Card";
-import CenterNav from "@/components/CenterNav";
-import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import Layout from "@/components/Layout";
-import NoEvents from "@/components/NoEvents";
-import SocialPopup from "@/components/SocialPopup";
-import ComingSoon from "@/components/ComingSoon";
-import Head from "next/head";
+import React from "react";
+import Lottie from "react-lottie-player";
+import lottieJson from "@/assets/animations/blue_planet.json";
+import lottieJson2 from "@/assets/animations/planet_orbit1.json";
+import TestNetCard from "@/components/guide/Testnet";
+import { Image } from "@chakra-ui/react";
 
-import Loans from "@/components/Loans";
+import TokenTable from "@/components/testing/TokenTable";
 
+import WriteHedges from "@/components/testing/WriteHedges";
 
-export default function Home() {
-  const [showPositions, setShowPositions] = React.useState(false);
-  const [showDiscover, setShowDiscover] = React.useState(true);
-  const [showBookmarks, setShowBookmarks] = React.useState(false);
-  const [showSocials, setShowSocials] = React.useState(false);
-  const [showComingSoon, setShowComingSoon] = React.useState(false);
-  const [activeSideTab, setActiveSideTab] = React.useState("");
-  const [activeSection, setActiveSection] = React.useState("discover");
+import { motion } from "framer-motion";
+import Footer from "@/components/Footer";
 
-  const [showLoans, setShowLoans] = React.useState(false);
+function Page() {
+  const glitchVariants = {
+    visible: {
+      textShadow: [
+        "1px 1px 0px lime",
+        "-1px -1px 0px purple",
+        "1px -1px 0px lime",
+        "-1px 1px 0px lime",
+        "2px 2px 2px lime",
+      ],
+      transition: {
+        duration: 0.2,
+        repeat: Infinity,
+        repeatType: "mirror",
+      },
+    },
+  };
+  const headingVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
 
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 },
+  };
   return (
     <>
-      <div className="bg-[#000] min-h-[100vh] px-8 pt-8 max-w-screen-2xl mx-auto">
+      <div className="bg-[#000] lg:min-h-[100vh] 2xl:min-h-[50vh] px-8 pt-8 max-w-screen-2xl mx-auto relative">
         <Header />
-        <div className="md:mt-20 lg:mt-32">
-          <Layout
-            setShowBookmarks={setShowBookmarks}
-            setShowDiscover={setShowDiscover}
-            setShowPositions={setShowPositions}
-            setShowSocials={setShowSocials}
+        <div className="flex flex-col md:gap-12 md:flex-row justify-between 2xl:mt-[20%] mt-[18%]">
+          <div className="md:w-[40%] lg:w-[100%] md:px-0 lg:px-18 flex items-center md:block">
+            <motion.h3
+              className="text-light-purple text-3xl md:text-5xl lg:text-7xl  lg:mt-14"
+              initial="hidden"
+              animate="visible"
+              variants={headingVariants}
+              transition={{ duration: 0.6 }}
+            >
+              Xeon
+            </motion.h3>
+            <motion.h3
+              className="text-grey text-3xl ml-1 md:ml-0  md:text-5xl lg:text-7xl"
+              initial="hidden"
+              animate="visible"
+              variants={headingVariants}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              Testnet
+            </motion.h3>
+            <motion.h3
+              className="text-grey text-3xl md:text-5xl ml-1 md:ml-0 lg:text-7xl"
+              initial="hidden"
+              animate="visible"
+              variants={headingVariants}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              Guide
+            </motion.h3>
 
-            setShowLoans={setShowLoans}
-
-            setShowComingSoon={setShowComingSoon}
-
-            showPositions={showPositions}
-            showDiscover={showDiscover}
-            showBookmarks={showBookmarks}
-            activeSection={activeSection}
-            activeSideTab={activeSideTab}
-            setActiveSection={setActiveSection}
-            setActiveSideTab={setActiveSideTab}
-          >
-            <CenterNav
-              setShowBookmarks={setShowBookmarks}
-              setShowDiscover={setShowDiscover}
-              setShowPositions={setShowPositions}
-              setShowSocials={setShowSocials}
-              setShowComingSoon={setShowComingSoon}
-              activeSection={activeSection}
-              activeSideTab={activeSideTab}
-              setActiveSection={setActiveSection}
-              setActiveSideTab={setActiveSideTab}
+            <Image
+              src="/dotted.webp"
+              alt="container"
+              className="md:absolute top-[10%] w-[40%] left-[-10%] hidden lg:block"
             />
-            {showDiscover && <Card />}
-            <div className="mt-5">{showDiscover && <Card />}</div>
-            <div className="mt-5">{showPositions && <NoEvents />}</div>
-            <div className="mt-5">{showBookmarks && <NoEvents />}</div>
-            <div className="mt-5">
-              {showSocials && (
-                <SocialPopup
-                  setShowSocial={setShowSocials}
-                  setShowDiscover={setShowDiscover}
-                />
-              )}
+            <Lottie
+              className=" md:absolute top-[150px] w-[12%] 2xl:left-12  left-12 hidden lg:block"
+              loop
+              animationData={lottieJson}
+              play
+            />
+            <Lottie
+              className="w-[40%] md:absolute bottom-[-55px] lg:bottom-[50px] xl:bottom-[-55px] 2xl:bottom-[-50px] right-[56%] hidden opacity-10 lg:block"
+              loop
+              animationData={lottieJson2}
+              play
+            />
+          </div>
+          <div className="relative">
+            <div className="md:absolute md:top-10 lg:top-10 md:left-[30px] lg:left-5 w-full h-full">
+              <p className="text-grey text-lg w-[85%] mt-4">
+                What to know about testing
+              </p>
+              <p className="text-grey md:text-justify text-lg mt-5 md:w-[86%]">
+                This involves usage of our Dapp to interact with our
+                protocol/smart contracts. All Testnet Versions are listed at the
+                bottom of this page for the public to inspect. Neon Hedge comes
+                with 3 OTC tools: Call Options, Put Options, Equity Swaps. Test
+                Blockchain is Seporlia Testnet. Install MetaMask on your Browser
+                to use our Dapp. When done, proceed to below section and claim
+                our mock ERC20 tokens.
+              </p>
+              <motion.div
+                className="flex md:mt-40 z-5 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-evenly 2xl:ml-[-100px]"
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+                transition={{ duration: 0.6 }}
+              >
+                <motion.a
+                  href="https://neon-hedge.gitbook.io/xeon-protocol-documentation/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
+                  variants={itemVariants}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  Read Manual
+                </motion.a>
+                <motion.a
+                  href="/guide"
+                  className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
+                  variants={itemVariants}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
+                  Jump to Dapp
+                </motion.a>
+                <motion.a
+                  href="https://t.me/xeon_protocol"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
+                  variants={itemVariants}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                >
+                  Telegram Support
+                </motion.a>
+              </motion.div>
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+                transition={{ duration: 0.6, delay: 0.8 }}
+              >
+                <p className="text-grey md:text-lg md:ml-[-20px] mt-5">{`{  Welcome to the Instruction Portal for the Neon Hedge test platform  }`}</p>
+              </motion.div>
             </div>
-          
+            <Image
+              src="/card-109.svg"
+              // w={"100%"}
 
-            <div className="mt-5">{showLoans && <Loans />}</div>
-
-          </Layout>
+              h={{
+                base: "150px",
+                md: "300px",
+                lg: "330px",
+                xl: "310px",
+              }}
+              alt="container"
+              className="relative hidden  md:block ml-[-20px]"
+            />
+          </div>
         </div>
       </div>
+      <TokenTable />
+      <div className="my-5 px-8 pt-8 md:px-20 max-w-screen-2xl mx-auto">
+        <motion.p className="text-grey text-3xl mt-5 md:w-[85%]">
+          <motion.span
+            variants={glitchVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            Token
+          </motion.span>{" "}
+          Use Cases
+        </motion.p>
+      </div>
+
+      <WriteHedges />
+
       <Footer />
     </>
   );
 }
+
+export default Page;

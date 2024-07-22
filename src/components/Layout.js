@@ -29,16 +29,13 @@ const Layout = ({
       setShowBookmarks(false);
       setActiveSection("discover");
       setActiveSideTab("Equity Swaps");
-    } else if (
-      section === "positions" &&
-      button === "Loans { Coming Soon ... }"
-    ) {
+    } else if (section === "positions" && button === "Loans") {
       setShowPositions(false);
       setShowDiscover(false);
       setShowBookmarks(false);
       setShowLoans(true);
       setActiveSection("positions");
-      setActiveSideTab("Loans { Coming Soon ... }");
+      setActiveSideTab("Loans");
     } else if (section === "positions" && button === "Options") {
       setShowPositions(false);
       setShowDiscover(false);
@@ -58,14 +55,12 @@ const Layout = ({
       setShowBookmarks(false);
       setActiveSection("positions");
       setActiveSideTab("Equity Swaps");
-
     } else if (section === "discover" && button === "Options") {
       setShowPositions(false);
       setShowDiscover(true);
       setShowBookmarks(false);
       setActiveSection("discover");
       setActiveSideTab("Options");
-
     }
   };
 
@@ -106,10 +101,7 @@ const Layout = ({
             <LeftBarButton
               active={activeSideTab === "Options" ? true : false}
               title="Options"
-
               handleClick={() => handleSectionChange("discover", "Options")}
-
-
             />
             <LeftBarButton
               active={activeSideTab === "Equity Swaps" ? true : false}
@@ -119,13 +111,9 @@ const Layout = ({
               }
             />
             <LeftBarButton
-              active={
-                activeSideTab === "Loans { Coming Soon ... }" ? true : false
-              }
-              title="Loans { Coming Soon ... }"
-              handleClick={() =>
-                handleSectionChange("positions", "Loans { Coming Soon ... }")
-              }
+              active={activeSideTab === "Loans" ? true : false}
+              title="Loans"
+              handleClick={() => handleSectionChange("positions", "Loans")}
             />
             <LeftBarButton
               active={activeSideTab === "Social" ? true : false}
