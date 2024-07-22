@@ -17,7 +17,7 @@ contracts/broadcast/*
 docs/
 
 # next.js
-/.next/
+#/.next/
 #/out/
 
 # compiler files
