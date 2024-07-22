@@ -9,6 +9,10 @@ import NoEvents from "@/components/NoEvents";
 import SocialPopup from "@/components/SocialPopup";
 import ComingSoon from "@/components/ComingSoon";
 import Head from "next/head";
+
+import Loans from "@/components/Loans";
+
+
 export default function Home() {
   const [showPositions, setShowPositions] = React.useState(false);
   const [showDiscover, setShowDiscover] = React.useState(true);
@@ -17,6 +21,8 @@ export default function Home() {
   const [showComingSoon, setShowComingSoon] = React.useState(false);
   const [activeSideTab, setActiveSideTab] = React.useState("");
   const [activeSection, setActiveSection] = React.useState("discover");
+
+  const [showLoans, setShowLoans] = React.useState(false);
 
   return (
     <>
@@ -28,7 +34,11 @@ export default function Home() {
             setShowDiscover={setShowDiscover}
             setShowPositions={setShowPositions}
             setShowSocials={setShowSocials}
+
+            setShowLoans={setShowLoans}
+
             setShowComingSoon={setShowComingSoon}
+
             showPositions={showPositions}
             showDiscover={showDiscover}
             showBookmarks={showBookmarks}
@@ -60,7 +70,10 @@ export default function Home() {
                 />
               )}
             </div>
-            <div className="mt-5">{showComingSoon && <ComingSoon />}</div>
+          
+
+            <div className="mt-5">{showLoans && <Loans />}</div>
+
           </Layout>
         </div>
       </div>

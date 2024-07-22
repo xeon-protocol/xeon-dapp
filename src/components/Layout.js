@@ -11,7 +11,9 @@ const Layout = ({
   setShowDiscover,
   setShowBookmarks,
   setShowSocials,
-  setShowComingSoon,
+
+  setShowLoans,
+
   setActiveSection,
   setActiveSideTab,
   activeSideTab,
@@ -34,7 +36,7 @@ const Layout = ({
       setShowPositions(false);
       setShowDiscover(false);
       setShowBookmarks(false);
-      setShowComingSoon(true);
+      setShowLoans(true);
       setActiveSection("positions");
       setActiveSideTab("Loans { Coming Soon ... }");
     } else if (section === "positions" && button === "Options") {
@@ -56,6 +58,14 @@ const Layout = ({
       setShowBookmarks(false);
       setActiveSection("positions");
       setActiveSideTab("Equity Swaps");
+
+    } else if (section === "discover" && button === "Options") {
+      setShowPositions(false);
+      setShowDiscover(true);
+      setShowBookmarks(false);
+      setActiveSection("discover");
+      setActiveSideTab("Options");
+
     }
   };
 
@@ -96,7 +106,10 @@ const Layout = ({
             <LeftBarButton
               active={activeSideTab === "Options" ? true : false}
               title="Options"
-              handleClick={() => handleSectionChange("positions", "Options")}
+
+              handleClick={() => handleSectionChange("discover", "Options")}
+
+
             />
             <LeftBarButton
               active={activeSideTab === "Equity Swaps" ? true : false}

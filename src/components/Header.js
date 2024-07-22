@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Button, IconButton, Image } from "@chakra-ui/react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import Link from "next/link";
+import { client } from "@/components/ConnectWallet/client";
+import { ConnectButton } from "thirdweb/react";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,7 +31,7 @@ function Header() {
         <Link href={"/wallet"}>Wallet</Link>
         <Link href={"/analytics"}>Analytics</Link>
         <Link href={"/guide"}>Guide</Link>
-        <Link href={"/testing"}>Testing</Link>
+        <Link href={"/claim"}>Claim</Link>
         <Link href={"/docs"}>Docs</Link>
       </nav>
       <div className="md:hidden">
@@ -37,10 +39,36 @@ function Header() {
           MENU
         </p>
       </div>
-      <div className=" md:block">
-        <button className="text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue">
+
+      <div className=" md:flex gap-4">
+        {/* <button className="text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue">
           Switch Network
-        </button>
+        </button> */}
+        <ConnectButton
+          connectButton={{
+            className:
+              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+            style: {
+              borderRadius: "50px",
+              backgroundColor: "#3253FB",
+              color: "white",
+            },
+          }}
+          signInButton={{
+            className:
+              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+          }}
+          detailsButton={{
+            className:
+              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+            style: {
+              borderRadius: "50px",
+              backgroundColor: "#3253FB",
+              color: "white",
+            },
+          }}
+          client={client}
+        />
       </div>
 
       {isMenuOpen && (
@@ -57,12 +85,13 @@ function Header() {
           <Link href="/guide">
             <p className="hover:text-gray-400">Guide</p>
           </Link>
-          <Link href="/testing">
-            <p className="hover:text-gray-400">Testing</p>
+          <Link href="/claim">
+            <p className="hover:text-gray-400">Claim</p>
           </Link>
           <Link
+            href="https://docs.xeon-protocol.io/documentation"
             target="_blank"
-            href="https://xeonprotocol.gitbook.io/xeon-protocol"
+            rel="noopener noreferrer"
           >
             <p className="hover:text-gray-400">Docs</p>
           </Link>

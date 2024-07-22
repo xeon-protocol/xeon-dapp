@@ -95,7 +95,9 @@ function CenterNav({
         className="bg-[#71637f4d] rounded-lg top-[35px]  md:top-[24px] lg:top-[35px]"
       >
         <InputLeftElement pointerEvents="none">
-          <FaSearch color="gray.300" className="mt-3 ml-2" />
+
+          <FaSearch color="#6c6c6c" className="ml-2" />
+
         </InputLeftElement>
         <Input
           size={{
