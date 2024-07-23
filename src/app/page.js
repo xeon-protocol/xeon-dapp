@@ -129,12 +129,15 @@ function Page() {
                 you have a wallet connected and switched to Base Sepolia
                 testnet.
               </p>
-              <button
-                className="border-0 mt-2 p-1 md:p-2 text-light-purple animate-pulse rounded-md text-grey text-xs md:text-base"
-                onClick={connectToBaseSepolia}
-              >
-                Connect to Base Sepolia
-              </button>
+              <div className="flex justify-center  mt-3 w-[86%]">
+                <button
+                  className="text-white bg-button-gradient mx-auto rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
+                  onClick={connectToBaseSepolia}
+                >
+                  Connect to Base Sepolia
+                </button>
+              </div>
+
               <motion.div
                 className="flex md:mt-40 z-5 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-evenly 2xl:ml-[-100px]"
                 initial="hidden"
@@ -188,10 +191,10 @@ function Page() {
                 base: "150px",
                 md: "300px",
                 lg: "330px",
-                xl: "310px",
+                xl: "360px",
               }}
               alt="container"
-              className="relative hidden  md:block ml-[-20px]"
+              className="relative hidden  md:block ml-[-30px]"
             />
           </div>
         </div>
