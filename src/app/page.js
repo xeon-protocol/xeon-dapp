@@ -1,33 +1,33 @@
-'use client';
-import Header from '@/components/Header';
-import React from 'react';
-import Lottie from 'react-lottie-player';
-import lottieJson from '@/assets/animations/blue_planet.json';
-import lottieJson2 from '@/assets/animations/planet_orbit1.json';
-import TestNetCard from '@/components/guide/Testnet';
-import { Image } from '@chakra-ui/react';
+"use client";
+import Header from "@/components/Header";
+import React from "react";
+import Lottie from "react-lottie-player";
+import lottieJson from "@/assets/animations/blue_planet.json";
+import lottieJson2 from "@/assets/animations/planet_orbit1.json";
+import TestNetCard from "@/components/guide/Testnet";
+import { Image } from "@chakra-ui/react";
 
-import TokenTable from '@/components/testing/TokenTable';
+import TokenTable from "@/components/testing/TokenTable";
 
-import WriteHedges from '@/components/testing/WriteHedges';
+import WriteHedges from "@/components/testing/WriteHedges";
 
-import { motion } from 'framer-motion';
-import Footer from '@/components/Footer';
+import { motion } from "framer-motion";
+import Footer from "@/components/Footer";
 
 function Page() {
   const glitchVariants = {
     visible: {
       textShadow: [
-        '1px 1px 0px lime',
-        '-1px -1px 0px purple',
-        '1px -1px 0px lime',
-        '-1px 1px 0px lime',
-        '2px 2px 2px lime',
+        "1px 1px 0px lime",
+        "-1px -1px 0px purple",
+        "1px -1px 0px lime",
+        "-1px 1px 0px lime",
+        "2px 2px 2px lime",
       ],
       transition: {
         duration: 0.2,
         repeat: Infinity,
-        repeatType: 'mirror',
+        repeatType: "mirror",
       },
     },
   };
@@ -43,6 +43,24 @@ function Page() {
   const itemVariants = {
     hidden: { opacity: 0, x: -20 },
     visible: { opacity: 1, x: 0 },
+  };
+  const connectToBaseSepolia = () => {
+    window.ethereum.request({
+      method: "wallet_addEthereumChain",
+      params: [
+        {
+          chainId: "0x14a34",
+          rpcUrls: ["https://sepolia.base.org"],
+          chainName: "Base Sepolia Testnet",
+          nativeCurrency: {
+            name: "ETH",
+            symbol: "ETH",
+            decimals: 18,
+          },
+          blockExplorerUrls: ["https://sepolia.basescan.org/"],
+        },
+      ],
+    });
   };
   return (
     <>
@@ -111,6 +129,12 @@ function Page() {
                 you have a wallet connected and switched to Base Sepolia
                 testnet.
               </p>
+              <button
+                className="border-0 mt-2 p-1 md:p-2 text-light-purple animate-pulse rounded-md text-grey text-xs md:text-base"
+                onClick={connectToBaseSepolia}
+              >
+                Connect to Base Sepolia
+              </button>
               <motion.div
                 className="flex md:mt-40 z-5 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-evenly 2xl:ml-[-100px]"
                 initial="hidden"
@@ -161,10 +185,10 @@ function Page() {
               // w={"100%"}
 
               h={{
-                base: '150px',
-                md: '300px',
-                lg: '330px',
-                xl: '310px',
+                base: "150px",
+                md: "300px",
+                lg: "330px",
+                xl: "310px",
               }}
               alt="container"
               className="relative hidden  md:block ml-[-20px]"
@@ -181,7 +205,7 @@ function Page() {
             animate="visible"
           >
             Token
-          </motion.span>{' '}
+          </motion.span>{" "}
           Use Cases
         </motion.p>
       </div>
