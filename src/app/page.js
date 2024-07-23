@@ -118,7 +118,7 @@ function Page() {
                 transition={{ duration: 0.6 }}
               >
                 <motion.a
-                  href="https://neon-hedge.gitbook.io/xeon-protocol-documentation/"
+                  href="https://docs.xeon-protocol.io/documentation"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
@@ -133,10 +133,10 @@ function Page() {
                   variants={itemVariants}
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
-                  Jump to Dapp
+                  Jump to Guide Page
                 </motion.a>
                 <motion.a
-                  href="https://t.me/xeon_protocol"
+                  href="https://t.me/XeonProtocolPortal"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
