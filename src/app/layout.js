@@ -2,7 +2,6 @@ import "./globals.css";
 import Head from "next/head";
 import { ChakraProvider } from "@chakra-ui/react";
 
-import Script from "next/script";
 import { ThirdwebProvider } from "thirdweb/react";
 
 export const metadata = {
@@ -17,13 +16,6 @@ export default function RootLayout({ children }) {
         <link
           href="https://api.fontshare.com/v2/css?f[]=nippo@200,300,400,500,700&display=swap"
           rel="stylesheet"
-        />
-
-        <Script
-          src="https://code.jquery.com/jquery-3.6.0.min.js"
-          integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+5hb7P1cbh5+6d5QQv6cCZ+3ouCgkG+3X5p5D7T"
-          crossOrigin="anonymous"
-          strategy="beforeInteractive"
         />
 
         <title>{metadata.title}</title>
