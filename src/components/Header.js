@@ -32,7 +32,7 @@ function Header() {
         <Link href={"/analytics"}>Analytics</Link>
         <Link href={"/guide"}>Guide</Link>
         <Link href={"/"}>Claim</Link>
-        <Link href={"/docs"}>Docs</Link>
+        <Link href={"https://docs.xeon-protocol.io/documentation"}>Docs</Link>
       </nav>
       <div className="md:hidden">
         <p className="text-grey" onClick={toggleMenu}>
