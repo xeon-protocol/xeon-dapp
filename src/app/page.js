@@ -1,33 +1,33 @@
-"use client";
-import Header from "@/components/Header";
-import React from "react";
-import Lottie from "react-lottie-player";
-import lottieJson from "@/assets/animations/blue_planet.json";
-import lottieJson2 from "@/assets/animations/planet_orbit1.json";
-import TestNetCard from "@/components/guide/Testnet";
-import { Image } from "@chakra-ui/react";
+'use client';
+import Header from '@/components/Header';
+import React from 'react';
+import Lottie from 'react-lottie-player';
+import lottieJson from '@/assets/animations/blue_planet.json';
+import lottieJson2 from '@/assets/animations/planet_orbit1.json';
+import TestNetCard from '@/components/guide/Testnet';
+import { Image } from '@chakra-ui/react';
 
-import TokenTable from "@/components/testing/TokenTable";
+import TokenTable from '@/components/testing/TokenTable';
 
-import WriteHedges from "@/components/testing/WriteHedges";
+import WriteHedges from '@/components/testing/WriteHedges';
 
-import { motion } from "framer-motion";
-import Footer from "@/components/Footer";
+import { motion } from 'framer-motion';
+import Footer from '@/components/Footer';
 
 function Page() {
   const glitchVariants = {
     visible: {
       textShadow: [
-        "1px 1px 0px lime",
-        "-1px -1px 0px purple",
-        "1px -1px 0px lime",
-        "-1px 1px 0px lime",
-        "2px 2px 2px lime",
+        '1px 1px 0px lime',
+        '-1px -1px 0px purple',
+        '1px -1px 0px lime',
+        '-1px 1px 0px lime',
+        '2px 2px 2px lime',
       ],
       transition: {
         duration: 0.2,
         repeat: Infinity,
-        repeatType: "mirror",
+        repeatType: 'mirror',
       },
     },
   };
@@ -102,13 +102,14 @@ function Page() {
                 What to know about testing
               </p>
               <p className="text-grey md:text-justify text-lg mt-5 md:w-[86%]">
-                This involves usage of our Dapp to interact with our
-                protocol/smart contracts. All Testnet Versions are listed at the
-                bottom of this page for the public to inspect. Neon Hedge comes
-                with 3 OTC tools: Call Options, Put Options, Equity Swaps. Test
-                Blockchain is Seporlia Testnet. Install MetaMask on your Browser
-                to use our Dapp. When done, proceed to below section and claim
-                our mock ERC20 tokens.
+                Thorough testing is an integral part of building a DeFi
+                protocol. Our testnet app is designed to test our full suite of
+                contracts in a live testnet environment that mimics mainnet, but
+                without real funds. Xeon Protocol is comprised of two core
+                contracts: hedging and staking. Hedging comes with three OTC
+                tools: Call Options, Put Options, and Equity Swaps. Make sure
+                you have a wallet connected and switched to Base Sepolia
+                testnet.
               </p>
               <motion.div
                 className="flex md:mt-40 z-5 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-evenly 2xl:ml-[-100px]"
@@ -160,10 +161,10 @@ function Page() {
               // w={"100%"}
 
               h={{
-                base: "150px",
-                md: "300px",
-                lg: "330px",
-                xl: "310px",
+                base: '150px',
+                md: '300px',
+                lg: '330px',
+                xl: '310px',
               }}
               alt="container"
               className="relative hidden  md:block ml-[-20px]"
@@ -180,7 +181,7 @@ function Page() {
             animate="visible"
           >
             Token
-          </motion.span>{" "}
+          </motion.span>{' '}
           Use Cases
         </motion.p>
       </div>
