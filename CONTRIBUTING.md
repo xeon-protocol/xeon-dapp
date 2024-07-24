@@ -1,22 +1,83 @@
-# Contributing Guidelines
+# Contributing
 
-In order to maintain high quality code that is easy to collaborate on, please make sure to stick to best practices. Expectations for code management are listed below. These guidelines apply to all code in the Xeon Protocol codebase and this `CONTRIBUTING.md` file should accompany every repository in the organization.
+Feel free to dive in! [Open](https://github.com/xeon-protocol/xeon-testnet/issues/new) an issue, [start](https://github.com/xeon-protocol/xeon-testnet/discussions/new) a discussion or submit a PR. For any informal concerns or feedback, please join our [Telegram Group](https://t.me/XeonProtocolPortal).
+
+Contributions to Xeon Protocol are welcome by anyone interested in writing more tests, improving readability, optimizing for gas efficiency, or extending the protocol via new features.
+
+## Pre Requisites
+
+You will need the following software on your machine:
+
+- [Git](https://git-scm.com/downloads)
+- [Foundry](https://github.com/foundry-rs/foundry)
+- [Node.js](https://nodejs.org/en/download/)
+
+In addition, familiarity with [Solidity](https://soliditylang.org/) is a requisite.
+
+## Set Up
+
+Clone this repository including submodules:
+
+```shell
+git clone --recurse-submodules -j8 git@github.com:xeon-protocol/xeon-testnet.git
+```
+
+Then, ensure Foundry is installed and initialized inside the project directory:
+
+```shell
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
+Install the required dependencies:
+
+```shell
+forge install
+```
+
+## Environment variables
+
+### Local Setup
+
+To build locally, follow the `.env.sample` file to create a `.env` file at the root of the repo and populate it with the appropriate environment values. You need to provide a mnemonic phrase/private key and a few API keys.
+
+**NOTE:** Only put sensitive data in the `.env` file, which `.gitignore` will automatically ignore. DO NOT save sensitive data in `.env.sample`.
+
+## Pull Requests
+
+All work should be done on it's own branch. Once you are done working on a branch, create a pull request to merge it back into `main`.
+
+When making a pull request, ensure that:
+
+- All tests pass.
+  - Fork testing requires environment variables to be set up in the forked repo.
+- Code coverage remains the same or greater.
+- All new code adheres to the style guide:
+  - All lint checks pass
+  - Code is thoroughly commented with NatSpec where relevant.
+- If making a change to the contracts:
+  - Gas snapshots are provided and demonstrate an improvement (or an acceptable deficit given other improvements).
+  - Reference contracts are modified correspondingly if relevant.
+  - New tests are included for all new features or code paths.
+- A descriptive summary of the PR has been provided.
+- Assign reviewers to the PR and request a **code review**.
+- Address any feedback or requested changes promptly.
+
+## Additional Guidelines
+
+In order to maintain high quality code that is easy to collaborate on, please make sure to stick to best practices. Expectations for code management are listed below.
 
 ## Branching Strategy
 
 - Always create a new branch from `main` for any new feature or bug fix.
-- Use descriptive branch names that clearly indicate the purpose of the branch, such as:
-  - `feature/integrate-figma-ui-kit`
-  - `bugfix/fix-login-issue`
-  - `test/hedging-unit-tests`\
 - To avoid merge conflicts, each branch should only serve a single purpose.
+- Use descriptive branch names that clearly indicate the purpose of the branch, such as:
 
-## Pull Requests (PRs)
-
-- Once you are done working on a branch, create a pull request to merge it back into `main`.
-- Provide a clear and detailed description of the changes made in the PR.
-- Assign reviewers to the PR and request a **code review**.
-- Address any feedback or requested changes promptly.
+```shell
+`ui/integrate-ui-kit`
+`feature/update-hedging-contracts`
+`bugfix/fix-login-issue`
+```
 
 ## Code Reviews
 
@@ -26,16 +87,14 @@ In order to maintain high quality code that is easy to collaborate on, please ma
 
 ## Merging
 
-- Once the PR is approved and all checks pass, merge the branch into `main`.
-- Use **squash and merge** to keep the commit history clean (unless the branch contains logically distinct commits that should be preserved).
+- Once the PR is approved and all checks pass, squash and merge into `main`.
+  - Use **squash and merge** to keep the commit history clean (unless the branch contains logically distinct commits that should be preserved).
 
 ## Maintaining a Clean Codebase
 
 - Regularly pull the latest changes from `main` into your working branches to avoid conflicts.
 - After merging a branch, delete it to keep the repo clean.
 - Document any significant changes or new features in our project documentation (`README.md` and associated files).
-
-Adhering to these will keep things running smoothly, reduce the risk of conflicts, and help maintain high-quality and clean code.
 
 ## Additional Guidelines
 
@@ -133,6 +192,6 @@ fix: resolve network not switching (#69)
 
 ---
 
-By following these guidelines, we can ensure a collaborative and efficient workflow, maintain a high standard of code quality, and create a better product for our users.
+## Notice
 
-Thank you for your contributions!
+These guidelines apply to all code in the Xeon Protocol codebase and this `CONTRIBUTING.md` file should accompany every repository in the organization.
