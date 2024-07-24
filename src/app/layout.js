@@ -7,7 +7,7 @@ export const metadata = {
   title: 'Xeon Protocol | Redefining DeFi',
   description:
     'Unlock liquidity and manage risk seamlessly with Xeon Protocol, the future of DeFi. Use any ERC-20 token as collateral, lend tokens for a DeFi cash advance, or trade options & swaps using our next-gen hedging tools.',
-  url: 'https://www.xeon-protocol.io',
+  url: 'https://www.app.xeon-protocol.io',
   image: '/public/xeon-meta-image.png',
 };
 
