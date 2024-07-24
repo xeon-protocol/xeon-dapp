@@ -1,7 +1,7 @@
 import './globals.css';
 import { ChakraProvider } from '@chakra-ui/react';
-
 import { ThirdwebProvider } from 'thirdweb/react';
+// import { ThirdwebProvider } from '@thirdweb-dev/react';
 
 export const metadata = {
   title: 'Xeon Protocol | Redefining DeFi',
