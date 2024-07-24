@@ -2,8 +2,7 @@
 module.exports = {
   sites: [
     {
-      // "slug": "howling-potato-large",
-      slug: 'scarce-bit-crashing',
+      slug: 'howling-potato-large',
       distDir: '/',
       buildCommand: 'npm run build',
     },
