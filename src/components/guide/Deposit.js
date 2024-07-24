@@ -25,21 +25,12 @@ function ScrollCard() {
         <div className="md:absolute top-16 md:left-[30px] w-full h-full">
           <Image
             borderRadius={"md"}
-            src="/animations/xeon-testnet.gif"
+            src="/deposit-tokens.png"
             // w={"100%"}
 
             alt="container"
-            className="relative lg:ml-[-20px] md:w-[87%] lg:w-auto"
+            className="relative lg:ml-[-20px] md:w-[87%] lg:w-[90%]"
           />
-          {/* <p className="text-grey text-lg mt-5 md:w-[85%]">
-            We built an entire protocol from scratch to enable users to deposit
-            and create OTC trades using any ERC20 token. Most of the development
-            work for Neon Hedge is complete, we will only test, fine tune and
-            experiment with monetary concepts that we think can be ground
-            breaking. This is where you come in as the community to help in
-            manifesting the cause: universal ERC20 hedging and lending. To test
-            this platform, you need testnet tokens.
-          </p> */}
         </div>
         <Image
           src="/card-109.svg"

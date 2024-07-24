@@ -71,6 +71,7 @@ li{
 }
 .modal-container .modal-content-title .modal-title {
     color:#f2f2f2 !important;
+    margin-left: 10px;
 }
 
 .modal-container{
@@ -83,7 +84,7 @@ li{
     border: 0.5px solid #bebebe91;
     padding: 5px 10px;
     border-radius: 4px;
-    margin-left: 10px !important;
+    /* margin-left: 10px !important; */
     align-items: center;
 }
 
@@ -94,8 +95,8 @@ li{
   
 }
 .modal-container .modal-content-title .close-button {
-  
-    display: none !important;
+  color: #f2f2f2 !important;
+    /* display: none !important; */
    
 }
 .select-buttons__item {
@@ -109,11 +110,11 @@ li{
   border-bottom: 3px solid #aa79e5 !important;
 }
 .modal-container .blur-container > div{
-  position:  relative !important;
+  /* position:  relative !important; */
 }
 .modal-container-inner {
     margin-top: -160px;
-    height: 450px !important;
+    /* height: 600px !important; */
     width: 600px !important;
 }
 .modal-container .modal-content-title .title-chain-container .chain-image{
@@ -124,25 +125,28 @@ li{
 @media (max-width: 768px) {
   .modal-container-inner {
     
-    height: 450px !important;
+    /* height: 450px !important; */
     width: 100% !important;
     margin-left: 21% !important;
   }
   .modal-container {
     left: -7% !important;
         width: 80% !important;
-        height: 62% !important;
+        /* height: 62% !important; */
   
 }
 .modal-container-content{
 width: 125% !important;
 }
 }
+.modal-container-inner{
+  height: auto !important;
+}
 @media (min-width: 768px) and (max-width: 1024px) {
 
   .modal-container-inner {
     margin-top: -160px;
-    height: 450px !important;
+    /* height: 450px !important; */
     width: 70% !important;
   }
   .modal-container {
