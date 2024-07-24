@@ -95,9 +95,7 @@ function CenterNav({
         className="bg-[#71637f4d] rounded-lg top-[35px]  md:top-[24px] lg:top-[35px]"
       >
         <InputLeftElement pointerEvents="none">
-
           <FaSearch color="#6c6c6c" className="ml-2" />
-
         </InputLeftElement>
         <Input
           size={{
@@ -149,12 +147,14 @@ function CenterNav({
               }}
               variant="filled"
               placeholder="Call Option"
-              className="bg-black text-grey border-[1px] border-[#6c6c6c] rounded-lg w-full "
+              className="bg-black text-grey border-[1px] border-[#6c6c6c] rounded-lg w-full"
             >
-              <option>Call Option</option>
-              <option>Put Option</option>
-              <option>Equity Swap</option>
-              <option>Loan (coming)</option>
+              <option className="dark:text-gray text-black">Call Option</option>
+              <option className="dark:text-gray text-black">Put Option</option>
+              <option className="dark:text-gray text-black">Equity Swap</option>
+              <option className="dark:text-gray text-black">
+                Loan (coming)
+              </option>
             </Select>
             <div className="flex items-center gap-4 mt-4 mb-2">
               {" "}
