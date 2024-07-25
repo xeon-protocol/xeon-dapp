@@ -38,15 +38,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 #### Local Development
 
-If you prefer to run the application locally without Docker, follow these steps:
+If you prefer to run the application locally without Docker, follow these steps.
 
-1. Install the dependencies:
+First, install the dependencies:
 
 ```sh
 npm install
 ```
 
-2. Start the development server:
+Second, start the development server:
 
 ```sh
 npm run dev
@@ -54,21 +54,18 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Setting up Foundry for Smart Contract Development
+## Smart Contracts
 
 The `contracts` directory contains the Solidity contracts and related files.
 To work with these contracts, you need to set up Foundry.
 
-1. Install Foundry:
-
-Follow the instructions on [Foundry's official website](https://book.getfoundry.sh/getting-started/installation) to install Foundry.
+First, ensure Foundry is installed globally.
 
 ```sh
 curl -L https://foundry.paradigm.xyz | bash
-foundryup
 ```
 
-2. Navigate to the `/contracts` directory and follow the instructions in [`/contracts/README.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/contracts/README.md) to continue with Foundry.
+Navigate to the `/contracts` directory and follow the instructions in [`/contracts/README.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/contracts/README.md) to continue with Foundry.
 
 ## Directory Structure
 
@@ -82,21 +79,18 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
 - [Foundry Documentation](https://book.getfoundry.sh/) - learn about Foundry
 
-## Contributing
+## Product Management
 
-Please update and follow along with the current development progress on [Trello](https://trello.com/b/mW198hKo/xeon-protocol-board).
-
-- If unable to access, [request invite](https://trello.com/invite/b/mW198hKo/ATTIc305ea03ad04139d54ef382b7a276d651224A655/xeon-protocol-board)
-
-For guidance on best practices within the Xeon codebase, see the [CONTRIBUTING](https://github.com/xeon-protocol/xeon-testnet/blob/main/CONTRIBUTING.md) guide.
+Please stay up to date with current development progress on [Trello](https://trello.com/b/mW198hKo/xeon-protocol-board). You can request access by clicking [here](https://trello.com/invite/b/mW198hKo/ATTIc305ea03ad04139d54ef382b7a276d651224A655/xeon-protocol-board).
 
 ## Security
 
-For any security-related concerns, please refer to the [SECURITY](https://github.com/xeon-protocol/xeon-testnet/blob/main/SECURITY.md) policy. This repository is subject to a bug bounty program per the terms outlined in the aforementioned policy.
+For any security-related concerns, please refer to the [SECURITY](https://github.com/xeon-protocol/xeon-dapp/blob/main/SECURITY.md) policy. This repository is subject to a bug bounty program per the terms outlined in the aforementioned policy.
 
 ## License
 
-The primary license for Xeon Protocol is the Business Source License 1.1 (BUSL-1.1), see [`LICENSE.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE.md). However, there are some exceptions:
+The primary license for core Xeon Protocol contracts (`XeonHedging.sol` + `XeonStaking.sol`) is the Business Source License 1.1 (BUSL-1.1), see [`LICENSE.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE.md).
 
-- Several files in `contracts/script` and `contracts/test` are licensed under `GPL-3.0-or-later`, see [`LICENSE-GPL.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE-GPL.md).
-- Many files in `test/` remain unlicensed (as indicated in their SPDX headers).
+However, there are some exceptions:
+
+- Several files in `contracts/script` and `contracts/test` are licensed under `GPL-3.0-or-later` (see: [`LICENSE-GPL.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE-GPL.md)) or remain unlicensed (per their SPDX headers).
