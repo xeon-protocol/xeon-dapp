@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability in Xeon Protocol, we encourage you to report it to us as soon as possible. We will handle your report with the highest priority and confidentiality.
 
-Please email your findings to [jon@xeon-protocol.com](mailto:jon@xeon-protocol.com) or send a DM on [Warpcast](https://warpcast.com/jonbray.eth). Include as much detail as possible to help us understand and reproduce the issue.
+Please email your findings to [jon@xeon-protocol.io](mailto:jon@xeon-protocol.io) or send a DM on [Warpcast](https://warpcast.com/jonbray.eth). Include as much detail as possible to help us understand and reproduce the issue.
 If applicable, include a link or hash to any relevant onchain transactions.
 
 ## Response Expectations
@@ -17,14 +17,13 @@ If applicable, include a link or hash to any relevant onchain transactions.
 
 We provide security updates and support for all current deployments on the following networks:
 
-| Network                | Supported          |
-| ---------------------- | ------------------ |
-| Ethereum               | :white_check_mark: |
-| Sepolia Testnet        | :x:                |
-| Base                   | 🕒                |
-| Base Sepolia Testnet   | :white_check_mark: |
-| Arbitrum               | 🕒                |
-| Optimism               | 🕒                |
+| Network              | Supported |
+| -------------------- | --------- |
+| Ethereum             | ✅        |
+| Base                 | 🕒        |
+| Base Sepolia Testnet | ✅        |
+| Arbitrum             | 🕒        |
+| Optimism             | 🕒        |
 
 ## Security Updates
 
@@ -33,6 +32,7 @@ To stay informed about security updates, follow our [Trello](https://github.com/
 ## Security Practices
 
 We are committed to ensuring the security of our platform and follow best practices, including:
+
 - Regular penetration testing
 - Open-Sourcing public contracts
 - Continuous dependency management

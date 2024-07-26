@@ -1,0 +1,26 @@
+name: Sync Main to Deploy/Fleek
+# this workflow will sync `main` to `deploy/fleek`
+# due to differences in the current fleek build requirements
+# it is necessary to keep the branches separate
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: Checkout deploy/fleek branch
+        run: git checkout deploy/fleek
+      - name: Merge main into deploy/fleek
+        run: git merge main --no-ff
+      - name: Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: git push origin deploy/fleek

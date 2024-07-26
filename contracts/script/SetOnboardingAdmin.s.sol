@@ -12,8 +12,8 @@ import {OnboardingUtils} from "../src/OnboardingUtils.sol";
  */
 contract SetOnboardingAdminScript is Script {
     address public deployer = 0x56557c3266d11541c2D939BF6C05BFD29e881e55;
-    address public onboardingUtilsAddress = 0xF527B037e30D8764E8e24B7Ed7a6158488C6a758;
-    address public tokenFactoryAddress = 0xF46DFcf4eD6AF3b07f2e5a17A6261256A012da05;
+    address public onboardingUtilsAddress = 0x88232810891E015161D3e57C1E5A5DA2376407d5;
+    address public tokenFactoryAddress = 0x5A0d5390c45b49505C43A56DA4A4f89b93023F11;
     address public wethAddress = 0x395cB7753B02A15ed1C099DFc36bF00171F18218;
 
     address[] public admin = [

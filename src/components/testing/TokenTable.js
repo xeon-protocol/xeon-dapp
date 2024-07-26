@@ -26,10 +26,7 @@ const TokenTable = () => {
   const [status, setStatus] = useState("");
   const [referralAddress, setReferralAddress] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
-  console.log(
-    Constants.testnet.MockERC20FactoryContractAddress,
-    "Constants.testnet.MockERC20FactoryContractAddress"
-  );
+
   const [tokens, setTokens] = useState([
     {
       name: "Vela Exchange",
@@ -120,7 +117,10 @@ const TokenTable = () => {
   const ref = useRef(null);
   const inView = useInView(ref);
   useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider =
+      window.ethereum != null
+        ? new ethers.providers.Web3Provider(window.ethereum)
+        : ethers.providers.getDefaultProvider();
     const factoryContract = new ethers.Contract(
       Constants.testnet.MockERC20FactoryContractAddress,
       MockERC20FactoryABI,

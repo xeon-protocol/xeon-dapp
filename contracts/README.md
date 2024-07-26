@@ -1,47 +1,40 @@
-# Foundry
+# Xeon Protocol Core Contracts
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+This repository contains the Xeon Protocol contracts, tests, and scripts. Xeon is a cutting edge DeFi protocol that unlocks liquidity on EVM networks by providing novel risk-management tools and an all-inclusive frontend.
 
-Foundry consists of:
+## Foundry
+
+Xeon Protocol's core contracts are built with Foundry, a smart contract development toolchain made up of the following tools:
 
 - **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
 - **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
 - **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
 - **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
-## Using Foundryup
+## Setup
 
-Foundryup is the Foundry toolchain installer.
-
-Open your terminal and run the following command:
+First, ensure Foundry is installed.
 
 ```shell
 curl -L https://foundry.paradigm.xyz | bash
-```
-
-This will install Foundryup, then simply follow the instructions on-screen, which will make the foundryup command available in your CLI.
-
-If Foundry has already been installed globally, ensure that Foundry is initialized in your project directory:
-
-```shell
 foundryup
 ```
 
-Install dependencies. Foundry will automatically fetch required libraries from github
+Second, install the dependency submodules using Forge:
 
 ```shell
-forge install
+forge install --no-commit foundry-rs/forge-std openzeppelin/openzeppelin-contracts uniswap/v2-core uniswap v3-core uniswap v3-periphery
 ```
 
-## Documentation
+To learn more about Foundry, check out their docs [here](https://book.getfoundry.sh/).
 
-https://book.getfoundry.sh/
+## Forge
 
-## Usage
-
-Forge tests, builds, and deploys smart contracts.
+Forge is used to build, test, and deploy smart contracts.
 
 ### Build
+
+To build and compile all smart contracts, use:
 
 ```shell
 $ forge build
@@ -55,22 +48,12 @@ Tests are handled through test files, written in Solidity and using the naming c
 $ forge test
 ```
 
-### Format
-
-```shell
-$ forge fmt
-```
-
 ### Gas Snapshots
+
+Forge can generate gas snapshots for all test functions to see how much gas contracts will consume, or to compare gas usage before and after optimizations.
 
 ```shell
 $ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
 ```
 
 ### Deploy
@@ -80,42 +63,41 @@ Deployments are handled through script files, written in Solidity and using the 
 You can run a script directly from your CLI
 
 ```shell
-$ forge script script/Xeon.s.sol:XeonScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+$ forge script script/MyContract.s.sol:MyContractScript --rpc-url <your_rpc_url> --private-key <your_private_key>
 ```
 
 Unless you include the `--broadcast` argument, the script will be run in a simulated environment. If you need to run the script live, use the `--broadcast` arg
 
-**(CAUTION: This will initiate an onchain transaction, only use after thoroughly testing)**
+⚠️ **CAUTION: Using `--broadcast` will initiate an onchain transaction, only use after thoroughly testing**
 
 ```shell
-$ forge script script/Xeon.s.sol:XeonScript --rpc-url <your_rpc_url> --private-key <your_private_key> --chain-id 1 -vv --broadcast
+$ forge script script/MyContract.s.sol:MyContractScript --rpc-url <your_rpc_url> --private-key <your_private_key> --chain-id 1 -vv --broadcast
 ```
 
 Additional arguments can specity the chain and verbosity of the script
 
 ```shell
-$ forge script script/Xeon.s.sol:XeonScript --rpc-url <your_rpc_url> --private-key <your_private_key> --chain-id 1 -vv
+$ forge script script/MyContract.s.sol:MyContractScript --rpc-url <your_rpc_url> --private-key <your_private_key> --chain-id 1 -vv
 ```
 
-When required, you can use environment variables to pass a private key directly into script functions to prevent exposing it in the command line (recommended).
+Additionally, you can pass a private key directly into script functions to prevent exposing it in the command line (recommended).
 
-**CAUTION: Always ensure you are using a `.env.local` and a proper `.gitignore` to prevent leaked keys.**
+⚠️ **CAUTION: Ensure you are using a `.env.local` and a proper `.gitignore` to prevent leaked keys.**
 
 ```js
-vm.startBroadcast(vm.envUint('PRIVATE_KEY'));
+function run() public {
+    vm.startBroadcast(vm.envUint('PRIVATE_KEY'));
+    // rest of your code...
+}
 ```
 
-Then running the CLI command
+Then run the `forge script` command without the private key arg.
 
-```shell
-$ forge script script/Xeon.s.sol:XeonScript --rpc-url <your_rpc_url> --chain-id 1 -vv
-```
+💡 **When deploying a new contract, use the `--verify` arg to verify the contract on deployment.**
 
 ### Anvil
 
-Anvil is a local testnet node shipped with Foundry for testing contracts from frontends or for interacting over RPC.
-
-To use Anvil, simply type `anvil` to see a list of accounts and private keys available for use, as well as the address and port that the node is listening on.
+To use a local testnet node, simply type `anvil` to see a list of accounts and private keys available for use, as well as the address and port that the node is listening on.
 
 ```shell
 # number of dev accounts to generate and configure [default: 10]
@@ -128,9 +110,9 @@ anvil --hardfork <HARDFORK>
 anvil -p, --port <PORT>
 ```
 
-The `genesis.json` file in Anvil serves a similar purpose as in Geth, defining the network's initial state. All values are to be defined as hexadecimals.
+A `genesis.json` file can be used to define the initial state of the testnet. All values are to be defined as hexadecimals.
 
-A sample for simulating mainnet via genesis can be found [here](https://github.com/paradigmxyz/reth/blob/8f3e4a15738d8174d41f4aede5570ecead141a77/crates/primitives/res/genesis/mainnet.json)
+A sample for simulating mainnet via genesis can be found [here](https://github.com/paradigmxyz/reth/blob/8f3e4a15738d8174d41f4aede5570ecead141a77/crates/primitives/res/genesis/mainnet.json).
 
 ### Cast
 
@@ -140,16 +122,14 @@ Cast is a CLI for performing Ethereum RPC calls. You can make contract calls, se
 $ cast <subcommand>
 ```
 
-### Chisel
+## Security
 
-Chisel is a Solidity REPL that allows developers to write and test Solidity code snippets.
+For any security-related concerns, please refer to the [SECURITY](https://github.com/xeon-protocol/xeon-dapp/blob/main/SECURITY.md) policy. This repository is subject to a bug bounty program per the terms outlined in the aforementioned policy.
 
-More details on using `chisel` can be found [here](https://book.getfoundry.sh/reference/chisel/)
+## License
 
-### Help
+The primary license for core Xeon Protocol contracts (`XeonHedging.sol` + `XeonStaking.sol`) is the Business Source License 1.1 (BUSL-1.1), see [`LICENSE.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE.md).
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+However, there are some exceptions:
+
+- Several files in `script` and `test` are licensed under `GPL-3.0-or-later` (see: [`LICENSE-GPL.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE-GPL.md)) or remain unlicensed (per their SPDX headers).
