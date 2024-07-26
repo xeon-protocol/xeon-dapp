@@ -1,10 +1,11 @@
-"use client";
-import React, { useState } from "react";
-import { Button, IconButton, Image } from "@chakra-ui/react";
-import { FaBars, FaTimes } from "react-icons/fa";
-import Link from "next/link";
-import { client } from "@/components/ConnectWallet/client";
-import { ConnectButton } from "thirdweb/react";
+'use client';
+import React, { useState } from 'react';
+import { Button, IconButton, Image } from '@chakra-ui/react';
+import { FaBars, FaTimes } from 'react-icons/fa';
+import Link from 'next/link';
+import { client } from '@/components/ConnectWallet/client';
+import { ConnectButton } from 'thirdweb/react';
+import xeonTokenList from '@/abi/xeonTokenList.json';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,6 +13,21 @@ function Header() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  /**
+   * @dev map xeonTokenList to the required format for supportedTokens
+   */
+  const supportedTokens = Object.fromEntries(
+    Object.entries(xeonTokenList.tokens).map(([network, tokens]) => [
+      network,
+      tokens.map(({ address, name, symbol, icon }) => ({
+        address,
+        name,
+        symbol,
+        icon,
+      })),
+    ])
+  );
 
   return (
     <header
@@ -21,18 +37,24 @@ function Header() {
     max-w-screen-2xl
     "
     >
-      <Link href={"/"} className="text-lg font-medium">
+      <Link href={'/'} className="text-lg font-medium">
         <Image className="hidden md:block" ml={6} src="/logo.png" alt="xeon" />
         <Image className=" md:hidden" ml={6} src="/Logo2.png" alt="xeon" />
       </Link>
 
       <nav className="hidden md:flex space-x-6">
-        <Link href={"/silkroad"}>Silkroad</Link>
-        <Link href={"/wallet"}>Wallet</Link>
-        <Link href={"/analytics"}>Analytics</Link>
-        <Link href={"/guide"}>Guide</Link>
-        <Link href={"/"}>Claim</Link>
-        <Link href={"https://docs.xeon-protocol.io/documentation target='_blank' rel='noopener noreferrer' "}>Docs</Link>
+        <Link href={'/silkroad'}>Silkroad</Link>
+        <Link href={'/wallet'}>Wallet</Link>
+        <Link href={'/analytics'}>Analytics</Link>
+        <Link href={'/guide'}>Guide</Link>
+        <Link href={'/'}>Claim</Link>
+        <Link
+          href={
+            "https://docs.xeon-protocol.io/documentation target='_blank' rel='noopener noreferrer' "
+          }
+        >
+          Docs
+        </Link>
       </nav>
       <div className="md:hidden">
         <p className="text-grey" onClick={toggleMenu}>
@@ -45,26 +67,27 @@ function Header() {
           Switch Network
         </button> */}
         <ConnectButton
+          supportedTokens={supportedTokens}
           connectButton={{
             className:
-              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+              'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
             style: {
-              borderRadius: "50px",
-              backgroundColor: "#3253FB",
-              color: "white",
+              borderRadius: '50px',
+              backgroundColor: '#3253FB',
+              color: 'white',
             },
           }}
           signInButton={{
             className:
-              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+              'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
           }}
           detailsButton={{
             className:
-              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+              'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
             style: {
-              borderRadius: "50px",
-              backgroundColor: "#3253FB",
-              color: "white",
+              borderRadius: '50px',
+              backgroundColor: '#3253FB',
+              color: 'white',
             },
           }}
           client={client}
