@@ -1,20 +1,20 @@
-# Xeon Protocol dApp
+# [Xeon Protocol](https://xeon-protocol.io) &middot; [![GitHub license](https://img.shields.io/badge/core_license-BUSL_1.1-blue.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE) [![GitHub license](https://img.shields.io/badge/incl_license-GPL_3.0-blue.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE-GPL.md)
 
-This repository contains the Xeon Protocol dApp, which includes both the Node.js frontend and Solidity contracts, tests, and scripts built with Foundry.
+[![xeon token](https://img.shields.io/badge/$XEON-0x8d65a2eaBDE4B31cbD7E43F27E47559d1CCec86c-8429c6.svg?logo=ethereum)](https://app.uniswap.org/explore/tokens/ethereum/0x8d65a2eabde4b31cbd7e43f27e47559d1ccec86c?chain=mainnet)
 
-## Contributing
+This repository contains the Xeon Protocol dApp, which includes both the frontend application as well as Solidity contracts, tests, and scripts built with Foundry.
 
-If you are a developer looking to contribute, please take a look at the guidelines in [CONTRIBUTING](https://github.com/xeon-protocol/xeon-testnet/blob/main/CONTRIBUTING.md) first.
+### Follow Us
 
-If you are an auditor and have found any problems or vulnerabilities in the codebase, please see our policy in [SECURITY](https://github.com/xeon-protocol/xeon-testnet/blob/main/SECURITY.md).
+[![warpcast](https://img.shields.io/badge/Follow_@xeonprotocol-FFFFFF.svg?logo=farcaster)](https://warpcast.com/xeonprotocol) ![twitter follow](https://img.shields.io/twitter/follow/xeonprotocol) [![telegram](https://img.shields.io/badge/join_telegram-FFFFFF.svg?logo=telegram)](https://t.me/XeonProtocolPortal)
+
+### Repo Status
+
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/xeon-protocol/xeon-dapp) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/xeon-protocol/xeon-dapp) ![GitHub contributors](https://img.shields.io/github/contributors/xeon-protocol/xeon-dapp)
 
 ## Prerequisites
 
-- [Git](https://git-scm.com/downloads)
-- [Foundry](https://github.com/foundry-rs/foundry)
-- [Node.js](https://nodejs.org/en/download/)
-- npm (>= v6)
-- Docker (optional)
+[![git](https://img.shields.io/badge/git-any-darkgreen)](https://git-scm.com/downloads) [![node](https://img.shields.io/badge/node.js->_14.2.4-darkgreen)](https://nodejs.org/en/download/) [![npm](https://img.shields.io/badge/npm->=_6-darkgreen)](https://npmjs.com/) [![Foundry](https://img.shields.io/badge/Foundry-v0.2.0-orange)](https://book.getfoundry.sh/) [![docker](https://img.shields.io/badge/docker-optional-blue)](https://www.docker.com/)
 
 ## Set Up
 
@@ -79,11 +79,17 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
 - [Foundry Documentation](https://book.getfoundry.sh/) - learn about Foundry
 
-## Product Management
+## Product Management &middot; [![trello](https://img.shields.io/badge/Trello-855DCD.svg?logo=trello)](https://trello.com/b/mW198hKo/xeon-protocol-board)
 
-Please stay up to date with current development progress on [Trello](https://trello.com/b/mW198hKo/xeon-protocol-board). You can request access by clicking [here](https://trello.com/invite/b/mW198hKo/ATTIc305ea03ad04139d54ef382b7a276d651224A655/xeon-protocol-board).
+If you have trouble joining Trello, please request access by clicking [here](https://trello.com/invite/b/mW198hKo/ATTIc305ea03ad04139d54ef382b7a276d651224A655/xeon-protocol-board).
 
-## Security
+## [Contributing](https://github.com/xeon-protocol/xeon-testnet/blob/main/CONTRIBUTING.md) &middot; [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-darkgreen.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/CONTRIBUTING.md) &middot; [![Bug Bounties](https://img.shields.io/badge/Bug_Bounties-open-red.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/SECURITY.md)
+
+If you are a developer looking to contribute, please take a look at the guidelines in [CONTRIBUTING](https://github.com/xeon-protocol/xeon-testnet/blob/main/CONTRIBUTING.md) first.
+
+If you are an auditor and have found any problems or vulnerabilities in the codebase, please see our policy in [SECURITY](https://github.com/xeon-protocol/xeon-testnet/blob/main/SECURITY.md).
+
+## [Security](https://github.com/xeon-protocol/xeon-dapp/blob/main/SECURITY.md) &middot; [![warpcast](https://img.shields.io/badge/contact_dev-FFFFFF.svg?logo=farcaster)](https://warpcast.com/xeonprotocol)
 
 For any security-related concerns, please refer to the [SECURITY](https://github.com/xeon-protocol/xeon-dapp/blob/main/SECURITY.md) policy. This repository is subject to a bug bounty program per the terms outlined in the aforementioned policy.
 
