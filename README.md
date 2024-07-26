@@ -18,35 +18,25 @@ This repository contains the Xeon Protocol dApp, which includes both the fronten
 
 ## Set Up
 
-Ensure you have the latest changes from the repository locally on your machine:
+Clone the repository:
+
+```sh
+git clone https://github.com/xeon-protocol/xeon-dapp.git
+```
+
+If already cloned locally, ensure you have the latest changes locally:
 
 ```sh
 git pull origin main
 ```
 
-### Docker
-
-Build and run the Docker container:
-
-```sh
-docker build -t xeon-dapp -f Dockerfile .
-
-docker run -p 3000:3000 xeon-dapp
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-#### Local Development
-
-If you prefer to run the application locally without Docker, follow these steps.
-
-First, install the dependencies:
+Install all dependencies:
 
 ```sh
 npm install
 ```
 
-Second, start the development server:
+Then, start the development server:
 
 ```sh
 npm run dev
@@ -54,26 +44,12 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Smart Contracts
-
-The `contracts` directory contains the Solidity contracts and related files.
-To work with these contracts, you need to set up Foundry.
-
-First, ensure Foundry is installed globally.
-
-```sh
-curl -L https://foundry.paradigm.xyz | bash
-```
-
-Navigate to the `/contracts` directory and follow the instructions in [`/contracts/README.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/contracts/README.md) to continue with Foundry.
-
 ## Directory Structure
 
-- `contracts` - Contains the Solidity contracts and related files. The `foundry.toml` file is used to configure Foundry
+- `abi` - Contains ABI `json` files and global references to onchain deployments used in the app.
 - `src` - Source code for the Next.js application
 - Ensure sensitive data is stored in `.env.local`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
