@@ -115,7 +115,7 @@ function Page() {
             />
           </div>
           <div className="relative">
-            <div className="md:absolute md:top-10 lg:top-10 md:left-[30px] lg:left-5 w-full h-full">
+            <div className="md:absolute md:top-10 lg:top-10 md:left-[30px] lg:left-5 w-full h-full z-[5]">
               <p className="text-grey text-lg w-[85%] mt-4">
                 What to know about testing
               </p>
