@@ -14,11 +14,13 @@ If applicable, include a link or hash to any relevant onchain transactions.
 - **Resolution**: We will work to resolve the issue as quickly as possible, keeping you informed of our progress.
 - **Reward**: If the findings are eligible for a reward, we will reach out for a receiving address and process payment within 5 business days after resolution.
 
-## Bug Bounty Program &middot; ![eligible](https://img.shields.io/badge/v1--core-eligible-darkgreen.svg) ![not eligible](https://img.shields.io/badge/xeon--dapp-not_eligible-red.svg)
+## [Bug Bounty Program](https://github.com/xeon-protocol/xeon-dapp/blob/main/bug-bounty.md) &middot; ![eligible](https://img.shields.io/badge/v1--core-eligible-darkgreen.svg) ![not eligible](https://img.shields.io/badge/xeon--dapp-not_eligible-red.svg)
 
 Portions of our codebase are subject to the Xeon Protocol Bug Bounty (the "Program") to incentivize responsible disclosure of vulnerabilities. We are offering XEON token rewards for submissions that meet eligibility criteria.
 
-More details can be found [here](https://github.com/xeon-protocol/xeon-dapp/blob/main/bug-bounty.md).
+### Community Audit Program
+
+In order to maximize the security of our `v1-core` contracts, we will be opening them for community audit prior to their release on mainnet. If you are a Solidity developer with auditing experience, and would like to earn XEON token rewards in exchange for providing a detailed contract audit, please contact us on [Telegram](https://t.me/XeonProtocolPortal), or by [email](mailto:jon@xeon-protocol.io) for an invite to an audit discussion in Slack.
 
 ## Security Updates
 
