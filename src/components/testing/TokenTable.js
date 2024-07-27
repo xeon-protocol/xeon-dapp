@@ -165,6 +165,7 @@ const TokenTable = () => {
         [
           "function claimInitial(address tokenAddress) public",
           "function claimInitialWithReferral(address tokenAddress, address referredByAddress) public",
+          "function claimTokens(address tokenAddress) public", // Add this line to include claimTokens function
         ],
         signer
       );
@@ -183,15 +184,15 @@ const TokenTable = () => {
       setShowPopup(true);
       setMessage("Token claimed successfully!");
       setStatus("success");
+
       // Refresh token supply after claim
       const factoryContract = new ethers.Contract(
-        contract.testnet.MockERC20FactoryContractAddress,
+        Constants.testnet.MockERC20FactoryContractAddress,
         MockERC20FactoryABI,
         provider
       );
       const updatedSupply = await factoryContract.getTotalSupply(tokenAddress);
       const formattedSupply = ethers.utils.formatUnits(updatedSupply, 18);
-      console.log(formattedSupply, "formatted supply");
       setTokens((prevTokens) =>
         prevTokens.map((token) =>
           token.address === tokenAddress
@@ -200,9 +201,53 @@ const TokenTable = () => {
         )
       );
     } catch (error) {
-      setMessage("Failed to claim token.");
-      console.error("Error claiming token:", error);
-      setError("Failed to claim token. Please try again.");
+      if (
+        error.code === ethers.errors.UNPREDICTABLE_GAS_LIMIT &&
+        error.reason.includes("Already claimed initial tokens")
+      ) {
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner();
+          const claimContract = new ethers.Contract(
+            Constants.testnet.onboardingUtilsContractAddress,
+            ["function claimTokens(address tokenAddress) public"],
+            signer
+          );
+
+          const transaction = await claimContract.claimTokens(tokenAddress);
+          await transaction.wait();
+          setShowPopup(true);
+          setMessage("Weekly tokens claimed successfully!");
+          setStatus("success");
+
+          // Refresh token supply after claim
+          const factoryContract = new ethers.Contract(
+            Constants.testnet.MockERC20FactoryContractAddress,
+            MockERC20FactoryABI,
+            provider
+          );
+          const updatedSupply = await factoryContract.getTotalSupply(
+            tokenAddress
+          );
+          const formattedSupply = ethers.utils.formatUnits(updatedSupply, 18);
+          setTokens((prevTokens) =>
+            prevTokens.map((token) =>
+              token.address === tokenAddress
+                ? { ...token, supply: formattedSupply }
+                : token
+            )
+          );
+        } catch (weeklyClaimError) {
+          setMessage("Failed to claim weekly tokens. Please try again.");
+          setStatus("failed");
+          console.error("Error claiming weekly tokens:", weeklyClaimError);
+        }
+      } else {
+        setMessage("Failed to claim token.");
+        setStatus("failed");
+        console.error("Error claiming token:", error);
+        setError("Failed to claim token. Please try again.");
+      }
     }
 
     setLoading(false);
@@ -294,12 +339,16 @@ const TokenTable = () => {
                   </p>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <button
-                      className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400"
-                      onClick={() => handleClaim(token.address)}
-                    >
-                      Claim
-                    </button>
+                    {token.symbol !== "WETH" ? (
+                      <button
+                        className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400"
+                        onClick={() => handleClaim(token.address)}
+                      >
+                        Claim
+                      </button>
+                    ) : (
+                      <></>
+                    )}
                     <button className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400">
                       Return
                     </button>
