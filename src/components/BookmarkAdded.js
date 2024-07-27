@@ -6,13 +6,14 @@ function BookmarkAdded({ message, status }) {
     <div
       className={"bg-black text-grey flex flex-col justify-center items-center"}
     >
+      <p className="text-lg mb-4 text-center">{status}</p>
       <Image
         src={status === "success" ? "/success.webp" : "/fail.webp"}
         alt="failed popup"
         className=""
       />
-      <p className="text-lg mt-4">{status}</p>
-      <h3 className="text-2xl mt-4">{message}</h3>
+
+      <h3 className="text-2xl mt-4 text-cente">{message}</h3>
     </div>
   );
 }
