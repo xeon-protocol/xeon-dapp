@@ -2,7 +2,7 @@
 
 [![xeon token](https://img.shields.io/badge/$XEON-0x8d65a2eaBDE4B31cbD7E43F27E47559d1CCec86c-8429c6.svg?logo=ethereum)](https://app.uniswap.org/explore/tokens/ethereum/0x8d65a2eabde4b31cbd7e43f27e47559d1ccec86c?chain=mainnet)
 
-The `xeon-v1-core` repository is subject to the Xeon Protocol Bug Bounty (the "Program") to incentivize responsible disclosure of vulnerabilities. We are offering XEON token rewards for submissions that meet eligibility criteria.
+The `v1-core` repository is subject to the Xeon Protocol Bug Bounty (the "Program") to incentivize responsible disclosure of vulnerabilities. We are offering XEON token rewards for submissions that meet eligibility criteria.
 
 ## Scope
 
