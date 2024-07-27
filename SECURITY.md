@@ -1,4 +1,4 @@
-# Security Policy
+# Security Policy &middot; [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-darkgreen.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/CONTRIBUTING.md) [![Bug Bounties](https://img.shields.io/badge/Bug_Bounties-open-darkgreen.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/bug-bounties.md)
 
 ## Reporting a Vulnerability
 
@@ -12,22 +12,19 @@ If applicable, include a link or hash to any relevant onchain transactions.
 - **Acknowledgement**: We will acknowledge receipt of your report within 48 hours.
 - **Initial Triage**: We will complete an initial assessment of your report within 5 business days.
 - **Resolution**: We will work to resolve the issue as quickly as possible, keeping you informed of our progress.
+- **Reward**: If the findings are eligible for a reward, we will reach out for a receiving address and process payment within 5 business days after resolution.
 
-## Supported Deployments
+## [Bug Bounty Program](https://github.com/xeon-protocol/xeon-dapp/blob/main/bug-bounty.md) &middot; ![eligible](https://img.shields.io/badge/v1--core-eligible-darkgreen.svg) ![not eligible](https://img.shields.io/badge/xeon--dapp-not_eligible-red.svg)
 
-We provide security updates and support for all current deployments on the following networks:
+Portions of our codebase are subject to the Xeon Protocol Bug Bounty (the "Program") to incentivize responsible disclosure of vulnerabilities. We are offering XEON token rewards for submissions that meet eligibility criteria.
 
-| Network              | Supported |
-| -------------------- | --------- |
-| Ethereum             | ✅        |
-| Base                 | 🕒        |
-| Base Sepolia Testnet | ✅        |
-| Arbitrum             | 🕒        |
-| Optimism             | 🕒        |
+### Community Audit Program
+
+In order to maximize the security of our `v1-core` contracts, we will be opening them for community audit prior to their release on mainnet. If you are a Solidity developer with auditing experience, and would like to earn XEON token rewards in exchange for providing a detailed contract audit, please contact us on [Telegram](https://t.me/XeonProtocolPortal), or by [email](mailto:jon@xeon-protocol.io) for an invite to an audit discussion in Slack.
 
 ## Security Updates
 
-To stay informed about security updates, follow our [Trello](https://github.com/xeon-protocol/xeon-dapp/security/advisories) for the latest updates. Additionally, we publish regular articles on our [Paragraph Newsletter](https://paragraph.xyz/@xeon-protocol).
+To stay informed about security updates, follow us on [Warpcast](https://warpcast.com/xeonprotocol) and [X](https://x.com/xeonprotocol) for the latest updates. Additionally, we publish regular articles on our [Paragraph Newsletter](https://paragraph.xyz/@xeon-protocol).
 
 ## Security Practices
 

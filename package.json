@@ -1,26 +1,23 @@
 {
   "name": "xeon-dapp",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "postbuild": "next-sitemap",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "version": "auto-changelog -p && git add CHANGELOG.md"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@openzeppelin/contracts": "^5.0.2",
     "@tanstack/react-query": "^5.51.1",
     "@teller-protocol/teller-widget": "^1.2.0",
     "@teller-protocol/v2-contracts": "^3.1.13",
     "@thirdweb-dev/sdk": "^4.0.99",
-    "@uniswap/v2-core": "^1.0.1",
-    "@uniswap/v3-core": "^1.0.1",
-    "@uniswap/v3-periphery": "^1.4.4",
     "alchemy-sdk": "^3.3.1",
     "ethers": "5",
     "framer-motion": "^11.2.12",
@@ -38,6 +35,7 @@
     "wagmi": "^2.11.2"
   },
   "devDependencies": {
+    "auto-changelog": "^2.4.0",
     "autoprefixer": "^10.4.19",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",

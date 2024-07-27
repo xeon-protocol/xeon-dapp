@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Dev Support
+    url: mailto:jon@xeon-protocol.io
+    about: If you need support or have questions, please contact the developer.
+  - name: GitBook
+    url: https://xeon-protocol.gitbook.io/documentation/
+    about: Learn more about Xeon Protocol
+  - name: Warpcast
+    url: https://warpcast.com/xeonprotocol
+    about: Contact us on Warpcast
+  - name: Twitter
+    url: https://twitter.com/xeonprotocol
+    about: Contact us on Twitter
+  - name: Telegram
+    url: https://t.me/XeonProtocolPortal
+    about: Join us on Telegram
