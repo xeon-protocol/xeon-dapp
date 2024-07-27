@@ -1,4 +1,4 @@
-# Security Policy &middot; [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-darkgreen.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/CONTRIBUTING.md) [![Bug Bounties](https://img.shields.io/badge/Bug_Bounties-open-darkgreen.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/bug-bounties.md)
+# Security Policy &middot; [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-darkgreen.svg)](CONTRIBUTING.md) [![Bug Bounties](https://img.shields.io/badge/Bug_Bounties-open-darkgreen.svg)](bug-bounties.md)
 
 ## Reporting a Vulnerability
 

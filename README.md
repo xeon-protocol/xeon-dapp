@@ -1,8 +1,10 @@
 # Xeon Protocol dApp
 
-[![GitHub license](https://img.shields.io/badge/core_license-BUSL_1.1-blue.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE) [![GitHub license](https://img.shields.io/badge/incl_license-GPL_3.0-blue.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE-GPL.md)
+[![GitHub license](https://img.shields.io/badge/core_license-BUSL_1.1-blue.svg)](LICENSE) [![GitHub license](https://img.shields.io/badge/incl_license-GPL_3.0-blue.svg)](LICENSE-GPL.md)
 
 [![xeon token](https://img.shields.io/badge/$XEON-0x8d65a2eaBDE4B31cbD7E43F27E47559d1CCec86c-8429c6.svg?logo=ethereum)](https://app.uniswap.org/explore/tokens/ethereum/0x8d65a2eabde4b31cbd7e43f27e47559d1ccec86c?chain=mainnet)
+
+![Xeon Protocol](https://aquamarine-evil-bedbug-307.mypinata.cloud/ipfs/QmdcJqYcLE3Cp8tcygNjsb1Bp7ya8ApsjxivhBkgM8UJFk)
 
 This repository contains the Xeon Protocol frontend. For the smart contracts, see the [xeon-v1-core](https://github.com/xeon-protocol/v1-core) repository.
 
@@ -58,22 +60,22 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Contributing
 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-darkgreen.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/CONTRIBUTING.md) [![Bug Bounties](https://img.shields.io/badge/Bug_Bounties-open-red.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/SECURITY.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-darkgreen.svg)](CONTRIBUTING.md) [![Bug Bounties](https://img.shields.io/badge/Bug_Bounties-open-red.svg)](bug-bounty.md)
 
-If you are a developer looking to contribute, please take a look at the guidelines in [CONTRIBUTING](https://github.com/xeon-protocol/xeon-testnet/blob/main/CONTRIBUTING.md) first, then feel free to look at [open issues](https://github.com/xeon-protocol/xeon-dapp/issues/) or open a [new one](https://github.com/xeon-protocol/xeon-dapp/issues/new/choose).
+If you are a developer looking to contribute, please take a look at the guidelines in [CONTRIBUTING](CONTRIBUTING.md) first, then feel free to look at [open issues](https://github.com/xeon-protocol/xeon-dapp/issues/) or open a [new one](https://github.com/xeon-protocol/xeon-dapp/issues/new/choose).
 
 If you are an Solidity developer and are interested in auditing our contracts, you can submit an audit by using the form [here](https://github.com/xeon-protocol/v1-core/issues/new?assignees=heyJonBray%2C+wellytg%2C+neonhedge&labels=type%3A+audit%2C+status%3A+discussing&projects=&template=04-audit-submission.md&title=xeon-v1-core+audit+%5BMM-DD-YYYY%5D-%5ByourName%5D).
 
 ## Security
 
-For any security-related concerns, please refer to the [SECURITY](https://github.com/xeon-protocol/xeon-dapp/blob/main/SECURITY.md) policy. This repository is subject to a bug bounty program per the terms outlined in the aforementioned policy.
+For any security-related concerns, please refer to the [SECURITY](SECURITY.md) policy. This repository is subject to a bug bounty program per the terms outlined in the aforementioned policy.
 
-For vulnerability hunters, please see our [Bug Bounty Program](https://github.com/xeon-protocol/xeon-dapp/blob/main/bug-bounty.md).
+For vulnerability hunters, please see our [Bug Bounty Program](bug-bounty.md).
 
 ## License
 
-The primary license for core Xeon Protocol contracts (`XeonHedging.sol` + `XeonStaking.sol`) is the Business Source License 1.1 (BUSL-1.1), see [`LICENSE.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE.md).
+The primary license for core Xeon Protocol contracts (`XeonHedging.sol` + `XeonStaking.sol`) is the Business Source License 1.1 (BUSL-1.1), see [`LICENSE.md`](LICENSE.md).
 
 However, there are some exceptions:
 
-- Several files in `contracts/script` and `contracts/test` are licensed under `GPL-3.0-or-later` (see: [`LICENSE-GPL.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/LICENSE-GPL.md)) or remain unlicensed (per their SPDX headers).
+- Several files in `contracts/script` and `contracts/test` are licensed under `GPL-3.0-or-later` (see: [`LICENSE-GPL.md`](LICENSE-GPL.md)) or remain unlicensed (per their SPDX headers).
