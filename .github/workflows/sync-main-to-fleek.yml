@@ -3,6 +3,9 @@
 # it is necessary to keep the branches separate
 name: Sync Main to Deploy/Fleek
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
