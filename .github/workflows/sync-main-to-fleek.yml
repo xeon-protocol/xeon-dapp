@@ -26,8 +26,8 @@ jobs:
 
       - name: Set Git user
         run: |
-          git config user.name "xeon-sync-bot"
-          git config user.email "jon@xeon-protocol.io"
+          git config user.name "xeon-actions"
+          git config user.email "xeon-protocol-actions@github.com"
 
       - name: Merge main into deploy/fleek
         run: git merge origin/main --no-ff
