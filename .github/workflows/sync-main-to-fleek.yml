@@ -1,7 +1,10 @@
-name: Sync Main to Deploy/Fleek
-# this workflow will sync `main` to `deploy/fleek`
-# due to differences in the current fleek build requirements
+# when `main` is updated, sync to `deploy/fleek`
+# due to current fleek build requirements
 # it is necessary to keep the branches separate
+name: Sync Main to Deploy/Fleek
+
+permissions:
+  contents: write
 
 on:
   push:
@@ -16,10 +19,19 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: main
+          fetch-depth: 0
+
       - name: Checkout deploy/fleek branch
-        run: git checkout deploy/fleek
+        run: git checkout -B deploy/fleek origin/deploy/fleek
+
+      - name: Set Git user
+        run: |
+          git config user.name "Xeon Protocol"
+          git config user.email "xeon-dapp@xeon-protocol.io"
+
       - name: Merge main into deploy/fleek
-        run: git merge main --no-ff
+        run: git merge origin/main --no-ff
+
       - name: Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

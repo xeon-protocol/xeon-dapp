@@ -1,53 +1,52 @@
 # Xeon Protocol dApp
 
-This repository contains the Xeon Protocol dApp, which includes both the Node.js frontend and Solidity contracts, tests, and scripts built with Foundry.
+[![GitHub license](https://img.shields.io/badge/core_license-BUSL_1.1-blue.svg)](LICENSE) [![GitHub license](https://img.shields.io/badge/incl_license-GPL_3.0-blue.svg)](LICENSE-GPL.md)
+
+[![xeon token](https://img.shields.io/badge/$XEON-0x8d65a2eaBDE4B31cbD7E43F27E47559d1CCec86c-8429c6.svg?logo=ethereum)](https://app.uniswap.org/explore/tokens/ethereum/0x8d65a2eabde4b31cbd7e43f27e47559d1ccec86c?chain=mainnet)
+
+![Xeon Protocol](https://aquamarine-evil-bedbug-307.mypinata.cloud/ipfs/QmdcJqYcLE3Cp8tcygNjsb1Bp7ya8ApsjxivhBkgM8UJFk)
+
+This repository contains the Xeon Protocol frontend. For the smart contracts, see the [xeon-v1-core](https://github.com/xeon-protocol/v1-core) repository.
+
+### Follow Us
+
+[![warpcast](https://img.shields.io/badge/Follow_@xeonprotocol-FFFFFF.svg?logo=farcaster)](https://warpcast.com/xeonprotocol) ![twitter follow](https://img.shields.io/twitter/follow/xeonprotocol) [![telegram](https://img.shields.io/badge/join_telegram-FFFFFF.svg?logo=telegram)](https://t.me/XeonProtocolPortal)
+
+### Repo Status
+
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/xeon-protocol/xeon-dapp) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/xeon-protocol/xeon-dapp) ![GitHub contributors](https://img.shields.io/github/contributors/xeon-protocol/xeon-dapp)
 
 ## Prerequisites
 
-- Docker
-- Git
-- Node.js (for local development without Docker)
-- npm (v6 or higher)
-- Foundry (for smart contract development)
+[![git](https://img.shields.io/badge/git-any-darkgreen)](https://git-scm.com/downloads) [![node](https://img.shields.io/badge/node.js->_14.2.4-darkgreen)](https://nodejs.org/en/download/) [![npm](https://img.shields.io/badge/npm->=_6-darkgreen)](https://npmjs.com/) [![docker](https://img.shields.io/badge/docker-optional-blue)](https://www.docker.com/)
 
-## Setting Up the Development Environment
+## Directory Structure
 
-You can set up the development environment using Docker with the provided Dockerfiles.
+- `abi` - Contains ABI `json` files and global references to onchain deployments used in the app.
+- `src` - Source code for the Next.js application
+- Ensure sensitive data is stored in `.env.local`
 
-1. `Dockerfile` - Standard setup for Node.js app
-2. `Dockerfile.foundry` - Setup with Foundry for Solidity testing
+## Set Up
 
-### Building and Running the Docker Containers
+Clone the repository:
 
-#### Standard Setup
+```sh
+git clone https://github.com/xeon-protocol/xeon-dapp.git
+```
 
-To build and run the repository locally, ensure you have the latest changes from the repository locally on your machine:
+If already cloned locally, ensure you have the latest changes locally:
 
 ```sh
 git pull origin main
 ```
 
-Build and run the Docker container:
-
-```sh
-docker build -t xeon-dapp -f Dockerfile .
-
-docker run -p 3000:3000 xeon-dapp
-```
-
-This will start the development server on port 3000 ([http://localhost:3000](http://localhost:3000)).
-
-#### Local Development
-
-If you prefer to run the application locally without Docker, follow these steps:
-
-1. Install the dependencies:
+Install all dependencies:
 
 ```sh
 npm install
 ```
 
-2. Start the development server:
+Then, start the development server:
 
 ```sh
 npm run dev
@@ -55,36 +54,28 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Setting up Foundry for Smart Contract Development
+## Product Management
 
-The `contracts` directory contains the Solidity contracts and related files.
-To work with these contracts, you need to set up Foundry.
+[![trello](https://img.shields.io/badge/Trello-855DCD.svg?logo=trello)](https://trello.com/invite/b/mW198hKo/ATTIc305ea03ad04139d54ef382b7a276d651224A655/xeon-protocol-board)
 
-1. Install Foundry:
+## Contributing
 
-Follow the instructions on [Foundry's official website](https://book.getfoundry.sh/getting-started/installation) to install Foundry.
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-darkgreen.svg)](CONTRIBUTING.md) [![Bug Bounties](https://img.shields.io/badge/Bug_Bounties-open-red.svg)](bug-bounty.md)
 
-```sh
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
-```
+If you are a developer looking to contribute, please take a look at the guidelines in [CONTRIBUTING](CONTRIBUTING.md) first, then feel free to look at [open issues](https://github.com/xeon-protocol/xeon-dapp/issues/) or open a [new one](https://github.com/xeon-protocol/xeon-dapp/issues/new/choose).
 
-2. Navigate to the `/contracts` directory and follow the instructions in [`/contracts/README.md`](https://github.com/xeon-protocol/xeon-dapp/blob/main/contracts/README.md) to continue with Foundry.
+If you are an Solidity developer and are interested in auditing our contracts, you can submit an audit by using the form [here](https://github.com/xeon-protocol/v1-core/issues/new?assignees=heyJonBray%2C+wellytg%2C+neonhedge&labels=type%3A+audit%2C+status%3A+discussing&projects=&template=04-audit-submission.md&title=xeon-v1-core+audit+%5BMM-DD-YYYY%5D-%5ByourName%5D).
 
-## Directory Structure
+## Security
 
-- `contracts` - Contains the Solidity contracts and related files. The `foundry.toml` file is used to configure Foundry
-- `src` - Source code for the Next.js application
-- Ensure sensitive data is stored in `.env.local`
+For any security-related concerns, please refer to the [SECURITY](SECURITY.md) policy. This repository is subject to a bug bounty program per the terms outlined in the aforementioned policy.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+For vulnerability hunters, please see our [Bug Bounty Program](bug-bounty.md).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
-- [Foundry Documentation](https://book.getfoundry.sh/) - learn about Foundry
+## License
 
-## Current Work
+The primary license for core Xeon Protocol contracts (`XeonHedging.sol` + `XeonStaking.sol`) is the Business Source License 1.1 (BUSL-1.1), see [`LICENSE.md`](LICENSE.md).
 
-Please update and follow along with the current development progress on [Trello](https://trello.com/b/mW198hKo/xeon-protocol-board).
+However, there are some exceptions:
 
-- If unable to access, [request invite](https://trello.com/invite/b/mW198hKo/ATTIc305ea03ad04139d54ef382b7a276d651224A655/xeon-protocol-board)
+- Several files in `contracts/script` and `contracts/test` are licensed under `GPL-3.0-or-later` (see: [`LICENSE-GPL.md`](LICENSE-GPL.md)) or remain unlicensed (per their SPDX headers).
