@@ -1,23 +1,31 @@
 ---
 name: Feature request
-about: Suggest a new idea for this project
-title: 'feat:'
+about: Suggest a new idea for the Xeon Protocol dApp.
+title: 'feat: [description]'
 labels: 'status: discussing, type: feature request'
 assignees: heyJonBray
-
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Feature Request
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+> Briefly state the name or type of feature being requested.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Description
 
-**Have you seen a similar feature elsewhere?**
-Please provide any references. Ex. So-and-so has a feature that [...]
+> A clear description of the feature.
+>
+> If the request is associated with an existing problem, explain that here.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+## Desired solution
+
+> A clear and concise description of what you want to happen
+
+## References
+
+> Please provide any references, links, or examples of similar features in other applications
+>
+> Include references to existing issues or pull requests here
+
+## Additional context
+
+> Add any other context or screenshots about the feature request here
