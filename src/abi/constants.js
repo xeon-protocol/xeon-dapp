@@ -1,4 +1,11 @@
 // global contract addresses
+import OnboardingUtilsABI from './OnboardingUtils.abi.json';
+import MockERC20FactoryABI from './MockERC20Factory.abi.json';
+
+export const ABI = {
+  OnboardingUtilsABI,
+  MockERC20FactoryABI,
+};
 export const Constants = {
   testnet: {
     network: 'Base Sepolia',
