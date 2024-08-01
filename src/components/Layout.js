@@ -1,6 +1,6 @@
 "use client";
-import { Image } from "@chakra-ui/react";
-import React, { useState } from "react";
+import {Image} from "@chakra-ui/react";
+import React, {useState} from "react";
 import RightBarCard from "./RightBarCard";
 import LeftBarButton from "./LeftBarButton";
 import LiveTxs from "./LiveTxs";
@@ -13,7 +13,7 @@ const Layout = ({
   setShowSocials,
 
   setShowLoans,
-
+  setShowTellerWidget,
   setActiveSection,
   setActiveSideTab,
   activeSideTab,
@@ -21,6 +21,7 @@ const Layout = ({
 }) => {
   const [showStats, setShowStats] = useState(true);
   const [activeRightBar, setActiveRightBar] = useState("Stats");
+
   console.log(activeRightBar, showStats);
   const handleSectionChange = (section, button) => {
     if (section === "discover" && button === "Equity Swaps") {
@@ -29,6 +30,7 @@ const Layout = ({
       setShowBookmarks(false);
       setActiveSection("discover");
       setActiveSideTab("Equity Swaps");
+      setShowTellerWidget(false);
     } else if (section === "positions" && button === "Loans") {
       setShowPositions(false);
       setShowDiscover(false);
@@ -36,12 +38,14 @@ const Layout = ({
       setShowLoans(true);
       setActiveSection("positions");
       setActiveSideTab("Loans");
+      setShowTellerWidget(true);
     } else if (section === "positions" && button === "Options") {
       setShowPositions(false);
       setShowDiscover(false);
       setShowBookmarks(false);
       setActiveSection("positions");
       setActiveSideTab("Options");
+      setShowTellerWidget(false);
     } else if (section === "discover" && button === "Social") {
       setShowPositions(false);
       setShowDiscover(false);
@@ -49,18 +53,21 @@ const Layout = ({
       setShowSocials(true);
       setActiveSection("discover");
       setActiveSideTab("Social");
+      setShowTellerWidget(false);
     } else if (section === "positions" && button === "Equity Swaps") {
       setShowPositions(false);
       setShowDiscover(true);
       setShowBookmarks(false);
       setActiveSection("positions");
       setActiveSideTab("Equity Swaps");
+      setShowTellerWidget(false);
     } else if (section === "discover" && button === "Options") {
       setShowPositions(false);
       setShowDiscover(true);
       setShowBookmarks(false);
       setActiveSection("discover");
       setActiveSideTab("Options");
+      setShowTellerWidget(false);
     }
   };
 

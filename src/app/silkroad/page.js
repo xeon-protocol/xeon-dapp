@@ -20,7 +20,7 @@ export default function Home() {
   const [showComingSoon, setShowComingSoon] = React.useState(false);
   const [activeSideTab, setActiveSideTab] = React.useState("");
   const [activeSection, setActiveSection] = React.useState("discover");
-
+  const [showTellerWidget, setShowTellerWidget] = React.useState(false);
   const [showLoans, setShowLoans] = React.useState(false);
 
   return (
@@ -40,6 +40,7 @@ export default function Home() {
             showBookmarks={showBookmarks}
             activeSection={activeSection}
             activeSideTab={activeSideTab}
+            setShowTellerWidget={setShowTellerWidget}
             setActiveSection={setActiveSection}
             setActiveSideTab={setActiveSideTab}
           >
@@ -67,7 +68,9 @@ export default function Home() {
               )}
             </div>
 
-            <div className="mt-5">{showLoans && <Loans />}</div>
+            <div className="mt-5">
+              {showLoans && showTellerWidget && <Loans />}
+            </div>
           </Layout>
         </div>
       </div>

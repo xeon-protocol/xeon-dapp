@@ -1,12 +1,13 @@
-import { Widget } from "@teller-protocol/teller-widget";
+import {Widget} from "@teller-protocol/teller-widget";
+import LendingForm from "./teller/lending";
 
 function Loans() {
   return (
-    <div>
+    <div className="relative teller-cont">
       <Widget
         showOnlyWhiteListedTokens={false}
         showModalByDefault
-        buttonClassName=" md:block  text-white bg-floral flex justify-center items-center flex p-2 w-full rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
+        buttonClassName="hidden  text-white bg-floral flex justify-center items-center flex p-2 w-full rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
         isBareButton
         whitelistedChains={[1, 137, 42161, 8453]}
         whitelistedTokens={{
@@ -18,6 +19,7 @@ function Loans() {
           42161: ["0x221a0f68770658c15b525d0f89f5da2baab5f321"],
         }}
       />
+      {/* <LendingForm /> */}
     </div>
   );
 }

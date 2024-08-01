@@ -5,13 +5,13 @@ import Lottie from "react-lottie-player";
 import lottieJson from "@/assets/animations/blue_planet.json";
 import lottieJson2 from "@/assets/animations/planet_orbit1.json";
 import TestNetCard from "@/components/guide/Testnet";
-import { Image } from "@chakra-ui/react";
+import {Image} from "@chakra-ui/react";
 
 import TokenTable from "@/components/testing/TokenTable";
 
 import WriteHedges from "@/components/testing/WriteHedges";
 
-import { motion } from "framer-motion";
+import {motion} from "framer-motion";
 import Footer from "@/components/Footer";
 
 function Page() {
@@ -32,17 +32,17 @@ function Page() {
     },
   };
   const headingVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
+    hidden: {opacity: 0, y: 20},
+    visible: {opacity: 1, y: 0},
   };
   const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
+    hidden: {opacity: 0, y: 20},
+    visible: {opacity: 1, y: 0},
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
+    hidden: {opacity: 0, x: -20},
+    visible: {opacity: 1, x: 0},
   };
   const connectToBaseSepolia = () => {
     window.ethereum.request({
@@ -73,7 +73,7 @@ function Page() {
               initial="hidden"
               animate="visible"
               variants={headingVariants}
-              transition={{ duration: 0.6 }}
+              transition={{duration: 0.6}}
             >
               Xeon
             </motion.h3>
@@ -82,7 +82,7 @@ function Page() {
               initial="hidden"
               animate="visible"
               variants={headingVariants}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{duration: 0.6, delay: 0.2}}
             >
               Testnet
             </motion.h3>
@@ -91,7 +91,7 @@ function Page() {
               initial="hidden"
               animate="visible"
               variants={headingVariants}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{duration: 0.6, delay: 0.4}}
             >
               Guide
             </motion.h3>
@@ -143,7 +143,7 @@ function Page() {
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
-                transition={{ duration: 0.6 }}
+                transition={{duration: 0.6}}
               >
                 <motion.a
                   href="https://docs.xeon-protocol.io/documentation"
@@ -151,7 +151,7 @@ function Page() {
                   rel="noopener noreferrer"
                   className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
                   variants={itemVariants}
-                  transition={{ duration: 0.6, delay: 0.2 }}
+                  transition={{duration: 0.6, delay: 0.2}}
                 >
                   Read Manual
                 </motion.a>
@@ -159,7 +159,7 @@ function Page() {
                   href="/guide"
                   className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
                   variants={itemVariants}
-                  transition={{ duration: 0.6, delay: 0.4 }}
+                  transition={{duration: 0.6, delay: 0.4}}
                 >
                   Jump to Guide Page
                 </motion.a>
@@ -169,7 +169,7 @@ function Page() {
                   rel="noopener noreferrer"
                   className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
                   variants={itemVariants}
-                  transition={{ duration: 0.6, delay: 0.6 }}
+                  transition={{duration: 0.6, delay: 0.6}}
                 >
                   Telegram Support
                 </motion.a>
@@ -178,7 +178,7 @@ function Page() {
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
-                transition={{ duration: 0.6, delay: 0.8 }}
+                transition={{duration: 0.6, delay: 0.8}}
               >
                 <p className="text-grey md:text-lg md:ml-[-20px] mt-5">{`{  Welcome to the Instruction Portal for the Neon Hedge test platform  }`}</p>
               </motion.div>

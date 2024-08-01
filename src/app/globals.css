@@ -64,19 +64,25 @@ li{
     border: 0.5px solid #bebebe91;
     padding: 1em 1em 0.25em;
     transform: translate(0, 0);
-    width: 100%;
-    height: 100%;
+    width: 450px !important;
+    height: 33% !important;
+    top: 300px;
+    
+    position: absolute !important;
     display: flex;
+    
     flex-direction: column;
 }
+
 .modal-container .modal-content-title .modal-title {
-    color:#f2f2f2 !important;
+    color: #f2f2f2 !important;
     margin-left: 10px;
 }
 
-.modal-container{
-  position: absolute !important;
+.modal-container {
+    position: absolute !important;
 }
+
 .chain-dropdown {
     position: relative;
     display: flex;
@@ -84,7 +90,6 @@ li{
     border: 0.5px solid #bebebe91;
     padding: 5px 10px;
     border-radius: 4px;
-    /* margin-left: 10px !important; */
     align-items: center;
 }
 
@@ -92,116 +97,153 @@ li{
     margin-top: 1rem;
     padding: 1rem;
     background-color: black !important;
-  
 }
+
 .modal-container .modal-content-title .close-button {
-  color: #f2f2f2 !important;
-    /* display: none !important; */
-   
+    color: #f2f2f2 !important;
+    display: none !important;
 }
+
 .select-buttons__item {
-  background-color: #000 !important;
-  color: #f2f2f2 !important;
+    background-color: #000 !important;
+    color: #f2f2f2 !important;
 }
+
 .section-title {
-  color: #f2f2f2 !important;
+    color: #f2f2f2 !important;
 }
+
 .select-buttons__item.active {
-  border-bottom: 3px solid #aa79e5 !important;
+    border-bottom: 3px solid #aa79e5 !important;
 }
-.modal-container .blur-container > div{
-  /* position:  relative !important; */
+
+.modal-container .blur-container > div {
+    display: none !important;
 }
+
 .modal-container-inner {
     margin-top: -160px;
-    /* height: 600px !important; */
     width: 600px !important;
 }
-.modal-container .modal-content-title .title-chain-container .chain-image{
-  margin-right: 0 !important;
-}
 
+.modal-container .modal-content-title .title-chain-container .chain-image {
+    margin-right: 0 !important;
+}
 
 @media (max-width: 768px) {
-  .modal-container-inner {
-    
-    /* height: 450px !important; */
-    width: 100% !important;
-    margin-left: 21% !important;
-  }
-  .modal-container {
-    left: -7% !important;
+    .modal-container-inner {
+        width: 100% !important;
+        margin-left: 21% !important;
+    }
+    .modal-container {
+        left: -7% !important;
         width: 80% !important;
-        /* height: 62% !important; */
-  
+    }
+    .modal-container-content {
+        width: 380px !important;
+        top: 200px;
+        left: 45px;
+        right: 45px;
+    }
 }
-.modal-container-content{
-width: 125% !important;
-}
-}
-.modal-container-inner{
-  height: auto !important;
-}
+
 @media (min-width: 768px) and (max-width: 1024px) {
+    .modal-container-inner {
+        width: 70% !important;
+    }
+    .modal-container-content{
+      left: 320px;
+      top:200px;
+    }
+    .modal-container {
+        position: static !important;
+    }
+    .modal-container .blur-container > div {
+        display: none !important;
+    }
+    .modal-container .modal-content-title .close-button {
+        margin: 10px;
+        display: none !important;
+        color: #f2f2f2 !important;
+        padding-top: 15px !important;
+    }
+    .modal-container .modal-content-title .title-chain-container .chain-image {
+        margin-right: 10px !important;
+    }
+}
 
-  .modal-container-inner {
-    margin-top: -160px;
-    /* height: 450px !important; */
-    width: 70% !important;
-  }
-  .modal-container {
-    position:fixed !important;
-  }
-  .modal-container .blur-container > div{
-    position:  fixed !important; 
-  }
-  .modal-container .modal-content-title .close-button {
-  margin: 10px;
-    display: block !important;
-   color: #f2f2f2 !important;
-   padding-top: 15px !important;
-}
-.modal-container .modal-content-title .title-chain-container .chain-image{
-  margin-right: 10px !important;
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .modal-container {
+        position: static !important;
+    }
+    .modal-container-content {
+        width: 610px !important;
+    }
 }
 
+@media (min-width: 1280px) and (max-width: 1535px) {
+    .modal-container {
+        position: static !important;
+    }
+    .modal-container-content {
+        width: 610px !important;
+    }
 }
-.paragraph{
-  color: #f2f2f2 !important;
-}
-.token-dropdown{
-  background-color: #000 !important;
-}
-.opportunities-list .opportunity-list-item-body{
-  background-color: #000 !important;
-}
-.data-pill{
-  background-color: #2d2d2d !important;
-}
-.opportunities-list .opportunity-list-item-data-value {
-  color: #f2f2f2 !important;
 
-}
-.token-input-container .token-input {
-  background-color: #000 !important;
-  color: #f2f2f2 !important;
-}
-.data-field {
-  color: #f2f2f2 !important;
-  background-color: #000 !important;
-}
 @media (min-width: 1536px) {
-  .modal-container {
-    position:fixed !important;
-  }
-
-  .modal-container-inner{
-    width: 670px !important;
-  }
+    .modal-container {
+        position: static !important;
+    }
+    .modal-container-content {
+        width: 670px !important;
+        margin-left: -30px;
+    }
 }
+@media (min-width: 600px) and (max-width: 768px) {
+    .modal-container {
+        position: static !important;
+    }
+    .modal-container-content {
+        width: 400px !important;
+    }
+}
+
+.paragraph {
+    color: #f2f2f2 !important;
+}
+
+.token-dropdown {
+    background-color: #000 !important;
+}
+
+.opportunities-list .opportunity-list-item-body {
+    background-color: #000 !important;
+}
+
+.data-pill {
+    background-color: #2d2d2d !important;
+}
+
+.opportunities-list .opportunity-list-item-data-value {
+    color: #f2f2f2 !important;
+}
+
+.token-input-container .token-input {
+    background-color: #000 !important;
+    color: #f2f2f2 !important;
+}
+
+.data-field {
+    color: #f2f2f2 !important;
+    background-color: #000 !important;
+}
+
 h1{
   font-weight: 400 !important;
   
+}
+.modal-container .modal-content-title{
+  display: none !important;
 }
 .footer-social{
   height:100%;
@@ -241,4 +283,30 @@ select option {
   background: rgba(0, 0, 0, 0.3) !important;
   color: #fff;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+/* teller lending form */
+.tooltip-container {
+  position: relative;
+}
+
+.tooltip-container::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  /* white-space: nowrap; */
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  width: 300px;
+  z-index: 1000;
+}
+
+.tooltip-container:hover::after {
+  opacity: 1;
 }
