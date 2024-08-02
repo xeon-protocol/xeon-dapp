@@ -6,52 +6,22 @@ import {
   useConnect,
   ConnectButton,
 } from "thirdweb/react";
-import { createWallet } from "thirdweb/wallets";
-import { useEffect, useState } from "react";
-import { Box, Text, Spinner, Flex } from "@chakra-ui/react";
-import { baseSepolia } from "thirdweb/chains";
+import {createWallet} from "thirdweb/wallets";
+import {useEffect, useState} from "react";
+import {Box, Text, Spinner, Flex} from "@chakra-ui/react";
+import {baseSepolia} from "thirdweb/chains";
 import Lottie from "react-lottie-player";
 import lottieJson from "@/assets/animations/planet_orbit3.json";
 import loadingLottie from "@/assets/animations/loader.json";
-import { client } from "./client";
+
+import {client} from "./client";
 
 const NetworkChecker = () => {
   const activeChain = useActiveWalletChain();
   const switchChain = useSwitchActiveWalletChain();
   const connectionStatus = useActiveWalletConnectionStatus();
-  const { connect, isConnecting, error } = useConnect();
+  const {connect, isConnecting, error} = useConnect();
   const [loading, setLoading] = useState(true);
-
-  const connectToBaseSepolia = () => {
-    console.log("Button clicked: connectToBaseSepolia");
-    if (window.ethereum) {
-      window.ethereum
-        .request({
-          method: "wallet_addEthereumChain",
-          params: [
-            {
-              chainId: "0x14a34",
-              rpcUrls: ["https://sepolia.base.org"],
-              chainName: "Base Sepolia Testnet",
-              nativeCurrency: {
-                name: "ETH",
-                symbol: "ETH",
-                decimals: 18,
-              },
-              blockExplorerUrls: ["https://sepolia.basescan.org/"],
-            },
-          ],
-        })
-        .then(() => {
-          console.log("Network switch request sent");
-        })
-        .catch((error) => {
-          console.error("Failed to switch network", error);
-        });
-    } else {
-      console.error("Ethereum object not found");
-    }
-  };
 
   useEffect(() => {
     if (connectionStatus === "unknown" || connectionStatus === "connecting") {
@@ -151,7 +121,7 @@ const NetworkChecker = () => {
         </Text>
 
         <button
-          onClick={connectToBaseSepolia}
+          onClick={() => switchChain(baseSepolia)}
           className="text-white bg-button-gradient mt-5 rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
         >
           Connect to Base Sepolia
