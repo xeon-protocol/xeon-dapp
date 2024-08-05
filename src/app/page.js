@@ -117,11 +117,13 @@ function Page() {
               </p>
               <div className="flex justify-center  mt-3 w-[86%]">
                 <button
-                  disabled={activeChain.id === baseSepolia.id}
+                  disabled={activeChain?.id === baseSepolia?.id}
                   className="text-white bg-button-gradient mx-auto rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
                   onClick={() => switchChain(baseSepolia)}
                 >
-                  {activeChain.id !== baseSepolia.id ? "Connect" : "Connected"}{" "}
+                  {activeChain?.id !== baseSepolia?.id
+                    ? "Connect"
+                    : "Connected"}{" "}
                   to Base Sepolia
                 </button>
               </div>
