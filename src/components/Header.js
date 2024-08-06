@@ -43,15 +43,19 @@ function Header() {
       </Link>
 
       <nav className="hidden md:flex space-x-6">
-        <Link href={'/silkroad'}>Silkroad</Link>
-        <Link href={'/wallet'}>Wallet</Link>
-        <Link href={'/analytics'}>Analytics</Link>
-        <Link href={'/guide'}>Guide</Link>
-        <Link href={'/'}>Claim</Link>
+        <Link href={"/silkroad"}>Silkroad</Link>
+        <Tooltip label="Page under construction">
+          <div className="cursor-not-allowed">Wallet</div>
+        </Tooltip>
+        <Tooltip label="Page under construction">
+          <div className="cursor-not-allowed">Analytics</div>
+        </Tooltip>
+        <Link href={"/guide"}>Guide</Link>
+        <Link href={"/"}>Claim</Link>
         <Link
-          href={
-            "https://docs.xeon-protocol.io/documentation target='_blank' rel='noopener noreferrer' "
-          }
+          href={"https://docs.xeon-protocol.io/documentation"}
+          target="_blank"
+          rel="noopener noreferrer"
         >
           Docs
         </Link>
@@ -63,9 +67,6 @@ function Header() {
       </div>
 
       <div className=" md:flex gap-4">
-        {/* <button className="text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue">
-          Switch Network
-        </button> */}
         <ConnectButton
           supportedTokens={supportedTokens}
           connectButton={{
@@ -99,12 +100,14 @@ function Header() {
           <Link href="/silkroad">
             <p className="hover:text-gray-400">Silkroad</p>
           </Link>
-          <Link href="/wallet">
-            <p className="hover:text-gray-400">Wallet</p>
-          </Link>
-          <Link href="/analytics">
-            <p className="hover:text-gray-400">Analytics</p>
-          </Link>
+          <Tooltip label="Page under construction">
+            <div className="hover:text-gray-400 cursor-not-allowed">Wallet</div>
+          </Tooltip>
+          <Tooltip label="Page under construction">
+            <div className="hover:text-gray-400 cursor-not-allowed">
+              Analytics
+            </div>
+          </Tooltip>
           <Link href="/guide">
             <p className="hover:text-gray-400">Guide</p>
           </Link>

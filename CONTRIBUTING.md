@@ -1,47 +1,51 @@
 # Contributing
 
-Feel free to dive in! [Open](https://github.com/xeon-protocol/xeon-testnet/issues/new) an issue, [start](https://github.com/xeon-protocol/xeon-testnet/discussions/new) a discussion or submit a PR. For any informal concerns or feedback, please join our [Telegram Group](https://t.me/XeonProtocolPortal).
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-darkgreen.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/CONTRIBUTING.md) [![Bug Bounties](https://img.shields.io/badge/Bug_Bounties-open-darkgreen.svg)](https://github.com/xeon-protocol/xeon-dapp/blob/main/SECURITY.md)
 
-Contributions to Xeon Protocol are welcome by anyone interested in writing more tests, improving readability, optimizing for gas efficiency, or extending the protocol via new features.
+Feel free to dive in! [Open](https://github.com/xeon-protocol/xeon-dapp/issues/new) an issue, [start](https://github.com/xeon-protocol/xeon-dapp/discussions/new) a discussion or submit a PR. For any informal concerns or feedback, please join our [Telegram Group](https://t.me/XeonProtocolPortal).
+
+Contributions to Xeon Protocol are welcome by anyone interested in writing tests, improving readability, optimizing the build, or extending the protocol via new features.
 
 ## Pre Requisites
 
 You will need the following software on your machine:
 
-- [Git](https://git-scm.com/downloads)
-- [Foundry](https://github.com/foundry-rs/foundry)
-- [Node.js](https://nodejs.org/en/download/)
+[![git](https://img.shields.io/badge/git-any-darkgreen)](https://git-scm.com/downloads) [![node](https://img.shields.io/badge/node.js->_14.2.4-darkgreen)](https://nodejs.org/en/download/) [![npm](https://img.shields.io/badge/npm->=_6-darkgreen)](https://npmjs.com/)
 
-In addition, familiarity with [Solidity](https://soliditylang.org/) is a requisite.
+In addition, familiarity with [Solidity](https://soliditylang.org/) and contract ABIs is a plus but not required for frontend contribution.
 
-## Set Up
+## Getting Started
 
-Clone this repository including submodules:
+### 1. Fork the Repository
+
+First, create a fork of this repository to your GitHub account. You can do this by visiting the repository page and clicking the "Fork" button in the top right corner.
+
+[Visit the Repository](https://github.com/xeon-protocol/xeon-dapp)
+
+### 2. Clone Your Fork Locally
+
+Once you have forked the repository, clone your fork to your local machine:
 
 ```shell
-git clone --recurse-submodules -j8 git@github.com:xeon-protocol/xeon-testnet.git
+git clone https://github.com/<your-username>/xeon-dapp.git
 ```
 
-Then, ensure Foundry is installed and initialized inside the project directory:
+### 3. Set Up the Original Repository as a Remote
+
+To keep your fork up-to-date with the original repository, add the original repository as a remote:
 
 ```shell
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
-```
-
-Install the required dependencies:
-
-```shell
-forge install
+cd xeon-dapp
+git remote add upstream https://github.com/xeon-protocol/xeon-dapp.git
 ```
 
 ## Environment variables
 
 ### Local Setup
 
-To build locally, follow the `.env.sample` file to create a `.env` file at the root of the repo and populate it with the appropriate environment values. You need to provide a mnemonic phrase/private key and a few API keys.
+To build locally, copy the `.env.sample` file to a new `.env` file at the root of the repo and populate it with the appropriate environment values.
 
-**NOTE:** Only put sensitive data in the `.env` file, which `.gitignore` will automatically ignore. DO NOT save sensitive data in `.env.sample`.
+⚠️ **NOTE:** Only put sensitive data in the `.env` file, which `.gitignore` will automatically ignore. **DO NOT** save sensitive data in `.env.sample`.
 
 ## Pull Requests
 
@@ -103,94 +107,9 @@ In order to maintain high quality code that is easy to collaborate on, please ma
 - **Testing:** Write and maintain unit and integration tests for all new features and bug fixes. Ensure that all tests pass before submitting a pull request.
 - **Documentation:** Keep the documentation up-to-date with any code changes. This includes comments within the code, as well as external documentation like the `README.md` and any additional guides.
 
----
+## Commit Guidelines
 
-# Commit Guidelines
-
-Xeon Protocol uses **The Conventional Commits** specification across the codebase. Refer to the complete [documentation](https://www.conventionalcommits.org/en/v1.0.0/#summary) for details.
-
-Commit messages should be structured as follows:
-
-```
-<type>(optional scope): <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-This commit structure communicates intent to consumers of the codebase, and automatically populates our CHANGELOG which helps with version control, and ensures that we can easily trace the commit history.
-
-## Type
-
-Main commit types are `fix` for bug patches and `feat` for new features. Other types are allowed, but must be one of the following:
-
-`build:` a change that affect the build system or external dependencies (example scopes: `scripts`, `foundry`, `npm`, `docker`)
-
-`chore:` a code change that neither fixes a bug nor adds a feature
-
-`docs:` documentation only changes
-
-`feat:` a new feature
-
-`fix:` a bug fix
-
-`perf:` a code change that improves performance
-
-`style:` a change that does not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-
-`test:` adding missing tests or correcting existing tests
-
-## Scope
-
-Optional field that is only relevant if changes are made in a repository that has multiple packages.
-
-## Description
-
-A succinct description of the change:
-
-- use the imperative, present tense: _"change"_ not _"changed"_ nor _"changes"_
-- don't capitalize the first letter
-- no dot (.) at the end
-
-## Body
-
-Just as in the subject, use the imperative, present tense: **_"change"_** not _"changed"_ nor _"changes"_. The body should include the motivation for the change and contrast this with previous behavior.
-
-## Footer
-
-The footer contains any info about **Breaking Changes** and is the place to reference any GitHub issues that the commit **CLOSES**.
-
-- `BREAKING CHANGE:` footer or appends a `!` after the type/scope introduces a breaking change. This correlates to a new `MAJOR` version and can be associated with any type.
-
-## Example Commits
-
-Commit message with no body
-
-```
-docs: add commit guidelines to CHANGELOG
-```
-
-Commit message with multi-paragraph body and multiple footers
-
-```
-feat(wallet): multi-chain balance display
-
-Introduce a multi-chain native wallet modal to display total user balance across networks. Dismiss dust.
-
-Remove obsolete dependencies for multiple networks.
-
-Reviewed-by: Jon
-Refs: #123
-```
-
-If a commit fixes a specific issue, indicate the number after the description.
-
-```
-fix: resolve network not switching (#69)
-```
-
----
+We use conventional commits in our codebases, more information [here](commit-guidelines.md)
 
 ## Notice
 
