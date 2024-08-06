@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { FaCopy } from 'react-icons/fa';
-import { color, motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { ethers } from 'ethers';
+import React, {useEffect, useState} from "react";
+import {FaCopy} from "react-icons/fa";
+import {color, motion, useInView} from "framer-motion";
+import {useRef} from "react";
+import {ethers} from "ethers";
 import {
   Modal,
   ModalOverlay,
@@ -13,103 +13,103 @@ import {
   ModalCloseButton,
   Spinner,
   useDisclosure,
-} from '@chakra-ui/react';
-import BookmarkAdded from '../BookmarkAdded';
-import MockERC20FactoryABI from '@/abi/MockERC20Factory.abi.json';
-import { Constants } from '@/abi/constants';
+} from "@chakra-ui/react";
+import BookmarkAdded from "../BookmarkAdded";
+import MockERC20FactoryABI from "@/abi/MockERC20Factory.abi.json";
+import {Constants} from "@/abi/constants";
 
 const TokenTable = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [message, setMessage] = useState('');
-  const [status, setStatus] = useState('');
-  const [referralAddress, setReferralAddress] = useState('');
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("");
+  const [referralAddress, setReferralAddress] = useState("");
+  const {isOpen, onOpen, onClose} = useDisclosure();
 
   const [tokens, setTokens] = useState([
     {
-      name: 'Vela Exchange',
-      symbol: 'oVELA',
-      address: '0xb7E16D46f26B1615Dcc501931F28F07fD4b0D7F4',
-      pair: 'WETH',
-      supply: '100,000,000',
+      name: "Vela Exchange",
+      symbol: "oVELA",
+      address: "0xb7E16D46f26B1615Dcc501931F28F07fD4b0D7F4",
+      pair: "WETH",
+      supply: "100,000,000",
     },
     {
-      name: 'Pepe',
-      symbol: 'oPEPE',
-      address: '0x7dC9ecE25dcCA41D8a627cb47ded4a9322f7722b',
-      pair: 'WETH',
-      supply: '100,000,000',
+      name: "Pepe",
+      symbol: "oPEPE",
+      address: "0x7dC9ecE25dcCA41D8a627cb47ded4a9322f7722b",
+      pair: "WETH",
+      supply: "100,000,000",
     },
     {
-      name: 'Degen',
-      symbol: 'oDEGEN',
-      address: '0x9B9852A943a570685c3704d70C4F1ebD5EdE109B',
-      pair: 'WETH',
-      supply: '100,000,000',
+      name: "Degen",
+      symbol: "oDEGEN",
+      address: "0x9B9852A943a570685c3704d70C4F1ebD5EdE109B",
+      pair: "WETH",
+      supply: "100,000,000",
     },
     {
-      name: 'Higher',
-      symbol: 'oHIGHER',
-      address: '0x9855d38b7E6270B9f22F283A0C62330b16Ac909C',
-      pair: 'WETH',
-      supply: '100,000,000',
+      name: "Higher",
+      symbol: "oHIGHER",
+      address: "0x9855d38b7E6270B9f22F283A0C62330b16Ac909C",
+      pair: "WETH",
+      supply: "100,000,000",
     },
     {
-      name: 'Rorschach',
-      symbol: 'oROR',
-      address: '0xEb2DCAFFFf1b0d5BA76F14Fe6bB8348126339FcB',
-      pair: 'WETH',
-      supply: '100,000,000',
+      name: "Rorschach",
+      symbol: "oROR",
+      address: "0xEb2DCAFFFf1b0d5BA76F14Fe6bB8348126339FcB",
+      pair: "WETH",
+      supply: "100,000,000",
     },
     {
-      name: 'Wrapped Ether',
-      symbol: 'WETH',
-      address: '0x395cB7753B02A15ed1C099DFc36bF00171F18218',
-      pair: 'WETH',
-      supply: '134,000',
+      name: "Wrapped Ether",
+      symbol: "WETH",
+      address: "0x395cB7753B02A15ed1C099DFc36bF00171F18218",
+      pair: "WETH",
+      supply: "134,000",
     },
   ]);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(
       () => {
-        alert('Address copied to clipboard!');
+        alert("Address copied to clipboard!");
       },
       (err) => {
-        alert('Failed to copy the address.');
+        alert("Failed to copy the address.");
       }
     );
   };
 
   const tableVariants = {
-    hidden: { opacity: 0, y: 50 },
+    hidden: {opacity: 0, y: 50},
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, staggerChildren: 0.1 },
+      transition: {duration: 0.5, staggerChildren: 0.1},
     },
   };
 
   const rowVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
+    hidden: {opacity: 0, y: 20},
+    visible: {opacity: 1, y: 0},
   };
 
   const glitchVariants = {
     visible: {
       textShadow: [
-        '1px 1px 0px lime',
-        '-1px -1px 0px purple',
-        '1px -1px 0px lime',
-        '-1px 1px 0px lime',
-        '2px 2px 2px lime',
+        "1px 1px 0px lime",
+        "-1px -1px 0px purple",
+        "1px -1px 0px lime",
+        "-1px 1px 0px lime",
+        "2px 2px 2px lime",
       ],
       transition: {
         duration: 0.2,
         repeat: Infinity,
-        repeatType: 'mirror',
+        repeatType: "mirror",
       },
     },
   };
@@ -142,7 +142,7 @@ const TokenTable = () => {
         );
         setTokens(updatedTokens);
       } catch (error) {
-        console.error('Error fetching token supply:', error);
+        console.error("Error fetching token supply:", error);
       }
     };
 
@@ -150,7 +150,7 @@ const TokenTable = () => {
   }, []);
   const handleClaim = async (tokenAddress) => {
     if (!window.ethereum) {
-      setError('Please install MetaMask!');
+      setError("Please install MetaMask!");
       return;
     }
 
@@ -197,7 +197,7 @@ const TokenTable = () => {
       setTokens((prevTokens) =>
         prevTokens.map((token) =>
           token.address === tokenAddress
-            ? { ...token, supply: formattedSupply }
+            ? {...token, supply: formattedSupply}
             : token
         )
       );
@@ -234,7 +234,7 @@ const TokenTable = () => {
           setTokens((prevTokens) =>
             prevTokens.map((token) =>
               token.address === tokenAddress
-                ? { ...token, supply: formattedSupply }
+                ? {...token, supply: formattedSupply}
                 : token
             )
           );
@@ -260,10 +260,10 @@ const TokenTable = () => {
         <motion.span
           variants={glitchVariants}
           initial="hidden"
-          animate={inView ? 'visible' : 'hidden'}
+          animate={inView ? "visible" : "hidden"}
         >
           Claim
-        </motion.span>{' '}
+        </motion.span>{" "}
         Testnet Tokens
       </motion.h1>
       <div className="mb-4">
@@ -278,7 +278,7 @@ const TokenTable = () => {
       <motion.table
         ref={ref}
         initial="hidden"
-        animate={inView ? 'visible' : 'hidden'}
+        animate={inView ? "visible" : "hidden"}
         variants={tableVariants}
         className="min-w-full bg-black border rounded mt-10 text-grey"
       >
@@ -327,7 +327,7 @@ const TokenTable = () => {
                 {token.supply}
               </motion.td>
               <motion.td className="py-2 px-4 border-b text-left">
-                {token.name === 'WETH' ? (
+                {token.name === "WETH" ? (
                   <p>
                     visit
                     <a
@@ -335,7 +335,7 @@ const TokenTable = () => {
                       href="https://www.alchemy.com/faucets/base-sepolia"
                     >
                       Alchemy Faucet
-                    </a>{' '}
+                    </a>{" "}
                     to claim testnet ETH
                   </p>
                 ) : (
@@ -350,9 +350,6 @@ const TokenTable = () => {
                     ) : (
                       <></>
                     )}
-                    <button className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400">
-                      Return
-                    </button>
                   </div>
                 )}
               </motion.td>
@@ -363,12 +360,12 @@ const TokenTable = () => {
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent bg={'#000'}>
-          <ModalHeader bg={'#000'} color={'white'}>
+        <ModalContent bg={"#000"}>
+          <ModalHeader bg={"#000"} color={"white"}>
             Claim Token
           </ModalHeader>
           <ModalCloseButton />
-          <ModalBody bg={'#000'}>
+          <ModalBody bg={"#000"}>
             {loading ? (
               <Spinner />
             ) : (
@@ -405,7 +402,7 @@ const TokenTable = () => {
 
       <p className="text-grey text-lg mt-5">
         We require: Metamask, testnet ETH on Base Sepolia, and Testnet ERC20
-        tokens to test the platform. Make sure to claim ETH from{' '}
+        tokens to test the platform. Make sure to claim ETH from{" "}
         <a
           target="_blank"
           rel="noreferrer noopener"
@@ -413,7 +410,7 @@ const TokenTable = () => {
           href="https://www.alchemy.com/faucets/base-sepolia"
         >
           Alchemy Faucet
-        </a>{' '}
+        </a>{" "}
         . Your initial token claim includes 1 WETH, which is required for
         opening trades as all tokens are paired with WETH. These tokens are for
         testing purposes only. They hold no value outside of the Xeon Protocol
