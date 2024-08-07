@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Button, IconButton, Image, Tooltip } from '@chakra-ui/react';
+import { Image, Tooltip } from '@chakra-ui/react';
 import Link from 'next/link';
 import { client } from '@/components/ConnectWallet/client';
 import { ConnectButton } from 'thirdweb/react';
