@@ -9,7 +9,6 @@ import {
   fetchUniswapTokenList,
   mapToSupportedTokens,
 } from '@/utils/tokenUtils';
-import { useEffect } from 'react/cjs/react.production.min';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
