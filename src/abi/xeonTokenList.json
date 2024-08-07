@@ -2,7 +2,7 @@
   "networks": {
     "1": "Ethereum",
     "8453": "Base",
-    "11155111": "Base Sepolia",
+    "84532": "Base Sepolia",
     "42161": "Arbitrum",
     "10": "Optimism",
     "137": "Polygon"
@@ -36,7 +36,7 @@
         "icon": "https://example.com/base-stablecoin-icon.png"
       }
     ],
-    "11155111": [
+    "84532": [
       {
         "address": "0x4444444444444444444444444444444444444444",
         "name": "Base Sepolia Token",

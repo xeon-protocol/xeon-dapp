@@ -1,33 +1,19 @@
 'use client';
 import React, { useState } from 'react';
-import { Button, IconButton, Image } from '@chakra-ui/react';
+import { Button, IconButton, Image, Tooltip } from '@chakra-ui/react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
 import { client } from '@/components/ConnectWallet/client';
 import { ConnectButton } from 'thirdweb/react';
-import xeonTokenList from '@/abi/xeonTokenList.json';
+import { getSupportedTokens } from '@/utils/tokenUtils';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const supportedTokens = getSupportedTokens();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
-  /**
-   * @dev map xeonTokenList to the required format for supportedTokens
-   */
-  const supportedTokens = Object.fromEntries(
-    Object.entries(xeonTokenList.tokens).map(([network, tokens]) => [
-      network,
-      tokens.map(({ address, name, symbol, icon }) => ({
-        address,
-        name,
-        symbol,
-        icon,
-      })),
-    ])
-  );
 
   return (
     <header
