@@ -1,15 +1,15 @@
-import { Image } from "@chakra-ui/react";
+import {Image} from "@chakra-ui/react";
 import React from "react";
 
-function BookmarkAdded({ message, status }) {
+function BookmarkAdded({message, status}) {
   return (
     <div
       className={"bg-black text-grey flex flex-col justify-center items-center"}
     >
       <p className="text-lg mb-4 text-center">{status}</p>
       <Image
-        src={status === "success" ? "/success.webp" : "/fail.webp"}
-        alt="failed popup"
+        src={status === "success" ? "/sucess.webp" : "/fail.webp"}
+        alt={status === "success" ? "success popup" : "failed popup"}
         className=""
       />
 
