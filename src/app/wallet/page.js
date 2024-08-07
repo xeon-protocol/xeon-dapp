@@ -1,5 +1,6 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import UnderConstruction from "@/components/UnderConstruction";
 import HedgesPanel from "@/components/wallet/HedgesPanel";
 import DashboardSection from "@/components/wallet/RewardsPanel";
 import StakingPanel from "@/components/wallet/Staking";
@@ -11,6 +12,7 @@ function Page() {
   return (
     <div className="pt-20">
       <Header />
+      <UnderConstruction />
       <UserAssets />
       <VaultBalances />
       <HedgesPanel />

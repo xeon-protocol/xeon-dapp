@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { FaCopy } from "react-icons/fa";
-import { color, motion, useInView } from "framer-motion";
-import { useRef } from "react";
-import { ethers } from "ethers";
+import React, {useEffect, useState} from "react";
+import {FaCopy} from "react-icons/fa";
+import {color, motion, useInView} from "framer-motion";
+import {useRef} from "react";
+import {ethers} from "ethers";
 import {
   Modal,
   ModalOverlay,
@@ -15,8 +15,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import BookmarkAdded from "../BookmarkAdded";
-import MockERC20FactoryABI from "../../../contracts/abi/MockERC20Factory.abi.json";
-import { Constants } from "@/abi/constants";
+import MockERC20FactoryABI from "@/abi/MockERC20Factory.abi.json";
+import {Constants} from "@/abi/constants";
 
 const TokenTable = () => {
   const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ const TokenTable = () => {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
   const [referralAddress, setReferralAddress] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {isOpen, onOpen, onClose} = useDisclosure();
 
   const [tokens, setTokens] = useState([
     {
@@ -84,17 +84,17 @@ const TokenTable = () => {
   };
 
   const tableVariants = {
-    hidden: { opacity: 0, y: 50 },
+    hidden: {opacity: 0, y: 50},
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, staggerChildren: 0.1 },
+      transition: {duration: 0.5, staggerChildren: 0.1},
     },
   };
 
   const rowVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
+    hidden: {opacity: 0, y: 20},
+    visible: {opacity: 1, y: 0},
   };
 
   const glitchVariants = {
@@ -165,6 +165,7 @@ const TokenTable = () => {
         [
           "function claimInitial(address tokenAddress) public",
           "function claimInitialWithReferral(address tokenAddress, address referredByAddress) public",
+          "function claimTokens(address tokenAddress) public",
         ],
         signer
       );
@@ -183,26 +184,71 @@ const TokenTable = () => {
       setShowPopup(true);
       setMessage("Token claimed successfully!");
       setStatus("success");
+
       // Refresh token supply after claim
       const factoryContract = new ethers.Contract(
-        contract.testnet.MockERC20FactoryContractAddress,
+        Constants.testnet.MockERC20FactoryContractAddress,
         MockERC20FactoryABI,
         provider
       );
       const updatedSupply = await factoryContract.getTotalSupply(tokenAddress);
       const formattedSupply = ethers.utils.formatUnits(updatedSupply, 18);
-      console.log(formattedSupply, "formatted supply");
+
       setTokens((prevTokens) =>
         prevTokens.map((token) =>
           token.address === tokenAddress
-            ? { ...token, supply: formattedSupply }
+            ? {...token, supply: formattedSupply}
             : token
         )
       );
     } catch (error) {
-      setMessage("Failed to claim token.");
-      console.error("Error claiming token:", error);
-      setError("Failed to claim token. Please try again.");
+      if (
+        error.code === ethers.errors.UNPREDICTABLE_GAS_LIMIT &&
+        error.reason.includes("Already claimed initial tokens")
+      ) {
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner();
+          const claimContract = new ethers.Contract(
+            Constants.testnet.onboardingUtilsContractAddress,
+            ["function claimTokens(address tokenAddress) public"],
+            signer
+          );
+
+          const transaction = await claimContract.claimTokens(tokenAddress);
+          await transaction.wait();
+          setShowPopup(true);
+          setMessage("Weekly tokens claimed successfully!");
+          setStatus("success");
+
+          // Refresh token supply after claim
+          const factoryContract = new ethers.Contract(
+            Constants.testnet.MockERC20FactoryContractAddress,
+            MockERC20FactoryABI,
+            provider
+          );
+          const updatedSupply = await factoryContract.getTotalSupply(
+            tokenAddress
+          );
+          const formattedSupply = ethers.utils.formatUnits(updatedSupply, 18);
+          setTokens((prevTokens) =>
+            prevTokens.map((token) =>
+              token.address === tokenAddress
+                ? {...token, supply: formattedSupply}
+                : token
+            )
+          );
+        } catch (weeklyClaimError) {
+          setMessage("Failed to claim weekly tokens. Please try again.");
+          setStatus("failed");
+          console.error("Error claiming weekly tokens:", weeklyClaimError);
+        }
+      } else {
+        setMessage("Failed to claim token.");
+        setStatus("failed");
+        console.error("Error claiming token:", error);
+        setError("Failed to claim token. Please try again.");
+      }
     }
 
     setLoading(false);
@@ -294,15 +340,16 @@ const TokenTable = () => {
                   </p>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <button
-                      className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400"
-                      onClick={() => handleClaim(token.address)}
-                    >
-                      Claim
-                    </button>
-                    <button className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400">
-                      Return
-                    </button>
+                    {token.symbol !== "WETH" ? (
+                      <button
+                        className="bg-black flex items-center gap-2 border-dashed border-light-purple border-2 text-white px-8 py-2 rounded-full hover:text-lime-400"
+                        onClick={() => handleClaim(token.address)}
+                      >
+                        Claim
+                      </button>
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 )}
               </motion.td>
