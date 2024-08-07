@@ -1,16 +1,18 @@
+import React, { useState, useEffect } from 'react';
 import { Widget } from '@teller-protocol/teller-widget';
-import xeonTokenList from '@/abi/xeonTokenList.json';
+import { fetchTokenList, mapToWhitelistedTokens } from '@/utils/tokenUtils';
 
 function Loans() {
-  /**
-   * @dev map xeonTokenList to the required format for Widget
-   */
-  const whitelistedTokens = Object.fromEntries(
-    Object.entries(xeonTokenList.tokens).map(([networkId, tokens]) => [
-      networkId,
-      tokens.map((token) => token.address),
-    ])
-  );
+  const [whitelistedTokens, setWhitelistedTokens] = useState({});
+
+  useEffect(() => {
+    const fetchAndMapTokens = async () => {
+      const tokens = await fetchTokenList();
+      const mappedTokens = mapToWhitelistedTokens(tokens);
+      setWhitelistedTokens(mappedTokens);
+    };
+    fetchAndMapTokens();
+  }, []);
 
   return (
     <div>
