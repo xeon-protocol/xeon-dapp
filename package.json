@@ -8,7 +8,7 @@
     "postbuild": "next-sitemap",
     "start": "next start",
     "lint": "next lint",
-    "version": "auto-changelog -p && git add CHANGELOG.md"
+    "changelog": "auto-changelog -p && git add CHANGELOG.md"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
