@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, IconButton, Image, Tooltip } from '@chakra-ui/react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
