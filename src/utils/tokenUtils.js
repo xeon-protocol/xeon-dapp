@@ -5,6 +5,15 @@ const UNISWAP_TOKEN_LIST_URL =
   'https://gateway.ipfs.io/ipns/tokens.uniswap.org';
 
 /**
+ * This module fetches and processes token lists according to the Uniswap Token List standard,
+ * a community-driven spec for lists of ERC-20 tokens that defines a JSON schema for token metadata.
+ *
+ * More info:
+ * https://github.com/Uniswap/token-lists
+ * https://tokenlists.org/
+ */
+
+/**
  * Fetches the Uniswap token list from the provided URL.
  *
  * This function makes an HTTP GET request to the Uniswap token list URL
