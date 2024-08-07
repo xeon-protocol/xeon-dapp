@@ -6,13 +6,6 @@ import Link from 'next/link';
 import { client } from '@/components/ConnectWallet/client';
 import { ConnectButton } from 'thirdweb/react';
 import xeonTokenList from '@/abi/xeonTokenList.json';
-('use client');
-import React, { useState } from 'react';
-import { Button, IconButton, Image, Tooltip } from '@chakra-ui/react';
-import { FaBars, FaTimes } from 'react-icons/fa';
-import Link from 'next/link';
-import { client } from '@/components/ConnectWallet/client';
-import { ConnectButton } from 'thirdweb/react';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -50,18 +43,6 @@ function Header() {
       </Link>
 
       <nav className="hidden md:flex space-x-6">
-        <Link href={'/silkroad'}>Silkroad</Link>
-        <Link href={'/wallet'}>Wallet</Link>
-        <Link href={'/analytics'}>Analytics</Link>
-        <Link href={'/guide'}>Guide</Link>
-        <Link href={'/'}>Claim</Link>
-        <Link
-          href={
-            "https://docs.xeon-protocol.io/documentation target='_blank' rel='noopener noreferrer' "
-          }
-        >
-          Docs
-        </Link>
         <Link href={'/silkroad'}>Silkroad</Link>
         <Tooltip label="Page under construction">
           <div className="cursor-not-allowed">Wallet</div>
