@@ -5,11 +5,24 @@ import { FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
 import { client } from '@/components/ConnectWallet/client';
 import { ConnectButton } from 'thirdweb/react';
-import { getSupportedTokens } from '@/utils/tokenUtils';
+import {
+  fetchUniswapTokenList,
+  mapToSupportedTokens,
+} from '@/utils/tokenUtils';
+import { useEffect } from 'react/cjs/react.production.min';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const supportedTokens = getSupportedTokens();
+  const [supportedTokens, setSupportedTokens] = useState([]);
+
+  useEffect(() => {
+    const fetchAndMapTokens = async () => {
+      const tokens = await fetchTokenList();
+      const mappedTokens = mapToSupportedTokens(tokens);
+      setSupportedTokens(mappedTokens);
+    };
+    fetchAndMapTokens();
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
