@@ -108,4 +108,4 @@ async function setupPaymaster(referralAddress = null) {
   };
 }
 
-export default setupPaymaster;
+export { setupPaymaster };
