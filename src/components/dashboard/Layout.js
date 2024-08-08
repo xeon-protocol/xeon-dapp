@@ -1,13 +1,13 @@
-"use client";
-import { Box, Button, Image } from "@chakra-ui/react";
-import React from "react";
-import RightBarCard from "./RightBarCard";
-import { BsSpeedometer2 } from "react-icons/bs";
-import { FaBookmark, FaEthereum } from "react-icons/fa";
-import { MdElectricBolt } from "react-icons/md";
-import LeftBottomWethValue from "./LeftBottomWethValue";
-import LeftBottomDates from "./LeftBottomDates";
-import CenterNav from "./CenterNav";
+'use client';
+import { Box, Image } from '@chakra-ui/react';
+import React from 'react';
+import { BsSpeedometer2 } from 'react-icons/bs';
+import { FaBookmark, FaEthereum } from 'react-icons/fa';
+import { MdElectricBolt } from 'react-icons/md';
+import CenterNav from './CenterNav';
+import LeftBottomDates from './LeftBottomDates';
+import LeftBottomWethValue from './LeftBottomWethValue';
+import RightBarCard from './RightBarCard';
 
 const Layout = ({ children }) => {
   const [showGraphic, setShowGraphic] = React.useState(false);
@@ -23,7 +23,7 @@ const Layout = ({ children }) => {
       <div className="flex fixed bottom-5 bg-black z-[31] justify-evenly w-[80%] gap-2 md:hidden">
         <p
           className={`${
-            showGraphic ? "text-grey" : "text-muted"
+            showGraphic ? 'text-grey' : 'text-muted'
           } hover:cursor-pointer`}
           onClick={() => {
             setShowGraphic(true);
@@ -38,7 +38,7 @@ const Layout = ({ children }) => {
             setShowSwap(true);
           }}
           className={`${
-            showSwap ? "text-grey" : "text-muted"
+            showSwap ? 'text-grey' : 'text-muted'
           } hover:cursor-pointer`}
         >
           Swap
@@ -47,8 +47,8 @@ const Layout = ({ children }) => {
       <div className="flex flex-col gap-4 mx-auto lg:flex-row lg:flex-row lg:justify-between lg:gap-x-4 ">
         <Box
           display={{
-            base: showSwap || showGraphic ? "none" : "block",
-            md: "block",
+            base: showSwap || showGraphic ? 'none' : 'block',
+            md: 'block',
           }}
           className="border-[1px] border-[#6c6c6c] border-[1px] rounded-xl   pt-2 text-white relative p-4  lg:block md:w-[100%] lg:w-4/12"
         >
@@ -73,7 +73,7 @@ const Layout = ({ children }) => {
           </div>
           <Image
             src="/left-nav.png"
-            height={"100px"}
+            height={'100px'}
             className="w-[100%] "
             mt={5}
             alt="container"
@@ -95,7 +95,7 @@ const Layout = ({ children }) => {
                   </p>
                   <div class="rounded-full w-6 h-6 p-px bg-gradient-to-b from-grey to-transparent">
                     <div class="bg-black  h-6 rounded-full flex m-auto justify-center items-center">
-                      <FaEthereum className="text-light-purple" size={14} />{" "}
+                      <FaEthereum className="text-light-purple" size={14} />{' '}
                     </div>
                   </div>
                   <span className="lg:text-sm text-xs ml-1 text-light-purple">
@@ -144,23 +144,23 @@ const Layout = ({ children }) => {
             </div>
             <div className="flex flex-col md:flex-row lg:flex-col justify-between gap-4 xl:items-center mt-5">
               <div className="w-[100%]">
-                <LeftBottomWethValue value={"0.00"} />
-                <LeftBottomWethValue value={"0.00"} />
-                <LeftBottomWethValue value={"0.00"} />
+                <LeftBottomWethValue value={'0.00'} />
+                <LeftBottomWethValue value={'0.00'} />
+                <LeftBottomWethValue value={'0.00'} />
                 <LeftBottomDates
-                  line1={"Date"}
-                  line2={"Created"}
-                  value={"10/04/2024"}
+                  line1={'Date'}
+                  line2={'Created'}
+                  value={'10/04/2024'}
                 />
                 <LeftBottomDates
-                  line1={"Date"}
-                  line2={"taken"}
-                  value={"10/04/2024"}
+                  line1={'Date'}
+                  line2={'taken'}
+                  value={'10/04/2024'}
                 />
                 <LeftBottomDates
-                  line1={"Date"}
-                  line2={"Expire"}
-                  value={"10/04/2024"}
+                  line1={'Date'}
+                  line2={'Expire'}
+                  value={'10/04/2024'}
                 />
               </div>
 
@@ -193,7 +193,7 @@ const Layout = ({ children }) => {
           <div className="text-white  relative p-4 md:block lg:hidden hidden">
             <Image
               src="/Bg.png"
-              height={"170px"}
+              height={'170px'}
               alt="container"
               mt={5}
               className="relative "
@@ -261,9 +261,9 @@ const Layout = ({ children }) => {
         </div>
         <Box
           display={{
-            base: showGraphic ? "block" : "none",
-            md: "none",
-            lg: "block",
+            base: showGraphic ? 'block' : 'none',
+            md: 'none',
+            lg: 'block',
           }}
           className="flex-1 md:p-4 order-1 lg:order-none"
         >
@@ -272,16 +272,16 @@ const Layout = ({ children }) => {
 
         <Box
           display={{
-            base: showSwap ? "block" : "none",
-            lg: "block",
+            base: showSwap ? 'block' : 'none',
+            lg: 'block',
           }}
           className={`text-white lg:block relative p-4 md:hidden lg:block lg:w-3/12`}
         >
           <Image
             src="/Bg.png"
-            height={"170px"}
+            height={'170px'}
             alt="container"
-            w={"full"}
+            w={'full'}
             className="relative "
           />
 

@@ -1,32 +1,26 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { IoMdDocument } from "react-icons/io";
-import { TbDecimal } from "react-icons/tb";
-import {
-  FaCoins,
-  FaDollarSign,
-  FaExchangeAlt,
-  FaFire,
-  FaList,
-} from "react-icons/fa";
-import { FaRepeat } from "react-icons/fa6";
-import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from "recharts";
+'use client';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { FaCoins, FaExchangeAlt, FaFire, FaList } from 'react-icons/fa';
+import { FaRepeat } from 'react-icons/fa6';
+import { IoMdDocument } from 'react-icons/io';
+import { TbDecimal } from 'react-icons/tb';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from 'recharts';
 
 function TokenInformation() {
   const glitchVariants = {
     visible: {
       textShadow: [
-        "1px 1px 0px lime",
-        "-1px -1px 0px purple",
-        "1px -1px 0px lime",
-        "-1px 1px 0px lime",
-        "2px 2px 2px lime",
+        '1px 1px 0px lime',
+        '-1px -1px 0px purple',
+        '1px -1px 0px lime',
+        '-1px 1px 0px lime',
+        '2px 2px 2px lime',
       ],
       transition: {
         duration: 0.2,
         repeat: Infinity,
-        repeatType: "mirror",
+        repeatType: 'mirror',
       },
     },
   };
@@ -38,11 +32,11 @@ function TokenInformation() {
   }, []);
 
   const data = [
-    { name: "Burnt Supply", value: 2 },
-    { name: "Circulating Supply", value: 10 }, // example values, replace with actual data
+    { name: 'Burnt Supply', value: 2 },
+    { name: 'Circulating Supply', value: 10 }, // example values, replace with actual data
   ];
 
-  const COLORS = ["#FF8042", "#0088FE"];
+  const COLORS = ['#FF8042', '#0088FE'];
 
   return (
     <div className="px-8 pt-8 md:px-10 max-w-screen-2xl mx-auto text-grey">
@@ -51,10 +45,10 @@ function TokenInformation() {
           variants={glitchVariants}
           initial="hidden"
           whileInView={{ opacity: 1, x: 0 }}
-          animate={"visible"}
+          animate={'visible'}
         >
           Token
-        </motion.span>{" "}
+        </motion.span>{' '}
         Information
       </motion.h1>
       <div className="flex flex-col md:flex-row mt-10 gap-20">
@@ -177,13 +171,13 @@ function TokenInformation() {
             Stake to claim portion of revenue share.
           </p>
           <p>
-            Read more on{" "}
+            Read more on{' '}
             <a
               href="#jump-to-section"
               className="walletStateLink text-blue-500"
             >
-              <text textAnchor="middle" style={{ color: "#188dd6" }}>
-                token-utility...{" "}
+              <text textAnchor="middle" style={{ color: '#188dd6' }}>
+                token-utility...{' '}
                 <i className="fa fa-link" aria-hidden="true"></i>
               </text>
             </a>

@@ -1,16 +1,14 @@
-"use client";
-import React from "react";
-import Card from "@/components/Card";
-import CenterNav from "@/components/CenterNav";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import Layout from "@/components/Layout";
-import NoEvents from "@/components/NoEvents";
-import SocialPopup from "@/components/SocialPopup";
-import ComingSoon from "@/components/ComingSoon";
-import Head from "next/head";
+'use client';
+import Card from '@/components/Card';
+import CenterNav from '@/components/CenterNav';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import Layout from '@/components/Layout';
+import NoEvents from '@/components/NoEvents';
+import SocialPopup from '@/components/SocialPopup';
+import React from 'react';
 
-import Loans from "@/components/Loans";
+import Loans from '@/components/Loans';
 
 export default function Home() {
   const [showPositions, setShowPositions] = React.useState(false);
@@ -18,8 +16,8 @@ export default function Home() {
   const [showBookmarks, setShowBookmarks] = React.useState(false);
   const [showSocials, setShowSocials] = React.useState(false);
   const [showComingSoon, setShowComingSoon] = React.useState(false);
-  const [activeSideTab, setActiveSideTab] = React.useState("");
-  const [activeSection, setActiveSection] = React.useState("discover");
+  const [activeSideTab, setActiveSideTab] = React.useState('');
+  const [activeSection, setActiveSection] = React.useState('discover');
 
   const [showLoans, setShowLoans] = React.useState(false);
 

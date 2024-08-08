@@ -1,5 +1,4 @@
-import React from "react";
-import { FaEthereum } from "react-icons/fa";
+import { FaEthereum } from 'react-icons/fa';
 
 function RightBarCard({ amount }) {
   return (
