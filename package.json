@@ -1,6 +1,8 @@
 {
   "name": "xeon-dapp",
   "version": "0.3.1",
+  "description": "The frontend for Xeon Protocol",
+  "license": "See LICENSE.md",
   "private": true,
   "scripts": {
     "dev": "next dev",
