@@ -258,6 +258,7 @@ const TokenTable = () => {
             <th className="py-2 px-4 border-b text-left">ADDR</th>
             <th className="py-2 px-4 border-b text-left">PAIR</th>
             <th className="py-2 px-4 border-b text-left">SUPPLY</th>
+            <th className="py-2 px-4 border-b text-left">{''}</th>
           </tr>
         </thead>
         <tbody>
