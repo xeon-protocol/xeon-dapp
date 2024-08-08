@@ -162,7 +162,7 @@ const TokenTable = () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const claimContract = new ethers.Contract(
-        Constants.testnet.onboardingUtilsContractAddress,
+        Constants.testnet.OnboardingUtilsContractAddress,
         [
           'function claimInitial(address tokenAddress) public',
           'function claimInitialWithReferral(address tokenAddress, address referredByAddress) public',
@@ -211,7 +211,7 @@ const TokenTable = () => {
           const provider = new ethers.providers.Web3Provider(window.ethereum);
           const signer = provider.getSigner();
           const claimContract = new ethers.Contract(
-            Constants.testnet.onboardingUtilsContractAddress,
+            Constants.testnet.OnboardingUtilsContractAddress,
             ['function claimTokens(address tokenAddress) public'],
             signer
           );

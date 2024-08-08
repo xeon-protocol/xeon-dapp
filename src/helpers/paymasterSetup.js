@@ -24,14 +24,7 @@ console.log(
 const rpcUrl = process.env.RPC_URL_BASE_SEPOLIA_PAYMASTER;
 const BASE_FACTORY_ADDRESS = '0x15Ba39375ee2Ab563E8873C8390be6f2E2F50232';
 const BASE_ENTRYPOINT_V06 = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
-const onboardingUtilsContractAddress =
-  Constants.testnet.onboardingUtilsContractAddress;
-const mockERC20FactoryContractAddress =
-  Constants.testnet.MockERC20FactoryContractAddress;
-const targetContracts = [
-  onboardingUtilsContractAddress,
-  mockERC20FactoryContractAddress,
-];
+const targetContract = Constants.testnet.OnboardingUtilsContractAddress;
 
 const publicClient = createPublicClient({
   chain: baseSepolia,
@@ -106,7 +99,7 @@ async function setupPaymaster(referralAddress = null) {
     ABI,
     Constants,
     smartAccountClient,
-    targetContracts,
+    targetContract,
     publicClient,
     sendTransactionFromSmartAccount,
     callData_claimInitial,
