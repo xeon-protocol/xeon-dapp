@@ -7,12 +7,6 @@ const privateKey = process.env.PRIVATE_KEY_PAYMASTER;
 const factoryAddress = '0x15Ba39375ee2Ab563E8873C8390be6f2E2F50232';
 const entryPoint = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
 
-if (!privateKey || !rpcUrl) {
-  throw new Error(
-    'Environment variables PRIVATE_KEY_PAYMASTER and RPC_URL_BASE_SEPOLIA_PAYMASTER must be defined'
-  );
-}
-
 export const transport = http(rpcUrl);
 
 const publicClient = createPublicClient({
