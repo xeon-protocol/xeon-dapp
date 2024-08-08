@@ -58,22 +58,20 @@ function Header() {
           <ConnectButton
             connectButton={{
               className:
-                'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
+                'text-white bg-button-gradient px-8 py-1 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
               style: {
-                borderRadius: '50px',
                 backgroundColor: '#3253FB',
                 color: 'white',
               },
             }}
             signInButton={{
               className:
-                'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
+                'text-white bg-button-gradient px-8 py-1 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
             }}
             detailsButton={{
               className:
-                'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
+                'text-white bg-button-gradient px-8 py-1 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
               style: {
-                borderRadius: '50px',
                 backgroundColor: '#3253FB',
                 color: 'white',
               },
