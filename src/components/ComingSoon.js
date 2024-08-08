@@ -1,7 +1,6 @@
-import { Image } from "@chakra-ui/react";
-import React from "react";
-import Lottie from "react-lottie-player";
-import lottieJson from "@/assets/animations/PE5.json";
+import lottieJson from '@/assets/animations/PE5.json';
+import { Image } from '@chakra-ui/react';
+import Lottie from 'react-lottie-player';
 
 function NoEvents() {
   return (

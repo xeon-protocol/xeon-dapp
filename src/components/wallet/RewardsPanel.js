@@ -1,20 +1,19 @@
-"use client";
-import React from "react";
-import { motion } from "framer-motion";
+'use client';
+import { motion } from 'framer-motion';
 const DashboardSection = () => {
   const glitchVariants = {
     visible: {
       textShadow: [
-        "1px 1px 0px lime",
-        "-1px -1px 0px purple",
-        "1px -1px 0px lime",
-        "-1px 1px 0px lime",
-        "2px 2px 2px lime",
+        '1px 1px 0px lime',
+        '-1px -1px 0px purple',
+        '1px -1px 0px lime',
+        '-1px 1px 0px lime',
+        '2px 2px 2px lime',
       ],
       transition: {
         duration: 0.2,
         repeat: Infinity,
-        repeatType: "mirror",
+        repeatType: 'mirror',
       },
     },
   };
@@ -26,10 +25,10 @@ const DashboardSection = () => {
             variants={glitchVariants}
             initial="hidden"
             whileInView={{ opacity: 1, x: 0 }}
-            animate={"visible"}
+            animate={'visible'}
           >
             Hedges
-          </motion.span>{" "}
+          </motion.span>{' '}
           Panel
         </motion.h1>
       </div>
@@ -39,7 +38,7 @@ const DashboardSection = () => {
         Namely: Vault withdrawal fees, Hedge settlement fees, Native hedge
         liquidity farming, and XEON token trading fees. Xeon Protocol brings
         back the generated revenue to investors for Revenue Sharing through
-        Staking Rewards. Learn more about our income streams{" "}
+        Staking Rewards. Learn more about our income streams{' '}
         <a href="#" className="neon-real-yield-link text-blue-500">
           here..
         </a>
@@ -57,7 +56,7 @@ const DashboardSection = () => {
               href="#jump-to-section"
               className="walletStateLink text-blue-500"
             >
-              {" "}
+              {' '}
               learn... <i className="fa fa-link" aria-hidden="true"></i>
             </a>
           </p>
@@ -74,7 +73,7 @@ const DashboardSection = () => {
               href="#jump-to-section"
               className="walletStateLink text-blue-500"
             >
-              {" "}
+              {' '}
               learn... <i className="fa fa-link" aria-hidden="true"></i>
             </a>
           </p>
@@ -90,7 +89,7 @@ const DashboardSection = () => {
               href="#jump-to-section"
               className="walletStateLink text-blue-500"
             >
-              {" "}
+              {' '}
               learn... <i className="fa fa-link" aria-hidden="true"></i>
             </a>
           </p>
@@ -106,7 +105,7 @@ const DashboardSection = () => {
             <div className="grid-sect-title text-green-600">
               <span id="totalRewardsDueAmnt" className="amount">
                 0
-              </span>{" "}
+              </span>{' '}
               (
               <span id="totalRewardsDueValue" className="green-value">
                 0
@@ -120,7 +119,7 @@ const DashboardSection = () => {
               <div className="grid-sect-subtitle-value text-sm">
                 <span id="rewardsDueAmnt" className="amount">
                   0
-                </span>{" "}
+                </span>{' '}
                 (
                 <span id="rewardsDueValue" className="green-value">
                   0
@@ -141,7 +140,7 @@ const DashboardSection = () => {
               <div className="grid-sect-subtitle-value text-sm">
                 <span id="rewardsDueAmntLend" className="amount">
                   0
-                </span>{" "}
+                </span>{' '}
                 (
                 <span id="rewardsDueValueLend" className="green-value">
                   0
@@ -162,7 +161,7 @@ const DashboardSection = () => {
               <div className="grid-sect-subtitle-value text-sm">
                 <span id="rewardsDueAmntLiq" className="amount">
                   0
-                </span>{" "}
+                </span>{' '}
                 (
                 <span id="rewardsDueValueLiq" className="green-value">
                   0
@@ -201,7 +200,7 @@ const DashboardSection = () => {
             <div className="grid-sect-title text-green-600">
               <span id="totalRewardsClaimedAmnt" className="amount">
                 0
-              </span>{" "}
+              </span>{' '}
               (
               <span id="totalRewardsClaimedValue" className="green-value">
                 0
@@ -216,7 +215,7 @@ const DashboardSection = () => {
             <div className="grid-sect-subtitle-value text-sm">
               <span id="rewardsClaimedAmnt" className="amount">
                 0
-              </span>{" "}
+              </span>{' '}
               (
               <span id="rewardsClaimedValue" className="green-value">
                 0
@@ -232,7 +231,7 @@ const DashboardSection = () => {
             <div className="grid-sect-subtitle-value text-sm">
               <span id="rewardsClaimedAmntLiq" className="amount">
                 0
-              </span>{" "}
+              </span>{' '}
               (
               <span id="rewardsClaimedValueLend" className="green-value">
                 0
@@ -248,7 +247,7 @@ const DashboardSection = () => {
             <div className="grid-sect-subtitle-value text-sm">
               <span id="rewardsClaimedAmntLend" className="amount">
                 0
-              </span>{" "}
+              </span>{' '}
               (
               <span id="rewardsClaimedValueLiq" className="green-value">
                 0
@@ -263,7 +262,7 @@ const DashboardSection = () => {
             </div>
             <div className="grid-sect-subtitle-value text-sm">
               <p id="rewardValue" className="amount">
-                generate total commission earned..{" "}
+                generate total commission earned..{' '}
               </p>
               <div className="hedge-i-cat">
                 <button className="border-dashed border-2 border-light-purple mt-2 text-white py-1 px-2 rounded-md">
