@@ -1,17 +1,16 @@
-"use client";
-import Header from "@/components/Header";
-import React from "react";
-import Lottie from "react-lottie-player";
-import lottieJson from "@/assets/animations/PE2.json";
-import lottieJson2 from "@/assets/animations/planet_orbit1.json";
-import TestNetCard from "@/components/guide/Testnet";
-import { Image } from "@chakra-ui/react";
-import ScrollCard from "@/components/guide/IntroCard";
-import Deposit from "@/components/guide/Deposit";
-import UseCases from "@/components/guide/UseCases";
-import HowItWorks from "@/components/guide/HowItWorks";
-import WhyOTC from "@/components/guide/WhyOTC";
-import Footer from "@/components/Footer";
+'use client';
+import lottieJson from '@/assets/animations/PE2.json';
+import lottieJson2 from '@/assets/animations/planet_orbit1.json';
+import Footer from '@/components/Footer';
+import Deposit from '@/components/guide/Deposit';
+import HowItWorks from '@/components/guide/HowItWorks';
+import ScrollCard from '@/components/guide/IntroCard';
+import TestNetCard from '@/components/guide/Testnet';
+import UseCases from '@/components/guide/UseCases';
+import WhyOTC from '@/components/guide/WhyOTC';
+import Header from '@/components/Header';
+import { Image } from '@chakra-ui/react';
+import Lottie from 'react-lottie-player';
 function Page() {
   return (
     <>
@@ -59,9 +58,9 @@ function Page() {
               src="/card-109.svg"
               // w={"100%"}
               h={{
-                base: "150px",
-                md: "200px",
-                lg: "155px",
+                base: '150px',
+                md: '200px',
+                lg: '155px',
               }}
               alt="container"
               className="relative hidden md:block ml-[-20px]"

@@ -1,9 +1,9 @@
-"use client";
-import React, { useState } from "react";
-import { FormControl, FormLabel, Switch } from "@chakra-ui/react";
-import { motion } from "framer-motion";
-import { FaEthereum } from "react-icons/fa";
-import AssetsValues from "./AssetsValues";
+'use client';
+import { FormControl, FormLabel, Switch } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { FaEthereum } from 'react-icons/fa';
+import AssetsValues from './AssetsValues';
 
 function UserAssets() {
   const [isSwitched, setIsSwitched] = useState(false);
@@ -22,7 +22,7 @@ function UserAssets() {
             id="mode-switch"
           />
           <FormLabel htmlFor="mode-switch" mb="0" ml={2} className="text-grey">
-            {isSwitched ? "Withdrawing mode" : "Depositing mode"}
+            {isSwitched ? 'Withdrawing mode' : 'Depositing mode'}
           </FormLabel>
         </FormControl>
 
@@ -95,9 +95,9 @@ function UserAssets() {
       <div className="w-full border-2 rounded-xl border-grey lg:py-9 p-4 flex gap-2 hover:border-animate">
         <div className="w-full">
           <div className="w-full flex justify-between gap-5">
-            {" "}
+            {' '}
             <div className="flex justify-between w-full mb-5">
-              {" "}
+              {' '}
               <p className="text-lime text-3xl">Net Worth</p>
               <p className="text-grey text-3xl">$0.00</p>
             </div>

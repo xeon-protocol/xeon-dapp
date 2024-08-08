@@ -1,11 +1,10 @@
-"use client";
-import { Image } from "@chakra-ui/react";
-import React from "react";
+'use client';
+import { Image } from '@chakra-ui/react';
 
 function LeftBarButton({ title, handleClick }) {
   return (
     <div className="my-8">
-      {" "}
+      {' '}
       <div className="relative ">
         <p
           onClick={handleClick}
