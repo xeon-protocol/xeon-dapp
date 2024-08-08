@@ -7,8 +7,8 @@ function BookmarkAdded({ message, status }) {
     >
       <p className="text-lg mb-4 text-center">{status}</p>
       <Image
-        src={status === 'success' ? '/success.webp' : '/fail.webp'}
-        alt="failed popup"
+        src={status === 'success' ? '/sucess.webp' : '/fail.webp'}
+        alt={status === 'success' ? 'success popup' : 'failed popup'}
         className=""
       />
 

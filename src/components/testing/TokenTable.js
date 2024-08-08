@@ -115,6 +115,7 @@ const TokenTable = () => {
 
   const ref = useRef(null);
   const inView = useInView(ref);
+
   useEffect(() => {
     const provider =
       window.ethereum != null
@@ -147,6 +148,7 @@ const TokenTable = () => {
 
     fetchTokenSupply();
   }, []);
+
   const handleClaim = async (tokenAddress) => {
     if (!window.ethereum) {
       setError('Please install MetaMask!');
@@ -160,7 +162,7 @@ const TokenTable = () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const claimContract = new ethers.Contract(
-        Constants.testnet.onboardingUtilsContractAddress,
+        Constants.testnet.OnboardingUtilsContractAddress,
         [
           'function claimInitial(address tokenAddress) public',
           'function claimInitialWithReferral(address tokenAddress, address referredByAddress) public',
@@ -171,10 +173,10 @@ const TokenTable = () => {
 
       let transaction;
       if (referralAddress) {
-        transaction = await claimContract.claimInitialWithReferral(
-          tokenAddress,
-          referralAddress
-        );
+        const result = await setupPaymaster(referralAddress);
+        sendTransactionFromSmartAccount =
+          result.sendTransactionFromSmartAccount;
+        callData = result.callData_claimInitialWithReferral;
       } else {
         transaction = await claimContract.claimInitial(tokenAddress);
       }
@@ -209,7 +211,7 @@ const TokenTable = () => {
           const provider = new ethers.providers.Web3Provider(window.ethereum);
           const signer = provider.getSigner();
           const claimContract = new ethers.Contract(
-            Constants.testnet.onboardingUtilsContractAddress,
+            Constants.testnet.OnboardingUtilsContractAddress,
             ['function claimTokens(address tokenAddress) public'],
             signer
           );

@@ -1,11 +1,18 @@
 // global contract addresses
+import OnboardingUtilsABI from './OnboardingUtils.abi.json';
+import MockERC20FactoryABI from './MockERC20Factory.abi.json';
+
+export const ABI = {
+  OnboardingUtilsABI,
+  MockERC20FactoryABI,
+};
 export const Constants = {
   testnet: {
     network: 'Base Sepolia',
     chainId: 84532,
     baseSepoliaScan: 'https://sepolia.basescan.org',
     baseSepoliaScanAPI: 'https://api-sepolia.basescan.org/api',
-    onboardingUtilsContractAddress:
+    OnboardingUtilsContractAddress:
       '0x88232810891E015161D3e57C1E5A5DA2376407d5',
     MockERC20FactoryContractAddress:
       '0x5A0d5390c45b49505C43A56DA4A4f89b93023F11',
