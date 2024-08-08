@@ -40,7 +40,7 @@ export async function sendTransaction(functionName, args) {
 
   console.log(
     '\x1b[32m',
-    `⛽ Successfully sponsored gas for ${functionName} transaction with Coinbase Developer Platform!`
+    `⛽ ${functionName} successfully sponsored by Xeon Protocol!`
   );
   console.log(
     '\x1b[36m',
