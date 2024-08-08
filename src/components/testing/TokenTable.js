@@ -96,23 +96,6 @@ const TokenTable = () => {
     visible: { opacity: 1, y: 0 },
   };
 
-  const glitchVariants = {
-    visible: {
-      textShadow: [
-        '1px 1px 0px lime',
-        '-1px -1px 0px purple',
-        '1px -1px 0px lime',
-        '-1px 1px 0px lime',
-        '2px 2px 2px lime',
-      ],
-      transition: {
-        duration: 0.2,
-        repeat: Infinity,
-        repeatType: 'mirror',
-      },
-    },
-  };
-
   const ref = useRef(null);
   const inView = useInView(ref);
   useEffect(() => {
@@ -254,16 +237,7 @@ const TokenTable = () => {
 
   return (
     <div className="overflow-x-auto overflow-y-hidden mt-10 px-8 pt-8 md:px-20 max-w-screen-2xl mx-auto">
-      <motion.h1 className="text-3xl text-grey">
-        <motion.span
-          variants={glitchVariants}
-          initial="hidden"
-          animate={inView ? 'visible' : 'hidden'}
-        >
-          Claim
-        </motion.span>{' '}
-        Testnet Tokens
-      </motion.h1>
+      <h1 className="text-3xl text-grey">Claim Testnet Tokens</h1>
       <div className="mb-4">
         <input
           type="text"
@@ -273,11 +247,8 @@ const TokenTable = () => {
           className="w-full bg-[#26222B] p-2 border text-grey border-gray-300 rounded mt-4"
         />
       </div>
-      <motion.table
+      <table
         ref={ref}
-        initial="hidden"
-        animate={inView ? 'visible' : 'hidden'}
-        variants={tableVariants}
         className="min-w-full bg-black border rounded mt-10 text-grey"
       >
         <thead>
@@ -290,16 +261,12 @@ const TokenTable = () => {
             <th className="py-2 px-4 border-b text-left">CTA</th>
           </tr>
         </thead>
-        <motion.tbody variants={tableVariants}>
+        <tbody>
           {tokens.map((token, index) => (
-            <motion.tr key={index} variants={rowVariants}>
-              <motion.td className="py-2 px-4 border-b text-left">
-                {token.name}
-              </motion.td>
-              <motion.td className="py-2 px-4 border-b text-left">
-                {token.symbol}
-              </motion.td>
-              <motion.td className="py-2 px-4 border-b text-left">
+            <tr key={index}>
+              <td className="py-2 px-4 border-b text-left">{token.name}</td>
+              <td className="py-2 px-4 border-b text-left">{token.symbol}</td>
+              <td className="py-2 px-4 border-b text-left">
                 <a
                   target="_blank"
                   rel="noreferrer noopener"
@@ -307,24 +274,16 @@ const TokenTable = () => {
                 >
                   {token.address.slice(0, 14)}...
                 </a>
-
                 <button
                   className="ml-2 bg-black text-white px-2 py-1 rounded hover:text-lime-400"
                   onClick={() => copyToClipboard(token.address)}
                 >
                   <FaCopy />
                 </button>
-              </motion.td>
-              <motion.td
-                className="py-2 px-4 border-b text-left"
-                variants={glitchVariants}
-              >
-                {token.pair}
-              </motion.td>
-              <motion.td className="py-2 px-4 border-b text-left">
-                {token.supply}
-              </motion.td>
-              <motion.td className="py-2 px-4 border-b text-left">
+              </td>
+              <td className="py-2 px-4 border-b text-left">{token.pair}</td>
+              <td className="py-2 px-4 border-b text-left">{token.supply}</td>
+              <td className="py-2 px-4 border-b text-left">
                 {token.name === 'WETH' ? (
                   <p>
                     visit
@@ -350,11 +309,11 @@ const TokenTable = () => {
                     )}
                   </div>
                 )}
-              </motion.td>
-            </motion.tr>
+              </td>
+            </tr>
           ))}
-        </motion.tbody>
-      </motion.table>
+        </tbody>
+      </table>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
