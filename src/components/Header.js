@@ -54,7 +54,7 @@ function Header() {
           </p>
         </div>
 
-        <div className=" md:flex gap-4">
+        <div className=" md:flex gap-4 p-1">
           <ConnectButton
             connectButton={{
               className:
