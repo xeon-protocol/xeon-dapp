@@ -1,19 +1,16 @@
-import { Button, Image, useDisclosure } from "@chakra-ui/react";
 import {
+  Image,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-} from "@chakra-ui/react";
-import { useRouter } from "next/navigation";
-import React from "react";
-import { FaBookmark, FaEthereum, FaInfoCircle } from "react-icons/fa";
-import { MdRadioButtonChecked } from "react-icons/md";
-import { TfiNewWindow } from "react-icons/tfi";
-import FailedPopup from "./FailedPopup";
+  ModalContent,
+  ModalOverlay,
+  useDisclosure,
+} from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
+import { FaBookmark, FaEthereum, FaInfoCircle } from 'react-icons/fa';
+import { MdRadioButtonChecked } from 'react-icons/md';
+import { TfiNewWindow } from 'react-icons/tfi';
 function Card() {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -63,7 +60,7 @@ function Card() {
               <div className="flex items-center w-full lg:w-[300px] justify-between">
                 <p className="flex items-center text-muted">
                   <span className="text-4xl">{`{`}</span>
-                  Strike:{" "}
+                  Strike:{' '}
                 </p>
                 <div className="flex ml-2 items-center">
                   <span className="text-grey lg:text-lg text-sm text-right">
@@ -117,11 +114,11 @@ function Card() {
               </button>
               <button
                 onClick={() => {
-                  router.push("/dashboard");
+                  router.push('/dashboard');
                 }}
                 className="bg-black flex items-center gap-2 border-none text-white px-8 py-2 rounded-lg ml-4"
               >
-                View{" "}
+                View{' '}
                 <div class="ml-1 rounded-full w-6 h-6 p-px bg-gradient-to-b from-grey to-transparent">
                   <div class="bg-black  h-6 rounded-full flex m-auto justify-center items-center">
                     <FaBookmark size={14} />
@@ -165,11 +162,11 @@ function Card() {
                 </button>
                 <button
                   onClick={() => {
-                    router.push("/dashboard");
+                    router.push('/dashboard');
                   }}
                   className="bg-black flex items-center gap-2 border-none text-white px-4 py-2 rounded-lg ml-4"
                 >
-                  View{" "}
+                  View{' '}
                   <div class="ml-1 rounded-full w-6 h-6 p-px bg-gradient-to-b from-grey to-transparent">
                     <div class="bg-black  h-6 rounded-full flex m-auto justify-center items-center">
                       <FaBookmark size={14} />
@@ -196,11 +193,11 @@ function Card() {
                 </button>
                 <button
                   onClick={() => {
-                    router.push("/dashboard");
+                    router.push('/dashboard');
                   }}
                   className="bg-black flex items-center gap-2 border-none text-white px-4 py-2 rounded-lg ml-4"
                 >
-                  View{" "}
+                  View{' '}
                   <div class="ml-1 rounded-full w-6 h-6 p-px bg-gradient-to-b from-grey to-transparent">
                     <div class="bg-black  h-6 rounded-full flex m-auto justify-center items-center">
                       <FaBookmark size={14} />
@@ -221,13 +218,13 @@ function Card() {
           </div>
         </div>
       </div>
-      <Modal isOpen={isOpen} onClose={onClose} className={"bg-black"}>
+      <Modal isOpen={isOpen} onClose={onClose} className={'bg-black'}>
         <ModalOverlay />
-        <ModalContent className={"bg-black"}>
-          <ModalCloseButton color={"#fff"} />
+        <ModalContent className={'bg-black'}>
+          <ModalCloseButton color={'#fff'} />
           <ModalBody
             className={
-              "bg-black text-grey flex flex-col justify-center items-center"
+              'bg-black text-grey flex flex-col justify-center items-center'
             }
           >
             <Image src="/info.webp" alt="xeon" />
@@ -253,7 +250,7 @@ function Card() {
               <div className="flex items-center w-full justify-between">
                 <p className="flex items-center text-muted">
                   <span className="text-4xl">{`{`}</span>
-                  Market Value:{" "}
+                  Market Value:{' '}
                 </p>
                 <div className="flex ml-2 items-center">
                   <span className="text-grey lg:text-lg text-sm text-right">
@@ -323,7 +320,7 @@ function Card() {
             </div>
           </ModalBody>
 
-          <div className={"bg-black py-3 flex justify-center"}>
+          <div className={'bg-black py-3 flex justify-center'}>
             <button
               className="text-white text-base bg-black px-8 py-2 mr-4 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
               mr={3}

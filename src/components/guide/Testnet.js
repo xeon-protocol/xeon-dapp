@@ -1,5 +1,4 @@
-import { Image } from "@chakra-ui/react";
-import React from "react";
+import { Image } from '@chakra-ui/react';
 
 function ScrollCard() {
   return (
@@ -11,17 +10,17 @@ function ScrollCard() {
           <span className="text-light-purple md:hidden"> Claim</span>
         </h1>
         <h1 className="text-light-purple text-3xl md:text-5xl lg:text-7xl ml-1 md:ml-10 hidden md:block">
-          {" "}
+          {' '}
           Claim
         </h1>
       </div>
       <div className="w-full lg:px-10 relative">
         <div className="border-2 border-[#6c6c6c] rounded-3xl text-grey p-4">
           <Image
-            borderRadius={"md"}
+            borderRadius={'md'}
             src="/testnet-table.png"
             // w={"100%"}
-            h={"350px"}
+            h={'350px'}
             alt="container"
             className="relative "
           />

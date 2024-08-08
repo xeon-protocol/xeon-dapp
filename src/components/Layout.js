@@ -1,9 +1,9 @@
-"use client";
-import { Image } from "@chakra-ui/react";
-import React, { useState } from "react";
-import RightBarCard from "./RightBarCard";
-import LeftBarButton from "./LeftBarButton";
-import LiveTxs from "./LiveTxs";
+'use client';
+import { Image } from '@chakra-ui/react';
+import { useState } from 'react';
+import LeftBarButton from './LeftBarButton';
+import LiveTxs from './LiveTxs';
+import RightBarCard from './RightBarCard';
 
 const Layout = ({
   children,
@@ -20,47 +20,47 @@ const Layout = ({
   activeSection,
 }) => {
   const [showStats, setShowStats] = useState(true);
-  const [activeRightBar, setActiveRightBar] = useState("Stats");
+  const [activeRightBar, setActiveRightBar] = useState('Stats');
   console.log(activeRightBar, showStats);
   const handleSectionChange = (section, button) => {
-    if (section === "discover" && button === "Equity Swaps") {
+    if (section === 'discover' && button === 'Equity Swaps') {
       setShowPositions(false);
       setShowDiscover(true);
       setShowBookmarks(false);
-      setActiveSection("discover");
-      setActiveSideTab("Equity Swaps");
-    } else if (section === "positions" && button === "Loans") {
+      setActiveSection('discover');
+      setActiveSideTab('Equity Swaps');
+    } else if (section === 'positions' && button === 'Loans') {
       setShowPositions(false);
       setShowDiscover(false);
       setShowBookmarks(false);
       setShowLoans(true);
-      setActiveSection("positions");
-      setActiveSideTab("Loans");
-    } else if (section === "positions" && button === "Options") {
+      setActiveSection('positions');
+      setActiveSideTab('Loans');
+    } else if (section === 'positions' && button === 'Options') {
       setShowPositions(false);
       setShowDiscover(false);
       setShowBookmarks(false);
-      setActiveSection("positions");
-      setActiveSideTab("Options");
-    } else if (section === "discover" && button === "Social") {
+      setActiveSection('positions');
+      setActiveSideTab('Options');
+    } else if (section === 'discover' && button === 'Social') {
       setShowPositions(false);
       setShowDiscover(false);
       setShowBookmarks(false);
       setShowSocials(true);
-      setActiveSection("discover");
-      setActiveSideTab("Social");
-    } else if (section === "positions" && button === "Equity Swaps") {
+      setActiveSection('discover');
+      setActiveSideTab('Social');
+    } else if (section === 'positions' && button === 'Equity Swaps') {
       setShowPositions(false);
       setShowDiscover(true);
       setShowBookmarks(false);
-      setActiveSection("positions");
-      setActiveSideTab("Equity Swaps");
-    } else if (section === "discover" && button === "Options") {
+      setActiveSection('positions');
+      setActiveSideTab('Equity Swaps');
+    } else if (section === 'discover' && button === 'Options') {
       setShowPositions(false);
       setShowDiscover(true);
       setShowBookmarks(false);
-      setActiveSection("discover");
-      setActiveSideTab("Options");
+      setActiveSection('discover');
+      setActiveSideTab('Options');
     }
   };
 
@@ -72,14 +72,14 @@ const Layout = ({
         alt="container"
       />
       <div className="flex fixed bottom-5 bg-black z-[31] justify-between w-[80%] gap-2 md:hidden">
-        <p onClick={() => handleSectionChange("positions", "Options")}>
+        <p onClick={() => handleSectionChange('positions', 'Options')}>
           Options
         </p>
-        <p onClick={() => handleSectionChange("discover", "Equity Swaps")}>
+        <p onClick={() => handleSectionChange('discover', 'Equity Swaps')}>
           Equity Swaps
         </p>
-        <p onClick={() => handleSectionChange("positions", "Loans")}>Loans</p>
-        <p onClick={() => handleSectionChange("discover", "Social")}>Social</p>
+        <p onClick={() => handleSectionChange('positions', 'Loans')}>Loans</p>
+        <p onClick={() => handleSectionChange('discover', 'Social')}>Social</p>
       </div>
 
       <div className="flex flex-col gap-4 mx-auto md:flex-row md:justify-start lg:flex-row lg:justify-between lg:gap-x-4">
@@ -88,9 +88,9 @@ const Layout = ({
             className="hidden md:block"
             src="/base.webp"
             height={{
-              base: "100px",
-              md: "350px",
-              lg: "380px",
+              base: '100px',
+              md: '350px',
+              lg: '380px',
             }}
             alt="container"
           />
@@ -99,26 +99,26 @@ const Layout = ({
           </div>
           <div className="absolute top-4 lg:top-[70px] left-6 w-full h-full hidden md:block">
             <LeftBarButton
-              active={activeSideTab === "Options" ? true : false}
+              active={activeSideTab === 'Options' ? true : false}
               title="Options"
-              handleClick={() => handleSectionChange("discover", "Options")}
+              handleClick={() => handleSectionChange('discover', 'Options')}
             />
             <LeftBarButton
-              active={activeSideTab === "Equity Swaps" ? true : false}
+              active={activeSideTab === 'Equity Swaps' ? true : false}
               title="Equity Swaps"
               handleClick={() =>
-                handleSectionChange("discover", "Equity Swaps")
+                handleSectionChange('discover', 'Equity Swaps')
               }
             />
             <LeftBarButton
-              active={activeSideTab === "Loans" ? true : false}
+              active={activeSideTab === 'Loans' ? true : false}
               title="Loans"
-              handleClick={() => handleSectionChange("positions", "Loans")}
+              handleClick={() => handleSectionChange('positions', 'Loans')}
             />
             <LeftBarButton
-              active={activeSideTab === "Social" ? true : false}
+              active={activeSideTab === 'Social' ? true : false}
               title="Social"
-              handleClick={() => handleSectionChange("discover", "Social")}
+              handleClick={() => handleSectionChange('discover', 'Social')}
             />
             <div>
               <p className="text-grey text-lg">Reach Us</p>
@@ -140,7 +140,7 @@ const Layout = ({
             <div className="text-white relative ml-[-10px] mt-16 hidden md:block lg:hidden md:flex md:flex-col">
               <Image
                 src="/right.webp"
-                height={"380px"}
+                height={'380px'}
                 alt="container"
                 className="relative hidden md:block ml-[-20px]"
               />
@@ -149,21 +149,21 @@ const Layout = ({
                   <p
                     onClick={() => {
                       setShowStats(true);
-                      setActiveRightBar("Stats");
+                      setActiveRightBar('Stats');
                     }}
                     className={`${
-                      activeRightBar === "Stats" ? "text-grey" : "text-muted"
+                      activeRightBar === 'Stats' ? 'text-grey' : 'text-muted'
                     } hover:cursor-pointer`}
                   >{`{ Statistics }`}</p>
                   <p
                     onClick={() => {
                       setShowStats(false);
-                      setActiveRightBar("Live Txs");
+                      setActiveRightBar('Live Txs');
                     }}
                     className={`${
-                      activeRightBar === "Live Txs"
-                        ? "text-grey"
-                        : "text-muted "
+                      activeRightBar === 'Live Txs'
+                        ? 'text-grey'
+                        : 'text-muted '
                     }
                     hover:cursor-pointer`}
                   >{`{ Live Txs }`}</p>
@@ -206,7 +206,7 @@ const Layout = ({
         <div className="text-white hidden md:hidden lg:block relative p-4 md:w-1/4 lg:w-1/4 md:flex md:flex-col">
           <Image
             src="/right.webp"
-            height={"380px"}
+            height={'380px'}
             alt="container"
             className="relative hidden md:block"
           />
@@ -215,19 +215,19 @@ const Layout = ({
               <p
                 onClick={() => {
                   setShowStats(true);
-                  setActiveRightBar("Stats");
+                  setActiveRightBar('Stats');
                 }}
                 className={`${
-                  activeRightBar === "Stats" ? "text-grey" : "text-muted"
+                  activeRightBar === 'Stats' ? 'text-grey' : 'text-muted'
                 } hover:cursor-pointer`}
               >{`{ Statistics }`}</p>
               <p
                 onClick={() => {
                   setShowStats(false);
-                  setActiveRightBar("Live Txs");
+                  setActiveRightBar('Live Txs');
                 }}
                 className={`${
-                  activeRightBar === "Live Txs" ? "text-grey" : "text-muted "
+                  activeRightBar === 'Live Txs' ? 'text-grey' : 'text-muted '
                 }
                     hover:cursor-pointer`}
               >{`{ Live Txs }`}</p>

@@ -1,5 +1,3 @@
-import React from "react";
-
 function RightBarCard({ title, amount, number }) {
   return (
     <div className="my-2">

@@ -1,37 +1,28 @@
-"use client";
-import Header from "@/components/Header";
-import React from "react";
-import Lottie from "react-lottie-player";
-import lottieJson from "@/assets/animations/blue_planet.json";
-import lottieJson2 from "@/assets/animations/planet_orbit1.json";
-import TestNetCard from "@/components/guide/Testnet";
-import { Image } from "@chakra-ui/react";
-import ScrollCard from "@/components/guide/IntroCard";
-import Deposit from "@/components/guide/Deposit";
-import UseCases from "@/components/guide/UseCases";
-import HowItWorks from "@/components/guide/HowItWorks";
-import WhyOTC from "@/components/guide/WhyOTC";
-import TokenTable from "@/components/testing/TokenTable";
-import TokenDeposit from "@/components/testing/TokenDeposits";
-import WriteHedges from "@/components/testing/WriteHedges";
-import SoftwareVersions from "@/components/testing/Versions";
-import { motion } from "framer-motion";
-import Footer from "@/components/Footer";
+'use client';
+import lottieJson from '@/assets/animations/blue_planet.json';
+import lottieJson2 from '@/assets/animations/planet_orbit1.json';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import TokenTable from '@/components/testing/TokenTable';
+import WriteHedges from '@/components/testing/WriteHedges';
+import { Image } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
+import Lottie from 'react-lottie-player';
 
 function Page() {
   const glitchVariants = {
     visible: {
       textShadow: [
-        "1px 1px 0px lime",
-        "-1px -1px 0px purple",
-        "1px -1px 0px lime",
-        "-1px 1px 0px lime",
-        "2px 2px 2px lime",
+        '1px 1px 0px lime',
+        '-1px -1px 0px purple',
+        '1px -1px 0px lime',
+        '-1px 1px 0px lime',
+        '2px 2px 2px lime',
       ],
       transition: {
         duration: 0.2,
         repeat: Infinity,
-        repeatType: "mirror",
+        repeatType: 'mirror',
       },
     },
   };
@@ -164,10 +155,10 @@ function Page() {
               // w={"100%"}
 
               h={{
-                base: "150px",
-                md: "300px",
-                lg: "330px",
-                xl: "310px",
+                base: '150px',
+                md: '300px',
+                lg: '330px',
+                xl: '310px',
               }}
               alt="container"
               className="relative hidden  md:block ml-[-20px]"
@@ -184,7 +175,7 @@ function Page() {
             animate="visible"
           >
             Token
-          </motion.span>{" "}
+          </motion.span>{' '}
           Use Cases
         </motion.p>
       </div>

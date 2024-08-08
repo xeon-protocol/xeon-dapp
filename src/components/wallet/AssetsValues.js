@@ -1,5 +1,3 @@
-import React from "react";
-
 function AssetsValues({ label, value }) {
   return (
     <div className="w-full my-4">

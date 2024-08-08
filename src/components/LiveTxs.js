@@ -1,5 +1,3 @@
-import React from "react";
-
 function LiveTxs({ value }) {
   return (
     <div className="flex justify-between items-center mx-8 mt-5">

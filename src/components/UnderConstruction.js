@@ -1,5 +1,4 @@
-import { Button, Image } from "@chakra-ui/react";
-import React from "react";
+import { Image } from '@chakra-ui/react';
 
 function UnderConstruction() {
   return (
@@ -10,9 +9,9 @@ function UnderConstruction() {
           alt="popup"
           className="absolute z-[1] hidden md:block"
           style={{
-            left: "50%",
-            top: "50%",
-            transform: "translate(-50%, -50%)",
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
           }}
         />
         <Image
@@ -20,9 +19,9 @@ function UnderConstruction() {
           alt="popup"
           className="absolute z-[1]  md:hidden"
           style={{
-            left: "50%",
-            top: "50%",
-            transform: "translate(-50%, -50%)",
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
           }}
         />
 

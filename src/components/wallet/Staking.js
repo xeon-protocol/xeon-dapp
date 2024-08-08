@@ -1,5 +1,3 @@
-import React from "react";
-
 const StakingPanel = () => {
   return (
     <div className="px-8 pt-8 md:px-10 max-w-screen-2xl mx-auto text-grey pb-20">

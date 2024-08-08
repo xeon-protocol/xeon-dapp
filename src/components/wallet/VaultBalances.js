@@ -1,7 +1,5 @@
-"use client";
-import React from "react";
-import Table from "./Table";
-import { FaStackExchange } from "react-icons/fa";
+'use client';
+import Table from './Table';
 function VaultBalances() {
   return (
     <div className="flex flex-col lg:flex-row gap-4 px-8 pt-8 md:px-10 max-w-screen-2xl mx-auto">
