@@ -21,8 +21,18 @@ function Header() {
     "
     >
       <Link href={'/'} className="text-lg font-medium">
-        <Image className="hidden md:block" ml={6} src="/logo.png" alt="xeon" />
-        <Image className=" md:hidden" ml={6} src="/Logo2.png" alt="xeon" />
+        <Image
+          className="hidden md:block w-auto h-[50px] p-1"
+          ml={6}
+          src="/logo.png"
+          alt="xeon"
+        />
+        <Image
+          className=" md:hidden w-auto h-[50px] p-1"
+          ml={6}
+          src="/logo-2.png"
+          alt="xeon"
+        />
       </Link>
 
       <nav className="hidden md:flex space-x-6">
