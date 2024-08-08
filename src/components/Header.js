@@ -1,13 +1,23 @@
-"use client";
-import React, { useState } from "react";
-import { Button, IconButton, Image, Tooltip } from "@chakra-ui/react";
-import { FaBars, FaTimes } from "react-icons/fa";
-import Link from "next/link";
-import { client } from "@/components/ConnectWallet/client";
-import { ConnectButton } from "thirdweb/react";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { Image, Tooltip } from '@chakra-ui/react';
+import Link from 'next/link';
+import { client } from '@/components/ConnectWallet/client';
+import { ConnectButton } from 'thirdweb/react';
+import { fetchTokenList, mapToSupportedTokens } from '@/utils/tokenUtils';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [supportedTokens, setSupportedTokens] = useState([]);
+
+  useEffect(() => {
+    const fetchAndMapTokens = async () => {
+      const tokens = await fetchTokenList();
+      const mappedTokens = mapToSupportedTokens(tokens);
+      setSupportedTokens(mappedTokens);
+    };
+    fetchAndMapTokens();
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -21,23 +31,23 @@ function Header() {
     max-w-screen-2xl
     "
     >
-      <Link href={"/"} className="text-lg font-medium">
+      <Link href={'/'} className="text-lg font-medium">
         <Image className="hidden md:block" ml={6} src="/logo.png" alt="xeon" />
         <Image className=" md:hidden" ml={6} src="/Logo2.png" alt="xeon" />
       </Link>
 
       <nav className="hidden md:flex space-x-6">
-        <Link href={"/silkroad"}>Silkroad</Link>
+        <Link href={'/silkroad'}>Silkroad</Link>
         <Tooltip label="Page under construction">
           <div className="cursor-not-allowed">Wallet</div>
         </Tooltip>
         <Tooltip label="Page under construction">
           <div className="cursor-not-allowed">Analytics</div>
         </Tooltip>
-        <Link href={"/guide"}>Guide</Link>
-        <Link href={"/"}>Claim</Link>
+        <Link href={'/guide'}>Guide</Link>
+        <Link href={'/'}>Claim</Link>
         <Link
-          href={"https://docs.xeon-protocol.io/documentation"}
+          href={'https://docs.xeon-protocol.io/documentation'}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -52,26 +62,27 @@ function Header() {
 
       <div className=" md:flex gap-4">
         <ConnectButton
+          supportedTokens={supportedTokens}
           connectButton={{
             className:
-              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+              'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
             style: {
-              borderRadius: "50px",
-              backgroundColor: "#3253FB",
-              color: "white",
+              borderRadius: '50px',
+              backgroundColor: '#3253FB',
+              color: 'white',
             },
           }}
           signInButton={{
             className:
-              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+              'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
           }}
           detailsButton={{
             className:
-              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+              'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
             style: {
-              borderRadius: "50px",
-              backgroundColor: "#3253FB",
-              color: "white",
+              borderRadius: '50px',
+              backgroundColor: '#3253FB',
+              color: 'white',
             },
           }}
           client={client}
