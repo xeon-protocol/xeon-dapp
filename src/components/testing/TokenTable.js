@@ -16,6 +16,7 @@ import { motion, useInView } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { FaCopy } from 'react-icons/fa';
 import BookmarkAdded from '../BookmarkAdded';
+import { sendTransaction } from '@/helpers/sponsoredTransaction';
 
 const TokenTable = () => {
   const [loading, setLoading] = useState(false);
@@ -141,35 +142,24 @@ const TokenTable = () => {
     setLoading(true);
     setError(null);
     onOpen();
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const claimContract = new ethers.Contract(
-        Constants.testnet.OnboardingUtilsContractAddress,
-        [
-          'function claimInitial(address tokenAddress) public',
-          'function claimInitialWithReferral(address tokenAddress, address referredByAddress) public',
-          'function claimTokens(address tokenAddress) public',
-        ],
-        signer
-      );
 
-      let transaction;
+    try {
+      let functionName = 'claimInitial';
+      let args = [tokenAddress];
+
       if (referralAddress) {
-        const result = await setupPaymaster(referralAddress);
-        sendTransactionFromSmartAccount =
-          result.sendTransactionFromSmartAccount;
-        callData = result.callData_claimInitialWithReferral;
-      } else {
-        transaction = await claimContract.claimInitial(tokenAddress);
+        functionName = 'claimInitialWithReferral';
+        args = [tokenAddress, referralAddress];
       }
 
-      await transaction.wait();
+      await sendTransaction(functionName, args);
+
       setShowPopup(true);
       setMessage('Token claimed successfully!');
       setStatus('success');
 
       // Refresh token supply after claim
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const factoryContract = new ethers.Contract(
         Constants.testnet.MockERC20FactoryContractAddress,
         MockERC20FactoryABI,
@@ -191,21 +181,14 @@ const TokenTable = () => {
         error.reason.includes('Already claimed initial tokens')
       ) {
         try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const signer = provider.getSigner();
-          const claimContract = new ethers.Contract(
-            Constants.testnet.OnboardingUtilsContractAddress,
-            ['function claimTokens(address tokenAddress) public'],
-            signer
-          );
+          await sendTransaction('claimTokens', [tokenAddress]);
 
-          const transaction = await claimContract.claimTokens(tokenAddress);
-          await transaction.wait();
           setShowPopup(true);
           setMessage('Weekly tokens claimed successfully!');
           setStatus('success');
 
           // Refresh token supply after claim
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
           const factoryContract = new ethers.Contract(
             Constants.testnet.MockERC20FactoryContractAddress,
             MockERC20FactoryABI,
