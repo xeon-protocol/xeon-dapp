@@ -1,11 +1,9 @@
-"use client";
-import React from "react";
-import Card from "@/components/Card";
-import CenterNav from "@/components/dashboard/CenterNav";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import Layout from "@/components/dashboard/Layout";
-import NoEvents from "@/components/NoEvents";
+'use client';
+import CenterNav from '@/components/dashboard/CenterNav';
+import Layout from '@/components/dashboard/Layout';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import React from 'react';
 
 export default function Dashboard() {
   const [showPositions, setShowPositions] = React.useState(false);

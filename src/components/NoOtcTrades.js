@@ -1,10 +1,9 @@
-import { Image } from "@chakra-ui/react";
-import React from "react";
+import { Image } from '@chakra-ui/react';
 
 function FailedPopup() {
   return (
     <div
-      className={"bg-black text-grey flex flex-col justify-center items-center"}
+      className={'bg-black text-grey flex flex-col justify-center items-center'}
     >
       <Image src="/fail.webp" alt="failed popup" className="" />
       <p className="text-xl mt-5">No OTC Trades Found</p>

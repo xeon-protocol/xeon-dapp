@@ -1,6 +1,5 @@
-"use client";
-import { Image } from "@chakra-ui/react";
-import React from "react";
+'use client';
+import { Image } from '@chakra-ui/react';
 
 function LeftBarButton({ title, handleClick, active }) {
   return (
@@ -8,7 +7,7 @@ function LeftBarButton({ title, handleClick, active }) {
       <div className="relative  hover:cursor-pointer" onClick={handleClick}>
         <p
           className={`${
-            active ? "text-light-purple" : "text-grey"
+            active ? 'text-light-purple' : 'text-grey'
           } ml-2 mt-[-10px]
        xl:w-[300px] lg:w-[245px] md:w-[200px] md:text-[16px] lg:text-lg
           hover:cursor-pointer hover:text-light-purple`}
@@ -16,7 +15,7 @@ function LeftBarButton({ title, handleClick, active }) {
           {title}
         </p>
         <Image
-          src={active ? "/btn-active.webp" : "/btn-grey.webp"}
+          src={active ? '/btn-active.webp' : '/btn-grey.webp'}
           alt="container"
           className="relative md:mt-[-28px] lg:mt-[-40px]  w-[84%]"
         />

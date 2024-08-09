@@ -1,63 +1,48 @@
-"use client";
-import {
-  Box,
-  Button,
-  Image,
-  Input,
-  InputGroup,
-  InputLeftElement,
-} from "@chakra-ui/react";
+'use client';
+import { Box, Image } from '@chakra-ui/react';
 
-import React from "react";
+import { FaHourglassHalf } from 'react-icons/fa';
+import { MdRefresh } from 'react-icons/md';
 import {
-  FaHourglass,
-  FaHourglassHalf,
-  FaPlus,
-  FaPlusCircle,
-  FaSearch,
-} from "react-icons/fa";
-import ProgressBar from "./ProgressBar";
-import { MdRefresh } from "react-icons/md";
-import {
-  LineChart,
+  Legend,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+} from 'recharts';
+import ProgressBar from './ProgressBar';
 
 function CenterNav({ setShowPositions, setShowDiscover, setShowBookmarks }) {
   const data = [
     {
-      name: "Point 1",
+      name: 'Point 1',
       StartPrice: 0.00000000027,
       CurrentPrice: 0.00000000027,
       TargetPrice: 0.00000000027,
     },
     {
-      name: "Point 2",
+      name: 'Point 2',
       StartPrice: 0.000000000275,
       CurrentPrice: 0.00000000027,
       TargetPrice: 0.00000000027,
     },
     {
-      name: "Point 3",
+      name: 'Point 3',
       StartPrice: 0.00000000029,
       CurrentPrice: 0.0000000003,
       TargetPrice: 0.00000000028,
     },
     {
-      name: "Point 4",
+      name: 'Point 4',
       StartPrice: 0.0000000003,
       CurrentPrice: 0.00000000031,
       TargetPrice: 0.00000000033,
     },
   ];
   const formatNumber = (number) => {
-    const formattedNumber = number.toLocaleString("fullwide", {
+    const formattedNumber = number.toLocaleString('fullwide', {
       useGrouping: false,
       minimumFractionDigits: 11,
     });
@@ -102,7 +87,7 @@ function CenterNav({ setShowPositions, setShowDiscover, setShowBookmarks }) {
             <p className="text-light-purple">35</p>
           </div>
         </div>
-        <ResponsiveContainer className={"mt-5"} width="100%" height={400}>
+        <ResponsiveContainer className={'mt-5'} width="100%" height={400}>
           <LineChart
             data={data}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -111,7 +96,7 @@ function CenterNav({ setShowPositions, setShowDiscover, setShowBookmarks }) {
             <YAxis
               tickFormatter={formatNumber}
               ticks={yAxisTicks}
-              domain={["dataMin", "dataMax"]}
+              domain={['dataMin', 'dataMax']}
             />
             <Tooltip formatter={(value) => formatNumber(value)} />
             <Legend />
@@ -130,8 +115,8 @@ function CenterNav({ setShowPositions, setShowDiscover, setShowBookmarks }) {
 
       <Image
         mb={10}
-        w={"100%"}
-        height={"700px"}
+        w={'100%'}
+        height={'700px'}
         src="/dashboard-center.webp"
         alt="logo"
       />

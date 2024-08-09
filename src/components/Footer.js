@@ -1,12 +1,10 @@
-import { Box, Image } from "@chakra-ui/react";
-import Link from "next/link";
-import React from "react";
-
-import { MdMail } from "react-icons/md";
+import { Box, Image } from '@chakra-ui/react';
+import Link from 'next/link';
+import { MdMail } from 'react-icons/md';
 
 function Footer() {
   return (
-    <Box fontWeight={"400"} position="relative" width="100%">
+    <Box fontWeight={'400'} position="relative" width="100%">
       <Image src="/line_footer.webp" alt="line footer" width="100%" />
       <Box
         position="absolute"
@@ -177,7 +175,7 @@ function Footer() {
         <Box className="w-full md:w-1/6 p-4" textAlign="left">
           <p className="mb-2 text-grey">{`{ READ }`}</p>
           <li className="mb-2 text-grey">
-            {" "}
+            {' '}
             <Link
               href="https://docs.xeon-protocol.io/documentation"
               target="_blank"
@@ -209,7 +207,7 @@ function Footer() {
         <Box className="w-full md:w-1/6 p-4" textAlign="left">
           <p className="mb-2 text-grey">{`{ ENGINEERING }`}</p>
           <li className="mb-2 text-grey">
-            {" "}
+            {' '}
             <Link
               target="_blank"
               rel="noopener noreferrer"
@@ -241,7 +239,7 @@ function Footer() {
         <Box className="w-full md:w-1/6 p-4" textAlign="left">
           <p className="mb-2 text-grey">{`{ REVENUE SHARING }`}</p>
           <li className="mb-2 text-grey">
-            {" "}
+            {' '}
             <Link
               target="_blank"
               rel="noopener noreferrer"

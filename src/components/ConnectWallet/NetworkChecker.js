@@ -1,34 +1,32 @@
-"use client";
+'use client';
+import lottieJson from '@/assets/animations/planet_orbit3.json';
+import { Box, Flex, Spinner, Text } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import Lottie from 'react-lottie-player';
+import { baseSepolia } from 'thirdweb/chains';
 import {
+  ConnectButton,
   useActiveWalletChain,
-  useSwitchActiveWalletChain,
   useActiveWalletConnectionStatus,
   useConnect,
-  ConnectButton,
-} from "thirdweb/react";
-import {createWallet} from "thirdweb/wallets";
-import {useEffect, useState} from "react";
-import {Box, Text, Spinner, Flex} from "@chakra-ui/react";
-import {baseSepolia} from "thirdweb/chains";
-import Lottie from "react-lottie-player";
-import lottieJson from "@/assets/animations/planet_orbit3.json";
-import loadingLottie from "@/assets/animations/loader.json";
+  useSwitchActiveWalletChain,
+} from 'thirdweb/react';
 
-import {client} from "./client";
+import { client } from './client';
 
 const NetworkChecker = () => {
   const activeChain = useActiveWalletChain();
   const switchChain = useSwitchActiveWalletChain();
   const connectionStatus = useActiveWalletConnectionStatus();
-  const {connect, isConnecting, error} = useConnect();
+  const { connect, isConnecting, error } = useConnect();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (connectionStatus === "unknown" || connectionStatus === "connecting") {
+    if (connectionStatus === 'unknown' || connectionStatus === 'connecting') {
       return;
     }
 
-    if (connectionStatus === "disconnected") {
+    if (connectionStatus === 'disconnected') {
       setLoading(false);
       return;
     }
@@ -41,8 +39,8 @@ const NetworkChecker = () => {
   }, [activeChain, connectionStatus, switchChain]);
 
   if (
-    connectionStatus === "unknown" ||
-    connectionStatus === "connecting" ||
+    connectionStatus === 'unknown' ||
+    connectionStatus === 'connecting' ||
     loading
   ) {
     return (
@@ -62,7 +60,7 @@ const NetworkChecker = () => {
     );
   }
 
-  if (connectionStatus === "disconnected") {
+  if (connectionStatus === 'disconnected') {
     return (
       <Box
         position="fixed"
@@ -73,10 +71,10 @@ const NetworkChecker = () => {
         bg="#000000c4"
         p="4"
         zIndex="1000"
-        display={"flex"}
-        flexDirection={"column"}
-        justifyContent={"center"}
-        alignItems={"center"}
+        display={'flex'}
+        flexDirection={'column'}
+        justifyContent={'center'}
+        alignItems={'center'}
       >
         <Lottie className="" loop animationData={lottieJson} play />
         <Text className="text-center text-grey text-lg">
@@ -86,11 +84,11 @@ const NetworkChecker = () => {
         <ConnectButton
           connectButton={{
             className:
-              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+              'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
             style: {
-              borderRadius: "50px",
-              backgroundColor: "#3253FB",
-              color: "white",
+              borderRadius: '50px',
+              backgroundColor: '#3253FB',
+              color: 'white',
             },
           }}
           client={client}
@@ -110,10 +108,10 @@ const NetworkChecker = () => {
         bg="#000000c4"
         p="4"
         zIndex="1000"
-        display={"flex"}
-        flexDirection={"column"}
-        justifyContent={"center"}
-        alignItems={"center"}
+        display={'flex'}
+        flexDirection={'column'}
+        justifyContent={'center'}
+        alignItems={'center'}
       >
         <Lottie className="" loop animationData={lottieJson} play />
         <Text className="text-center text-grey text-lg">

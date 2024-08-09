@@ -1,7 +1,5 @@
-import { Image } from "@chakra-ui/react";
-import React from "react";
-import Lottie from "react-lottie-player";
-import lottieJson2 from "@/assets/animations/blue_planet.json";
+import lottieJson2 from '@/assets/animations/blue_planet.json';
+import Lottie from 'react-lottie-player';
 function ScrollCard() {
   return (
     <div className="flex flex-col-reverse relative mt-10 lg:mt-20 md:flex-row-reverse lg:flex-row gap-6 md:gap-12 justify-between items-start px-8 pt-8 max-w-screen-2xl mx-auto">
@@ -93,7 +91,7 @@ function ScrollCard() {
           <span className="text-light-purple md:hidden"> Cases</span>
         </h1>
         <h1 className="text-light-purple text-3xl md:text-5xl lg:text-7xl ml-1 md:ml-10 hidden md:block">
-          {" "}
+          {' '}
           Cases
         </h1>
         <Lottie
