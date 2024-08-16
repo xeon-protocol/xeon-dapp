@@ -11,6 +11,7 @@ export const Constants = {
       '0x5A0d5390c45b49505C43A56DA4A4f89b93023F11',
     PriceOracleAddress: '0xcdea17068968a1a989a0d21e28c5c61ff220fe7e',
     WETH: '0x395cB7753B02A15ed1C099DFc36bF00171F18218',
+    XeonHedging: '0x6Fc917A5588123609B301F528Be107BcbB2f35A4', // XeonHedging_Test_V1
   },
   ethereum: {
     network: 'Ethereum',
