@@ -6,14 +6,14 @@ import {
   ModalContent,
   ModalOverlay,
   useDisclosure,
-} from '@chakra-ui/react';
-import { useRouter } from 'next/navigation';
-import { FaBookmark, FaEthereum, FaInfoCircle } from 'react-icons/fa';
-import { MdRadioButtonChecked } from 'react-icons/md';
-import { TfiNewWindow } from 'react-icons/tfi';
+} from "@chakra-ui/react";
+import {useRouter} from "next/navigation";
+import {FaBookmark, FaEthereum, FaInfoCircle} from "react-icons/fa";
+import {MdRadioButtonChecked} from "react-icons/md";
+import {TfiNewWindow} from "react-icons/tfi";
 function Card() {
   const router = useRouter();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {isOpen, onOpen, onClose} = useDisclosure();
   return (
     <div className="rounded-2xl border-[1px] border-[#6C6C6C] bg-black p-4 ">
       <div className="flex justify-between items-center ">
@@ -29,7 +29,14 @@ function Card() {
           </div>
         </div>
         <div>
-          <p className="text-light-purple">0x432e...456c</p>
+          <a
+            href="https://sepolia.basescan.org/address/0x6Fc917A5588123609B301F528Be107BcbB2f35A4"
+            className="text-light-purple"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            0x6Fc9...2f35A4
+          </a>
         </div>
       </div>
       <div className="border-[2px] rounded-lg border-gray-800 p-4 flex justify-between items-center mt-5">
@@ -60,7 +67,7 @@ function Card() {
               <div className="flex items-center w-full lg:w-[300px] justify-between">
                 <p className="flex items-center text-muted">
                   <span className="text-4xl">{`{`}</span>
-                  Strike:{' '}
+                  Strike:{" "}
                 </p>
                 <div className="flex ml-2 items-center">
                   <span className="text-grey lg:text-lg text-sm text-right">
@@ -114,11 +121,11 @@ function Card() {
               </button>
               <button
                 onClick={() => {
-                  router.push('/dashboard');
+                  router.push("/dashboard");
                 }}
                 className="bg-black flex items-center gap-2 border-none text-white px-8 py-2 rounded-lg ml-4"
               >
-                View{' '}
+                View{" "}
                 <div class="ml-1 rounded-full w-6 h-6 p-px bg-gradient-to-b from-grey to-transparent">
                   <div class="bg-black  h-6 rounded-full flex m-auto justify-center items-center">
                     <FaBookmark size={14} />
@@ -162,11 +169,11 @@ function Card() {
                 </button>
                 <button
                   onClick={() => {
-                    router.push('/dashboard');
+                    router.push("/dashboard");
                   }}
                   className="bg-black flex items-center gap-2 border-none text-white px-4 py-2 rounded-lg ml-4"
                 >
-                  View{' '}
+                  View{" "}
                   <div class="ml-1 rounded-full w-6 h-6 p-px bg-gradient-to-b from-grey to-transparent">
                     <div class="bg-black  h-6 rounded-full flex m-auto justify-center items-center">
                       <FaBookmark size={14} />
@@ -175,7 +182,7 @@ function Card() {
                 </button>
                 <button
                   onClick={onOpen}
-                  _hover={{ scale: 1.1 }}
+                  _hover={{scale: 1.1}}
                   className="text-white bg-button-gradient w-full p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
                   p={8}
                   variant="solid"
@@ -193,11 +200,11 @@ function Card() {
                 </button>
                 <button
                   onClick={() => {
-                    router.push('/dashboard');
+                    router.push("/dashboard");
                   }}
                   className="bg-black flex items-center gap-2 border-none text-white px-4 py-2 rounded-lg ml-4"
                 >
-                  View{' '}
+                  View{" "}
                   <div class="ml-1 rounded-full w-6 h-6 p-px bg-gradient-to-b from-grey to-transparent">
                     <div class="bg-black  h-6 rounded-full flex m-auto justify-center items-center">
                       <FaBookmark size={14} />
@@ -206,7 +213,7 @@ function Card() {
                 </button>
                 <button
                   onClick={onOpen}
-                  _hover={{ scale: 1.1 }}
+                  _hover={{scale: 1.1}}
                   className="text-white bg-button-gradient w-full p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
                   p={8}
                   variant="solid"
@@ -218,13 +225,13 @@ function Card() {
           </div>
         </div>
       </div>
-      <Modal isOpen={isOpen} onClose={onClose} className={'bg-black'}>
+      <Modal isOpen={isOpen} onClose={onClose} className={"bg-black"}>
         <ModalOverlay />
-        <ModalContent className={'bg-black'}>
-          <ModalCloseButton color={'#fff'} />
+        <ModalContent className={"bg-black"}>
+          <ModalCloseButton color={"#fff"} />
           <ModalBody
             className={
-              'bg-black text-grey flex flex-col justify-center items-center'
+              "bg-black text-grey flex flex-col justify-center items-center"
             }
           >
             <Image src="/info.webp" alt="xeon" />
@@ -250,7 +257,7 @@ function Card() {
               <div className="flex items-center w-full justify-between">
                 <p className="flex items-center text-muted">
                   <span className="text-4xl">{`{`}</span>
-                  Market Value:{' '}
+                  Market Value:{" "}
                 </p>
                 <div className="flex ml-2 items-center">
                   <span className="text-grey lg:text-lg text-sm text-right">
@@ -320,7 +327,7 @@ function Card() {
             </div>
           </ModalBody>
 
-          <div className={'bg-black py-3 flex justify-center'}>
+          <div className={"bg-black py-3 flex justify-center"}>
             <button
               className="text-white text-base bg-black px-8 py-2 mr-4 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue"
               mr={3}
