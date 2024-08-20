@@ -11,6 +11,7 @@ import {
   useDisconnect,
   useWalletBalance,
   useActiveWalletChain,
+  useWalletDetailsModal,
 } from "thirdweb/react";
 
 function Header() {
@@ -19,7 +20,7 @@ function Header() {
   const {disconnect} = useDisconnect();
   const wallet = useActiveWallet();
   const chain = useActiveWalletChain();
-
+  const detailsModal = useWalletDetailsModal();
   const address = activeAccount?.address;
   const {data, isLoading, isError} = useWalletBalance({
     chain,
@@ -30,6 +31,9 @@ function Header() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+  async function handleShowModal() {
+    detailsModal.open({client, theme: "dark"});
+  }
 
   return (
     <header className="bg-black bg-opacity-85 text-white border-y border-gray-800 fixed top-6 w-full z-50 left-0">
@@ -109,7 +113,7 @@ function Header() {
                     )}
                     <LuWallet className="inline-block" />
                     <button
-                      onClick={() => disconnect(wallet)}
+                      onClick={handleShowModal}
                       className="text-white bg-button-gradient px-4 py-1 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue rounded-md"
                     >
                       {activeAccount?.address?.slice(0, 6) +
