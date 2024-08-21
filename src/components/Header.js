@@ -13,6 +13,7 @@ import {
   useActiveWalletChain,
   useWalletDetailsModal,
 } from "thirdweb/react";
+import {inAppWallet} from "thirdweb/wallets";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,6 +35,21 @@ function Header() {
   async function handleShowModal() {
     detailsModal.open({client, theme: "dark"});
   }
+  const wallets = [
+    inAppWallet({
+      auth: {
+        options: [
+          "farcaster",
+          "google",
+          "apple",
+          "facebook",
+          "phone",
+          "email",
+          "passkey",
+        ],
+      },
+    }),
+  ];
 
   return (
     <header className="bg-black bg-opacity-85 text-white border-y border-gray-800 fixed top-6 w-full z-50 left-0">
@@ -79,6 +95,7 @@ function Header() {
 
         <div className=" md:flex gap-4 p-1">
           <ConnectButton
+            wallets={wallets}
             connectButton={{
               className:
                 "text-white bg-button-gradient px-8 py-1 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
