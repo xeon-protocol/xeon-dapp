@@ -1,52 +1,44 @@
-"use client";
-import lottieJson from "@/assets/animations/planet_orbit3.json";
-import {Box, Flex, Spinner, Text} from "@chakra-ui/react";
-import {useEffect, useState} from "react";
-import Lottie from "react-lottie-player";
-import {baseSepolia} from "thirdweb/chains";
+'use client';
+import lottieJson from '@/assets/animations/planet_orbit3.json';
+import { Box, Flex, Spinner, Text } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import Lottie from 'react-lottie-player';
+import { baseSepolia } from 'thirdweb/chains';
 import {
   ConnectButton,
   useActiveWalletChain,
   useActiveWalletConnectionStatus,
   useConnect,
   useSwitchActiveWalletChain,
-} from "thirdweb/react";
+} from 'thirdweb/react';
 
-import {client} from "./client";
-import {createWallet, inAppWallet} from "thirdweb/wallets";
+import { client } from './client';
+import { createWallet, inAppWallet } from 'thirdweb/wallets';
 
 const NetworkChecker = () => {
   const activeChain = useActiveWalletChain();
   const switchChain = useSwitchActiveWalletChain();
   const connectionStatus = useActiveWalletConnectionStatus();
-  const {connect, isConnecting, error} = useConnect();
+  const { connect, isConnecting, error } = useConnect();
   const [loading, setLoading] = useState(true);
   const wallets = [
     inAppWallet({
       auth: {
-        options: [
-          "farcaster",
-          "google",
-          "apple",
-          "facebook",
-          "phone",
-          "email",
-          "passkey",
-        ],
+        options: ['farcaster', 'passkey'],
       },
     }),
-    createWallet("io.metamask"),
-    createWallet("com.coinbase.wallet"),
-    createWallet("me.rainbow"),
-    createWallet("io.zerion.wallet"),
+    createWallet('io.metamask'),
+    createWallet('com.coinbase.wallet'),
+    createWallet('me.rainbow'),
+    createWallet('io.zerion.wallet'),
   ];
 
   useEffect(() => {
-    if (connectionStatus === "unknown" || connectionStatus === "connecting") {
+    if (connectionStatus === 'unknown' || connectionStatus === 'connecting') {
       return;
     }
 
-    if (connectionStatus === "disconnected") {
+    if (connectionStatus === 'disconnected') {
       setLoading(false);
       return;
     }
@@ -59,8 +51,8 @@ const NetworkChecker = () => {
   }, [activeChain, connectionStatus, switchChain]);
 
   if (
-    connectionStatus === "unknown" ||
-    connectionStatus === "connecting" ||
+    connectionStatus === 'unknown' ||
+    connectionStatus === 'connecting' ||
     loading
   ) {
     return (
@@ -80,7 +72,7 @@ const NetworkChecker = () => {
     );
   }
 
-  if (connectionStatus === "disconnected") {
+  if (connectionStatus === 'disconnected') {
     return (
       <Box
         position="fixed"
@@ -91,10 +83,10 @@ const NetworkChecker = () => {
         bg="#000000c4"
         p="4"
         zIndex="1000"
-        display={"flex"}
-        flexDirection={"column"}
-        justifyContent={"center"}
-        alignItems={"center"}
+        display={'flex'}
+        flexDirection={'column'}
+        justifyContent={'center'}
+        alignItems={'center'}
       >
         <Lottie className="" loop animationData={lottieJson} play />
         <Text className="text-center text-grey text-lg">
@@ -105,11 +97,11 @@ const NetworkChecker = () => {
           wallets={wallets}
           connectButton={{
             className:
-              "text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue",
+              'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',
             style: {
-              borderRadius: "50px",
-              backgroundColor: "#3253FB",
-              color: "white",
+              borderRadius: '50px',
+              backgroundColor: '#3253FB',
+              color: 'white',
             },
           }}
           client={client}
@@ -129,10 +121,10 @@ const NetworkChecker = () => {
         bg="#000000c4"
         p="4"
         zIndex="1000"
-        display={"flex"}
-        flexDirection={"column"}
-        justifyContent={"center"}
-        alignItems={"center"}
+        display={'flex'}
+        flexDirection={'column'}
+        justifyContent={'center'}
+        alignItems={'center'}
       >
         <Lottie className="" loop animationData={lottieJson} play />
         <Text className="text-center text-grey text-lg">
