@@ -13,6 +13,7 @@ import {
 } from 'thirdweb/react';
 
 import { client } from './client';
+import { createWallet, inAppWallet } from 'thirdweb/wallets';
 
 const NetworkChecker = () => {
   const activeChain = useActiveWalletChain();
@@ -20,6 +21,17 @@ const NetworkChecker = () => {
   const connectionStatus = useActiveWalletConnectionStatus();
   const { connect, isConnecting, error } = useConnect();
   const [loading, setLoading] = useState(true);
+  const wallets = [
+    inAppWallet({
+      auth: {
+        options: ['farcaster', 'passkey'],
+      },
+    }),
+    createWallet('io.metamask'),
+    createWallet('com.coinbase.wallet'),
+    createWallet('me.rainbow'),
+    createWallet('io.zerion.wallet'),
+  ];
 
   useEffect(() => {
     if (connectionStatus === 'unknown' || connectionStatus === 'connecting') {
@@ -82,6 +94,7 @@ const NetworkChecker = () => {
         </Text>
 
         <ConnectButton
+          wallets={wallets}
           connectButton={{
             className:
               'text-white bg-button-gradient rounded-full px-8 py-2 border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-blue',

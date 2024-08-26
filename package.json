@@ -33,7 +33,7 @@
     "react-icons": "^5.2.1",
     "react-lottie-player": "^2.0.0",
     "recharts": "^2.12.7",
-    "thirdweb": "^5.36.0",
+    "thirdweb": "^5.48.0",
     "wagmi": "^2.11.2"
   },
   "devDependencies": {
