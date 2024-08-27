@@ -1,14 +1,14 @@
-'use client';
-import Card from '@/components/Card';
-import CenterNav from '@/components/CenterNav';
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
-import Layout from '@/components/Layout';
-import NoEvents from '@/components/NoEvents';
-import SocialPopup from '@/components/SocialPopup';
-import React from 'react';
+"use client";
+import Card from "@/components/Card";
+import CenterNav from "@/components/CenterNav";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import Layout from "@/components/Layout";
+import NoEvents from "@/components/NoEvents";
+import SocialPopup from "@/components/SocialPopup";
+import React from "react";
 
-import Loans from '@/components/Loans';
+import Loans from "@/components/Loans";
 
 export default function Home() {
   const [showPositions, setShowPositions] = React.useState(false);
@@ -16,8 +16,10 @@ export default function Home() {
   const [showBookmarks, setShowBookmarks] = React.useState(false);
   const [showSocials, setShowSocials] = React.useState(false);
   const [showComingSoon, setShowComingSoon] = React.useState(false);
-  const [activeSideTab, setActiveSideTab] = React.useState('');
-  const [activeSection, setActiveSection] = React.useState('discover');
+  const [activeSideTab, setActiveSideTab] = React.useState("");
+  const [activeSection, setActiveSection] = React.useState("discover");
+  const [chainId, setChainId] = React.useState(1);
+  const [selectedToken, setSelectedToken] = React.useState("");
 
   const [showLoans, setShowLoans] = React.useState(false);
 
@@ -51,6 +53,10 @@ export default function Home() {
               activeSideTab={activeSideTab}
               setActiveSection={setActiveSection}
               setActiveSideTab={setActiveSideTab}
+              selectedToken={selectedToken}
+              setSelectedToken={setSelectedToken}
+              chainId={chainId}
+              setChainId={setChainId}
             />
             {showDiscover && <Card />}
             <div className="mt-5">{showDiscover && <Card />}</div>
@@ -65,7 +71,11 @@ export default function Home() {
               )}
             </div>
 
-            <div className="mt-5">{showLoans && <Loans />}</div>
+            <div className="mt-5">
+              {showLoans && (
+                <Loans chainId={chainId} selectedToken={selectedToken} />
+              )}
+            </div>
           </Layout>
         </div>
       </div>
