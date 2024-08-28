@@ -23,6 +23,62 @@ export default function Home() {
 
   const [showLoans, setShowLoans] = React.useState(false);
 
+  // NOTE: Mock token list with added chainId so that we can use it with teller
+  const tokenList = [
+    {
+      name: "Vela Exchange",
+      symbol: "oVELA",
+      address: "0xb7E16D46f26B1615Dcc501931F28F07fD4b0D7F4",
+      pair: "WETH",
+      supply: "100,000,000",
+      chainId: 555, //this is not a real chainId
+    },
+    {
+      name: "Pepe",
+      symbol: "oPEPE",
+      address: "0x7dC9ecE25dcCA41D8a627cb47ded4a9322f7722b",
+      pair: "WETH",
+      supply: "100,000,000",
+      chainId: 411,
+    },
+    {
+      name: "Degen",
+      symbol: "oDEGEN",
+      address: "0x9B9852A943a570685c3704d70C4F1ebD5EdE109B",
+      pair: "WETH",
+      supply: "100,000,000",
+      chainId: 666666666,
+    },
+    {
+      name: "Higher",
+      symbol: "oHIGHER",
+      address: "0x9855d38b7E6270B9f22F283A0C62330b16Ac909C",
+      pair: "WETH",
+      supply: "100,000,000",
+      chainId: 1, // this is not the real chainId as well
+    },
+    {
+      name: "Rorschach",
+      symbol: "oROR",
+      address: "0xEb2DCAFFFf1b0d5BA76F14Fe6bB8348126339FcB",
+      pair: "WETH",
+      supply: "100,000,000",
+      chainId: 8453, // used base chainId
+    },
+  ];
+  const handleSelectedToken = (inputAddress) => {
+    const token = tokenList.find(
+      (t) => t.address.toLowerCase() === inputAddress.toLowerCase()
+    );
+    if (token) {
+      setSelectedToken(token.address);
+      setChainId(token.chainId);
+    } else {
+      setSelectedToken("");
+      setChainId(1);
+      setShowLoans(false);
+    }
+  };
   return (
     <>
       <div className="bg-[#000] min-h-[100vh] px-8 pt-8 max-w-screen-2xl mx-auto">
@@ -53,10 +109,9 @@ export default function Home() {
               activeSideTab={activeSideTab}
               setActiveSection={setActiveSection}
               setActiveSideTab={setActiveSideTab}
-              selectedToken={selectedToken}
               setSelectedToken={setSelectedToken}
-              chainId={chainId}
-              setChainId={setChainId}
+              tokenList={tokenList}
+              handleSelectedToken={handleSelectedToken}
             />
             {showDiscover && <Card />}
             <div className="mt-5">{showDiscover && <Card />}</div>

@@ -25,14 +25,11 @@ function CenterNav({
   setActiveSection,
   setActiveSideTab,
   selectedToken,
-  setSelectedToken,
-  chainId,
+  tokenList,
+  handleSelectedToken,
   setChainId,
 }) {
   const {isOpen, onOpen, onClose} = useDisclosure();
-  const handleSelectedToken = (token) => {
-    setSelectedToken(token);
-  };
 
   return (
     <Box position="relative">
@@ -100,23 +97,20 @@ function CenterNav({
         <InputLeftElement pointerEvents="none">
           <FaSearch color="#6c6c6c" className="ml-2" />
         </InputLeftElement>
-        <Input
-          size={{
-            md: "sm",
-            lg: "md",
+        <Select
+          style={{
+            paddingLeft: "2.3rem",
           }}
+          placeholder="Select a token"
           onChange={(e) => handleSelectedToken(e.target.value)}
-          placeholder="filter token address..."
-          type="search"
-          bg="transparent"
-          w={"100%"}
-          pl="2rem"
-          _focus={{
-            border: "none",
-            outline: "none",
-          }}
-          className="bg-[#71637f4d] text-grey p-1 md:p-1 lg:p-2 border-[#6c6c6c] border-[1px] rounded-lg"
-        />
+          className="bg-[#71637f4d] text-grey p-1 md:p-1  border-[#6c6c6c] border-[1px] rounded-lg"
+        >
+          {tokenList.map((token) => (
+            <option key={token.address} value={token.address}>
+              {token.name} ({token.address})
+            </option>
+          ))}
+        </Select>
       </InputGroup>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
