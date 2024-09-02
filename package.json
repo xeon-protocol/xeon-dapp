@@ -20,6 +20,7 @@
     "@teller-protocol/teller-widget": "^1.2.0",
     "@teller-protocol/v2-contracts": "^3.1.13",
     "@thirdweb-dev/sdk": "^4.0.99",
+    "@uniswap/token-lists": "^1.0.0-beta.34",
     "alchemy-sdk": "^3.3.1",
     "ethers": "5",
     "framer-motion": "^11.2.12",

@@ -7,7 +7,7 @@ import Layout from "@/components/Layout";
 import NoEvents from "@/components/NoEvents";
 import SocialPopup from "@/components/SocialPopup";
 import React from "react";
-
+import {TokenList} from "@uniswap/token-lists";
 import Loans from "@/components/Loans";
 
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
   const [selectedToken, setSelectedToken] = React.useState("");
 
   const [showLoans, setShowLoans] = React.useState(false);
-
+  console.log("schema", TokenList);
   // NOTE: Mock token list with added chainId so that we can use it with teller
   const tokenList = [
     {
