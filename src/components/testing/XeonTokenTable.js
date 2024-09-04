@@ -30,29 +30,6 @@ const XeonTokenTable = () => {
     supply: "100,000,000",
   };
 
-  useEffect(() => {
-    const provider =
-      window.ethereum != null
-        ? new ethers.providers.Web3Provider(window.ethereum)
-        : ethers.providers.getDefaultProvider();
-    const xeonContract = new ethers.Contract(
-      xeonToken.address,
-      XeonTokenDistributorABI,
-      provider
-    );
-
-    const fetchXeonSupply = async () => {
-      try {
-        const totalSupply = await xeonContract.totalSupply();
-        xeonToken.supply = ethers.utils.formatUnits(totalSupply, 18);
-      } catch (error) {
-        console.error("Error fetching XEON supply:", error);
-      }
-    };
-
-    fetchXeonSupply();
-  }, []);
-
   const handleClaimXeon = async () => {
     if (!window.ethereum) {
       setError("Please install MetaMask!");
@@ -66,25 +43,27 @@ const XeonTokenTable = () => {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const xeonContract = new ethers.Contract(
+      const xeonDistributorContract = new ethers.Contract(
         Constants.testnet.XeonTokenDistributor,
         XeonTokenDistributorABI,
         signer
       );
 
-      const hasClaimed = await xeonContract.hasUserClaimed();
+      const userAddress = await signer.getAddress();
+      const hasClaimed = await xeonDistributorContract.hasUserClaimed(
+        userAddress
+      );
+
       if (hasClaimed) {
         setMessage("You have already claimed your XEON tokens.");
         setStatus("error");
       } else {
-        const transaction = await xeonContract.claimXeon();
+        const transaction = await xeonDistributorContract.claimXeon();
         await transaction.wait();
+
         setShowPopup(true);
         setMessage("XEON tokens claimed successfully!");
         setStatus("success");
-
-        const totalSupply = await xeonContract.totalSupply();
-        xeonToken.supply = ethers.utils.formatUnits(totalSupply, 18);
       }
     } catch (error) {
       console.error("Error claiming XEON tokens:", error);
