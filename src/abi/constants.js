@@ -11,7 +11,10 @@ export const Constants = {
       '0x5A0d5390c45b49505C43A56DA4A4f89b93023F11',
     PriceOracleAddress: '0xcdea17068968a1a989a0d21e28c5c61ff220fe7e',
     WETH: '0x395cB7753B02A15ed1C099DFc36bF00171F18218',
+    XeonToken: '0x296dBB55cbA3c9beA7A8ac171542bEEf2ceD1163',
+    XeonTokenDistributor: '0x5e401a28d129ee2aa22d58ea9aec9a146027566b',
     XeonHedging: '0x6Fc917A5588123609B301F528Be107BcbB2f35A4', // XeonHedging_Test_V1
+    XeonStakingPool: '0x949B2156916A63686835DaF66518C22D497bf8B0',
   },
   ethereum: {
     network: 'Ethereum',
