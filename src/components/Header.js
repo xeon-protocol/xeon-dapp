@@ -77,7 +77,7 @@ function Header() {
           <Tooltip label="Page under construction">
             <div className="cursor-not-allowed">Analytics</div>
           </Tooltip>
-          <Link href={"/guide"}>Guide</Link>
+          <Link href={"/stake"}>Stake</Link>
           <Link href={"/"}>Claim</Link>
           <Link
             href={"https://docs.xeon-protocol.io/documentation"}
@@ -160,8 +160,8 @@ function Header() {
                 Analytics
               </div>
             </Tooltip>
-            <Link href="/guide">
-              <p className="hover:text-gray-400">Guide</p>
+            <Link href="/stake">
+              <p className="hover:text-gray-400">Stake</p>
             </Link>
             <Link href="/">
               <p className="hover:text-gray-400">Claim</p>
