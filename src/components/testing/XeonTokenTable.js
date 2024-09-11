@@ -14,6 +14,7 @@ import {
 import {ethers} from "ethers";
 import {useEffect, useState} from "react";
 import BookmarkAdded from "../BookmarkAdded";
+import {FaCopy} from "react-icons/fa";
 
 const XeonTokenTable = () => {
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,17 @@ const XeonTokenTable = () => {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
   const {isOpen, onOpen, onClose} = useDisclosure();
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        alert("Address copied to clipboard!");
+      },
+      (err) => {
+        alert("Failed to copy the address.");
+      }
+    );
+  };
 
   const xeonToken = {
     name: "Xeon Token",
@@ -75,8 +87,8 @@ const XeonTokenTable = () => {
   };
 
   return (
-    <div className="overflow-x-auto overflow-y-hidden mt-10 px-8 pt-8 md:px-20 max-w-screen-2xl mx-auto">
-      <h1 className="text-3xl text-grey">Claim XEON Tokens</h1>
+    <div className="overflow-x-auto overflow-y-hidden mt-10 2xl:mt-32 px-8 pt-8 md:px-20 max-w-screen-2xl mx-auto">
+      <h1 className="text-3xl text-grey">Claim testnet XEON</h1>
       <table className="min-w-full bg-black border rounded mt-10 text-grey">
         <thead>
           <tr>
@@ -97,8 +109,14 @@ const XeonTokenTable = () => {
                 rel="noreferrer noopener"
                 href={`https://sepolia.basescan.org/address/${xeonToken.address}`}
               >
-                {xeonToken.address.slice(0, 14)}...
+                {xeonToken.address.slice(0, 6)}...{xeonToken.address.slice(-4)}
               </a>
+              <button
+                className="ml-2 bg-black text-white px-2 py-1 rounded hover:text-lime-400"
+                onClick={() => copyToClipboard(xeonToken.address)}
+              >
+                <FaCopy />
+              </button>
             </td>
             <td className="py-2 px-4 border-b text-left">{xeonToken.supply}</td>
             <td className="py-2 px-4 border-b text-left">
