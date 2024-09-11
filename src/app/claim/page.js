@@ -171,11 +171,7 @@ function Page() {
       <TokenTable />
       <div className="my-5 px-8 pt-8 md:px-20 max-w-screen-2xl mx-auto">
         <motion.p className="text-grey text-3xl mt-5 md:w-[85%]">
-          <motion.span
-            variants={glitchVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.span initial="hidden" animate="visible">
             Token
           </motion.span>{" "}
           Use Cases

@@ -1,20 +1,20 @@
-'use client';
-import { Image } from '@chakra-ui/react';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { FaCodepen } from 'react-icons/fa6';
-import { IoIosTrendingDown, IoIosTrendingUp } from 'react-icons/io';
-import { RiDownloadLine, RiUploadLine } from 'react-icons/ri';
+"use client";
+import {Image} from "@chakra-ui/react";
+import {motion} from "framer-motion";
+import {useState} from "react";
+import {FaCodepen} from "react-icons/fa6";
+import {IoIosTrendingDown, IoIosTrendingUp} from "react-icons/io";
+import {RiDownloadLine, RiUploadLine} from "react-icons/ri";
 const HedgesPanel = () => {
-  const [selectedOption, setSelectedOption] = useState('Options Created');
+  const [selectedOption, setSelectedOption] = useState("Options Created");
   const [hedgesData, setHedgesData] = useState([]);
 
   const options = [
-    'Options Created',
-    'Options Taken',
-    'Swaps Created',
-    'Swaps Taken',
-    'My Bookmarks',
+    "Options Created",
+    "Options Taken",
+    "Swaps Created",
+    "Swaps Taken",
+    "My Bookmarks",
   ];
 
   const handleOptionClick = (option) => {
@@ -24,16 +24,16 @@ const HedgesPanel = () => {
   const glitchVariants = {
     visible: {
       textShadow: [
-        '1px 1px 0px lime',
-        '-1px -1px 0px purple',
-        '1px -1px 0px lime',
-        '-1px 1px 0px lime',
-        '2px 2px 2px lime',
+        "1px 1px 0px lime",
+        "-1px -1px 0px purple",
+        "1px -1px 0px lime",
+        "-1px 1px 0px lime",
+        "2px 2px 2px lime",
       ],
       transition: {
         duration: 0.2,
         repeat: Infinity,
-        repeatType: 'mirror',
+        repeatType: "mirror",
       },
     },
   };
@@ -43,13 +43,12 @@ const HedgesPanel = () => {
         <div className="section-title flex items-center gap-2 mb-5">
           <motion.h1 className="text-3xl text-grey">
             <motion.span
-              variants={glitchVariants}
               initial="hidden"
-              whileInView={{ opacity: 1, x: 0 }}
-              animate={'visible'}
+              whileInView={{opacity: 1, x: 0}}
+              animate={"visible"}
             >
               Hedges
-            </motion.span>{' '}
+            </motion.span>{" "}
             Panel
           </motion.h1>
         </div>
@@ -121,7 +120,7 @@ const HedgesPanel = () => {
                 </p>
               </div>
               <div className="card-extra" title="hedge type">
-                <Image src={'/call-option.svg'} />
+                <Image src={"/call-option.svg"} />
               </div>
             </div>
           </div>
@@ -136,7 +135,7 @@ const HedgesPanel = () => {
                 </p>
               </div>
               <div className="card-extra" title="hedge type">
-                <Image src={'/equityswap.svg'} height={16} />
+                <Image src={"/equityswap.svg"} height={16} />
               </div>
             </div>
           </div>
@@ -147,7 +146,7 @@ const HedgesPanel = () => {
                 <p
                   className="card-value text-2xl"
                   id="profitsETH"
-                  style={{ color: '#089353' }}
+                  style={{color: "#089353"}}
                 >
                   0
                 </p>
@@ -164,7 +163,7 @@ const HedgesPanel = () => {
                 <p
                   className="card-value text-2xl"
                   id="lossesETH"
-                  style={{ color: '#d6188a' }}
+                  style={{color: "#d6188a"}}
                 >
                   0
                 </p>
@@ -184,7 +183,7 @@ const HedgesPanel = () => {
               <button
                 key={option}
                 className={`px-4 py-2 border rounded ${
-                  selectedOption === option ? 'border-lime' : 'border-grey'
+                  selectedOption === option ? "border-lime" : "border-grey"
                 }`}
                 onClick={() => handleOptionClick(option)}
               >

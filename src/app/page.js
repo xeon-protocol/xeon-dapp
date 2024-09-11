@@ -128,7 +128,7 @@ function Page() {
               </div>
 
               <motion.div
-                className="flex md:mt-40 z-5 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-evenly 2xl:ml-[-100px]"
+                className="flex md:mt-40 z-5 mt-5 gap-4 ml-[-20px] md:ml-[-30px] px-5 md:flex-row md:justify-start lg:flex-row lg:justify-start lg:gap-x-4 md:mt-5 2xl:justify-center 2xl:ml-[-100px]"
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
@@ -142,16 +142,9 @@ function Page() {
                   variants={itemVariants}
                   transition={{duration: 0.6, delay: 0.2}}
                 >
-                  Read Manual
+                  Read Docs
                 </motion.a>
-                <motion.a
-                  href="/guide"
-                  className="border-2 p-1 md:p-2 border-dashed border-light-purple rounded-md text-grey text-xs md:text-base"
-                  variants={itemVariants}
-                  transition={{duration: 0.6, delay: 0.4}}
-                >
-                  Jump to Guide Page
-                </motion.a>
+
                 <motion.a
                   href="https://t.me/XeonProtocolPortal"
                   target="_blank"
@@ -162,14 +155,6 @@ function Page() {
                 >
                   Telegram Support
                 </motion.a>
-              </motion.div>
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={containerVariants}
-                transition={{duration: 0.6, delay: 0.8}}
-              >
-                <p className="text-grey md:text-lg md:ml-[-20px] mt-5">{`{  Welcome to the Instruction Portal for the Neon Hedge test platform  }`}</p>
               </motion.div>
             </div>
             <Image
@@ -192,11 +177,7 @@ function Page() {
       <TokenTable />
       <div className="my-5 px-8 pt-8 md:px-20 max-w-screen-2xl mx-auto">
         <motion.p className="text-grey text-3xl mt-5 md:w-[85%]">
-          <motion.span
-            variants={glitchVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.span initial="hidden" animate="visible">
             Token
           </motion.span>{" "}
           Use Cases
