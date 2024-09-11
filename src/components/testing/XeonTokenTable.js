@@ -23,6 +23,8 @@ const XeonTokenTable = () => {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
   const {isOpen, onOpen, onClose} = useDisclosure();
+  const [txHash, setTxHash] = useState("");
+  const [txChainId, setTxChainId] = useState("");
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(
@@ -72,7 +74,8 @@ const XeonTokenTable = () => {
       } else {
         const transaction = await xeonDistributorContract.claimXeon();
         await transaction.wait();
-
+        setTxHash(transaction.hash);
+        setTxChainId(transaction.chainId);
         setShowPopup(true);
         setMessage("XEON tokens claimed successfully!");
         setStatus("success");
@@ -168,6 +171,8 @@ const XeonTokenTable = () => {
           <BookmarkAdded
             message={message}
             status={status}
+            txHash={txHash}
+            txChainId={txChainId}
             setShowPopup={setShowPopup}
           />
         </Modal>

@@ -25,7 +25,8 @@ const TokenTable = () => {
   const [status, setStatus] = useState("");
   const [referralAddress, setReferralAddress] = useState("");
   const {isOpen, onOpen, onClose} = useDisclosure();
-
+  const [txHash, setTxHash] = useState("");
+  const [txChainId, setTxChainId] = useState("");
   const [tokens, setTokens] = useState([
     {
       name: "Vela Exchange",
@@ -199,6 +200,9 @@ const TokenTable = () => {
 
           const transaction = await claimContract.claimTokens(tokenAddress);
           await transaction.wait();
+
+          setTxHash(transaction.hash);
+          setTxChainId(transaction.chainId);
           setShowPopup(true);
           setMessage("Weekly tokens claimed successfully!");
           setStatus("success");
@@ -354,6 +358,8 @@ const TokenTable = () => {
             message={message}
             status={status}
             setShowPopup={setShowPopup}
+            txHash={txHash}
+            txChainId={txChainId}
           />
         </Modal>
       )}
