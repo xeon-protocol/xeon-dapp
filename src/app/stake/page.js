@@ -1,13 +1,13 @@
-"use client";
-import {Image} from "@chakra-ui/react";
-import React, {useState} from "react";
-import Lottie from "react-lottie-player";
-import lottieJson from "@/assets/animations/PE2.json";
-import XeonStakingPoolABI from "@/abi/XeonStakingPool.abi.json";
-import {Constants} from "@/abi/constants";
-import Header from "@/components/Header";
-import UserAssets from "@/components/staking/UserAssets";
-import {ethers} from "ethers";
+'use client';
+import { useEffect, useState } from 'react';
+import { Image } from '@chakra-ui/react';
+import Lottie from 'react-lottie-player';
+import lottieJson from '@/assets/animations/PE2.json';
+import XeonStakingPoolABI from '@/abi/XeonStakingPool.abi.json';
+import { Constants } from '@/abi/constants';
+import Header from '@/components/Header';
+import UserAssets from '@/components/staking/UserAssets';
+import { ethers } from 'ethers';
 import {
   Modal,
   ModalOverlay,
@@ -17,21 +17,33 @@ import {
   ModalFooter,
   Spinner,
   useDisclosure,
-} from "@chakra-ui/react";
-import BookmarkAdded from "@/components/BookmarkAdded";
+} from '@chakra-ui/react';
+import BookmarkAdded from '@/components/BookmarkAdded';
+
 function Page() {
   const [voteValue, setVoteValue] = useState(5);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const {isOpen, onOpen, onClose} = useDisclosure();
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const XeonStakingPool = new ethers.Contract(
-    Constants.testnet.XeonStakingPool,
-    XeonStakingPoolABI,
-    signer
-  );
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = web3Provider.getSigner();
+      setProvider(web3Provider);
+      setSigner(signer);
+    }
+  }, []);
+
+  const XeonStakingPool = provider
+    ? new ethers.Contract(
+        Constants.testnet.XeonStakingPool,
+        XeonStakingPoolABI,
+        signer
+      )
+    : null;
 
   const handleIncrement = () => {
     setVoteValue((prevValue) => Math.min(prevValue + 1, 100));
@@ -42,8 +54,8 @@ function Page() {
   };
 
   const handleVote = async () => {
-    if (voteValue < 1 || voteValue > 100) {
-      setMessage("Please enter a value between 1 and 100");
+    if (!XeonStakingPool || voteValue < 1 || voteValue > 100) {
+      setMessage('Please enter a value between 1 and 100');
       return;
     }
 
@@ -56,9 +68,9 @@ function Page() {
       setLoading(false);
       setMessage(`Vote successful for ${voteValue}% buyback`);
     } catch (error) {
-      console.error("Vote failed", error);
+      console.error('Vote failed', error);
       setLoading(false);
-      setMessage("Vote failed, please try again.");
+      setMessage('Vote failed, please try again.');
     }
   };
 
@@ -109,9 +121,9 @@ function Page() {
             src="/card-109.svg"
             // w={"100%"}
             h={{
-              base: "150px",
-              md: "200px",
-              lg: "185px",
+              base: '150px',
+              md: '200px',
+              lg: '185px',
             }}
             alt="container"
             className="relative hidden md:block ml-[-20px]"
@@ -183,17 +195,17 @@ function Page() {
       </div>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent bg={"#000"}>
-          <ModalHeader bg={"#000"} color={"white"}>
+        <ModalContent bg={'#000'}>
+          <ModalHeader bg={'#000'} color={'white'}>
             Vote Feedback
           </ModalHeader>
-          <ModalBody bg={"#000"}>
+          <ModalBody bg={'#000'}>
             {loading ? (
               <Spinner />
             ) : (
               <BookmarkAdded
                 message={message}
-                status={loading ? "loading" : "success"}
+                status={loading ? 'loading' : 'success'}
               />
             )}
           </ModalBody>
