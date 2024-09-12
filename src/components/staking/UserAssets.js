@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   FormControl,
   FormLabel,
@@ -12,34 +12,34 @@ import {
   ModalCloseButton,
   ModalFooter,
   useDisclosure,
-} from "@chakra-ui/react";
-import {motion} from "framer-motion";
-import {useState, useEffect} from "react";
-import {FaEthereum} from "react-icons/fa";
-import AssetsValues from "../wallet/AssetsValues";
-import {useActiveAccount} from "thirdweb/react";
-import {ethers} from "ethers";
-import XeonStakingPoolABI from "@/abi/XeonStakingPool.abi.json";
-import {Constants} from "@/abi/constants";
-import BookmarkAdded from "../BookmarkAdded";
+} from '@chakra-ui/react';
+import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { FaEthereum } from 'react-icons/fa';
+import AssetsValues from '../wallet/AssetsValues';
+import { useActiveAccount } from 'thirdweb/react';
+import { ethers } from 'ethers';
+import XeonStakingPoolABI from '@/abi/XeonStakingPool.abi.json';
+import { Constants } from '@/abi/constants';
+import BookmarkAdded from '../BookmarkAdded';
 
 function UserAssets() {
   const [isSwitched, setIsSwitched] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
   const [stakedBalance, setStakedBalance] = useState(0);
-  const [stakeAmount, setStakeAmount] = useState("");
+  const [stakeAmount, setStakeAmount] = useState('');
   const [isApproved, setIsApproved] = useState(false);
-  const [buttonText, setButtonText] = useState("APPROVE");
+  const [buttonText, setButtonText] = useState('APPROVE');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState("");
-  const [epoch, setEpoch] = useState("0.00");
-  const [ethInPool, setEthInPool] = useState("0.00");
-  const [buyBackPercentage, setBuyBackPercentage] = useState("0.00");
-  const [teamPercentage, setTeamPercentage] = useState("0.00");
-  const [walletXeonBalance, setWalletXeonBalance] = useState("0.00");
-  const [stakedXeonBalance, setStakedXeonBalance] = useState("0.00");
-  const {isOpen, onOpen, onClose} = useDisclosure();
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState('');
+  const [epoch, setEpoch] = useState('0.00');
+  const [ethInPool, setEthInPool] = useState('0.00');
+  const [buyBackPercentage, setBuyBackPercentage] = useState('0.00');
+  const [teamPercentage, setTeamPercentage] = useState('0.00');
+  const [walletXeonBalance, setWalletXeonBalance] = useState('0.00');
+  const [stakedXeonBalance, setStakedXeonBalance] = useState('0.00');
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const wallet = useActiveAccount();
   const connectedAddress = wallet?.address;
   const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -55,7 +55,7 @@ function UserAssets() {
     signer
   );
   const WETH = new ethers.Contract(
-    "0x949B2156916A63686835DaF66518C22D497bf8B0",
+    Constants.testnet.WETH,
     XeonStakingPoolABI,
     provider
   );
@@ -79,12 +79,11 @@ function UserAssets() {
         const xeonBalance = await XeonToken.balanceOf(connectedAddress);
         setWalletXeonBalance(ethers.utils.formatEther(xeonBalance));
 
-        const stakedXeonBalance = await XeonStakingPool.balanceOf(
-          connectedAddress
-        );
+        const stakedXeonBalance =
+          await XeonStakingPool.balanceOf(connectedAddress);
         setStakedXeonBalance(ethers.utils.formatEther(stakedXeonBalance));
       } catch (error) {
-        console.error("Error fetching asset values:", error);
+        console.error('Error fetching asset values:', error);
       }
     };
 
@@ -106,7 +105,7 @@ function UserAssets() {
         (allowance) => {
           if (ethers.utils.formatEther(allowance) > 0) {
             setIsApproved(true);
-            setButtonText("STAKE");
+            setButtonText('STAKE');
           }
         }
       );
@@ -127,14 +126,14 @@ function UserAssets() {
         );
         await tx.wait();
         setIsApproved(true);
-        setButtonText("STAKE");
-        setStatus("success");
-        setMessage("Approval successful!");
+        setButtonText('STAKE');
+        setStatus('success');
+        setMessage('Approval successful!');
       }
     } catch (error) {
-      setStatus("error");
-      setMessage("Approval failed.");
-      console.error("Approval failed", error);
+      setStatus('error');
+      setMessage('Approval failed.');
+      console.error('Approval failed', error);
     } finally {
       setLoading(false);
       onOpen();
@@ -149,13 +148,13 @@ function UserAssets() {
           ethers.utils.parseEther(stakeAmount)
         );
         await tx.wait();
-        setStatus("success");
-        setMessage("Stake successful!");
+        setStatus('success');
+        setMessage('Stake successful!');
       }
     } catch (error) {
-      setStatus("error");
-      setMessage("Staking failed.");
-      console.error("Staking failed", error);
+      setStatus('error');
+      setMessage('Staking failed.');
+      console.error('Staking failed', error);
     } finally {
       setLoading(false);
       onOpen();
@@ -165,17 +164,17 @@ function UserAssets() {
     setLoading(true);
     try {
       if (parseFloat(stakeAmount) > parseFloat(stakedBalance)) {
-        throw new Error("Unstake amount exceeds staked balance");
+        throw new Error('Unstake amount exceeds staked balance');
       }
 
       const tx = await XeonStakingPool.unstake(
         ethers.utils.parseEther(stakeAmount)
       );
       await tx.wait();
-      setMessage("Unstake successful");
+      setMessage('Unstake successful');
     } catch (error) {
-      console.error("Unstaking failed", error);
-      setMessage(error.message || "Unstaking failed");
+      console.error('Unstaking failed', error);
+      setMessage(error.message || 'Unstaking failed');
     } finally {
       setLoading(false);
       onOpen();
@@ -195,9 +194,9 @@ function UserAssets() {
   const handleStakeAmountChange = (e) => {
     const value = e.target.value;
     if (isSwitched && parseFloat(value) > parseFloat(stakedBalance)) {
-      alert("Unstake amount exceeds your staked balance");
+      alert('Unstake amount exceeds your staked balance');
     } else if (!isSwitched && parseFloat(value) > parseFloat(walletBalance)) {
-      alert("Amount exceeds wallet balance");
+      alert('Amount exceeds wallet balance');
     } else {
       setStakeAmount(value);
     }
@@ -213,18 +212,18 @@ function UserAssets() {
             id="mode-switch"
           />
           <FormLabel htmlFor="mode-switch" mb="0" ml={2} className="text-grey">
-            {isSwitched ? "Unstaking mode" : "Staking mode"}
+            {isSwitched ? 'Unstaking mode' : 'Staking mode'}
           </FormLabel>
         </FormControl>
         <div className="text-grey text-3xl md:text-5xl lg:text-7xl mt-5">
-          {isSwitched ? "Unstake Tokens" : "Stake Tokens"}
+          {isSwitched ? 'Unstake Tokens' : 'Stake Tokens'}
         </div>
         {isSwitched ? (
           <motion.div
             className="w-full  py-5"
-            initial={{opacity: 0, x: -50}}
-            animate={{opacity: 1, x: 0}}
-            exit={{opacity: 0, x: 50}}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
           >
             <input
               type="text"
@@ -239,16 +238,16 @@ function UserAssets() {
                 onClick={handleButtonClick}
                 disabled={loading}
               >
-                {loading ? <Spinner /> : "Unstake"}
+                {loading ? <Spinner /> : 'Unstake'}
               </button>
             </div>
           </motion.div>
         ) : (
           <motion.div
             className="w-full py-5"
-            initial={{opacity: 0, x: 50}}
-            animate={{opacity: 1, x: 0}}
-            exit={{opacity: 0, x: -50}}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
           >
             <div className="text-grey mt-5 md:w-[100%]">
               <input
@@ -280,7 +279,7 @@ function UserAssets() {
               <p className="text-grey text-3xl"></p>
               <p className="text-light-purple">
                 {wallet?.address.slice(0, 6) +
-                  "..." +
+                  '...' +
                   wallet?.address.slice(-4)}
               </p>
             </div>
@@ -320,12 +319,12 @@ function UserAssets() {
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent bg={"#000"}>
-          <ModalHeader bg={"#000"} color={"white"}>
-            {status === "success" ? "Success" : "Error"}
+        <ModalContent bg={'#000'}>
+          <ModalHeader bg={'#000'} color={'white'}>
+            {status === 'success' ? 'Success' : 'Error'}
           </ModalHeader>
           <ModalCloseButton />
-          <ModalBody bg={"#000"}>
+          <ModalBody bg={'#000'}>
             {loading ? (
               <Spinner />
             ) : (

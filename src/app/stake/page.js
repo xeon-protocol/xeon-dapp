@@ -33,7 +33,6 @@ function Page() {
   // todo: add epoch number
 
   // init provider and signer
-
   useEffect(() => {
     const initializeProvider = async () => {
       if (typeof window !== 'undefined' && window.ethereum) {
