@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Image } from '@chakra-ui/react';
 import Lottie from 'react-lottie-player';
 import lottieJson from '@/assets/animations/PE2.json';
@@ -28,6 +28,7 @@ function Page() {
   const [signer, setSigner] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // init provider and signer
   useEffect(() => {
     if (typeof window !== 'undefined' && window.ethereum) {
       const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -37,14 +38,17 @@ function Page() {
     }
   }, []);
 
-  const XeonStakingPool = provider
-    ? new ethers.Contract(
-        Constants.testnet.XeonStakingPool,
-        XeonStakingPoolABI,
-        signer
-      )
-    : null;
+  // memoize the XeonStakingPool contract instance to avoid re-creating it on every render
+  const XeonStakingPool = useMemo(() => {
+    if (!provider || !signer) return null;
+    return new ethers.Contract(
+      Constants.testnet.XeonStakingPool,
+      XeonStakingPoolABI,
+      signer
+    );
+  }, [provider, signer]);
 
+  // handle increment and decrement of vote value
   const handleIncrement = () => {
     setVoteValue((prevValue) => Math.min(prevValue + 1, 100));
   };
@@ -53,6 +57,7 @@ function Page() {
     setVoteValue((prevValue) => Math.max(prevValue - 1, 1));
   };
 
+  // handle voting functionality
   const handleVote = async () => {
     if (!XeonStakingPool || voteValue < 1 || voteValue > 100) {
       setMessage('Please enter a value between 1 and 100');
@@ -74,6 +79,7 @@ function Page() {
     }
   };
 
+  // handle vote value change
   const handleVoteChange = (e) => {
     const value = parseInt(e.target.value);
     if (Number.isNaN(value)) {
@@ -111,15 +117,14 @@ function Page() {
           </p>
           <div className="md:absolute md:top-24 lg:top-20 md:left-[30px] lg:left-8 w-full h-full">
             <p className="text-grey md:text-justify text-lg md:w-[80%]">
-              Stake XEON tokens to be eligible for rewards sharing. The staking
-              window opens 3 days only each month-end, during which users can
-              stake or unstake XEON. Revenue is deposited to staking contract
-              for claiming.
+              Stake XEON tokens to be eligible for revenue sharing. The staking
+              window opens for 3 days at the end of each epoch, at which time
+              XEON can be staked or unstaked. Protocol revenue is deposited is
+              deposited into the staking pool.
             </p>
           </div>
           <Image
             src="/card-109.svg"
-            // w={"100%"}
             h={{
               base: '150px',
               md: '200px',
@@ -188,7 +193,7 @@ function Page() {
                 Vote
               </button>
             </div>
-
+            {/* todo: percentage should be obtained from contract data */}
             <p className="mt-3">Current 5.00%</p>
           </div>
         </div>
