@@ -33,12 +33,12 @@ function UserAssets() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('');
-  const [epoch, setEpoch] = useState('0.00');
+  const [epoch, setEpoch] = useState('0.00'); // todo: app doesn't set epoch, only reads it (value is whole number integer)
   const [ethInPool, setEthInPool] = useState('0.00');
   const [buyBackPercentage, setBuyBackPercentage] = useState('0.00');
   const [teamPercentage, setTeamPercentage] = useState('0.00');
-  const [walletXeonBalance, setWalletXeonBalance] = useState('0.00');
-  const [stakedXeonBalance, setStakedXeonBalance] = useState('0.00');
+  const [walletXeonBalance, setWalletXeonBalance] = useState('0.00'); // todo: display user's contract balance
+  const [stakedXeonBalance, setStakedXeonBalance] = useState('0.00'); // todo: display user's staked balance
   const { isOpen, onOpen, onClose } = useDisclosure();
   const wallet = useActiveAccount();
   const connectedAddress = wallet?.address;
