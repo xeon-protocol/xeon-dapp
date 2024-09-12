@@ -1,13 +1,6 @@
-import {Image} from "@chakra-ui/react";
-const explorerUrls = {
-  0: "https://sepolia.basescan.org/tx/",
-  1: "https://etherscan.io/tx/",
-  56: "https://bscscan.com/tx/",
-  137: "https://polygonscan.com/tx/",
-  84532: "https://sepolia.basescan.org/tx/",
-};
+import Image from 'next/image';
 
-function BookmarkAdded({message, status, chainId, txHash}) {
+const BookmarkAdded = ({ message, status, chainId, txHash }) => {
   const explorerUrl = explorerUrls[chainId]
     ? `${explorerUrls[chainId]}${txHash}`
     : null;
@@ -16,14 +9,13 @@ function BookmarkAdded({message, status, chainId, txHash}) {
     <div className="bg-black text-grey flex flex-col justify-center items-center">
       <p className="text-lg mb-4 text-center">{status}</p>
       <Image
-        src={status === "success" ? "/success.webp" : "/fail.webp"}
+        src={status === 'success' ? '/success.webp' : '/fail.webp'}
         alt="transaction status"
-        className=""
+        width={100} // adjust as per requirement
+        height={100} // adjust as per requirement
       />
-
       <h3 className="text-2xl mt-4 text-center">{message}</h3>
-
-      {status === "success" && explorerUrl && (
+      {status === 'success' && explorerUrl && (
         <a
           href={explorerUrl}
           target="_blank"
@@ -35,6 +27,6 @@ function BookmarkAdded({message, status, chainId, txHash}) {
       )}
     </div>
   );
-}
+};
 
 export default BookmarkAdded;
