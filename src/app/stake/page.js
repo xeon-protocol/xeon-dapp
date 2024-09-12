@@ -21,7 +21,8 @@ import {
 import BookmarkAdded from '@/components/BookmarkAdded';
 
 function Page() {
-  const [voteValue, setVoteValue] = useState(5);
+  const [voteValue, setVoteValue] = useState(5); // state for user vote
+  const [currentPercentage, setCurrentPercentage] = useState(5); // state for current buyback percentage
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [provider, setProvider] = useState(null);
@@ -48,19 +49,35 @@ function Page() {
     );
   }, [provider, signer]);
 
+  // fetch current buyback percentage from contract
+  useEffect(() => {
+    const fetchBuybackPercentage = async () => {
+      if (XeonStakingPool) {
+        try {
+          const percentage = await XeonStakingPool.buyBackPercentage(); // assume integer value from contract
+          setCurrentPercentage(percentage.toNumber()); // update state with value
+        } catch (error) {
+          console.error('Error fetching buyback percentage:', error);
+        }
+      }
+    };
+
+    fetchBuybackPercentage();
+  }, [XeonStakingPool]);
+
   // handle increment and decrement of vote value
   const handleIncrement = () => {
-    setVoteValue((prevValue) => Math.min(prevValue + 1, 100));
+    setVoteValue((prevValue) => Math.min(prevValue + 1, 100)); // todo: ensure vote value is clamped to current contract min/max
   };
 
   const handleDecrement = () => {
-    setVoteValue((prevValue) => Math.max(prevValue - 1, 1));
+    setVoteValue((prevValue) => Math.max(prevValue - 1, 1)); // todo: ensure vote value is clamped to current contract min/max
   };
 
   // handle voting functionality
   const handleVote = async () => {
     if (!XeonStakingPool || voteValue < 1 || voteValue > 100) {
-      setMessage('Please enter a value between 1 and 100');
+      setMessage('Please enter a value between 1 and 100'); // todo: ensure vote value is clamped to current contract min/max
       return;
     }
 
@@ -193,8 +210,9 @@ function Page() {
                 Vote
               </button>
             </div>
-            {/* todo: percentage should be obtained from contract data */}
-            <p className="mt-3">Current 5.00%</p>
+            <p className="mt-3">
+              Current Buyback Percentage: {currentPercentage}%
+            </p>
           </div>
         </div>
       </div>
