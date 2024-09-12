@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState, useMemo } from 'react';
 import { Image } from '@chakra-ui/react';
 import Lottie from 'react-lottie-player';
@@ -21,8 +22,8 @@ import {
 import BookmarkAdded from '@/components/BookmarkAdded';
 
 function Page() {
-  const [voteValue, setVoteValue] = useState(5); // state for user vote
-  // todo: for mainnet, ensure current percentage is correct
+  const [voteValue, setVoteValue] = useState(5); // state for user buyback vote value
+  // todo: for mainnet, ensure currentPercentage is proper default
   const [currentPercentage, setCurrentPercentage] = useState(5); // state for current buyback percentage
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -32,13 +33,18 @@ function Page() {
   // todo: add epoch number
 
   // init provider and signer
+
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.ethereum) {
-      const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = web3Provider.getSigner();
-      setProvider(web3Provider);
-      setSigner(signer);
-    }
+    const initializeProvider = async () => {
+      if (typeof window !== 'undefined' && window.ethereum) {
+        const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = web3Provider.getSigner();
+        setProvider(web3Provider);
+        setSigner(signer);
+      }
+    };
+
+    initializeProvider();
   }, []);
 
   // memoize the XeonStakingPool contract instance to avoid re-creating it on every render
@@ -51,8 +57,8 @@ function Page() {
     );
   }, [provider, signer]);
 
-  // fetch current buyback percentage from contract
   useEffect(() => {
+    // fetch current buyback percentage from contract
     const fetchBuybackPercentage = async () => {
       if (XeonStakingPool) {
         try {
@@ -78,7 +84,6 @@ function Page() {
     setVoteValue((prevValue) => Math.max(prevValue - 1, 1));
   };
 
-  // handle voting functionality
   const handleVote = async () => {
     if (!XeonStakingPool || voteValue < 1 || voteValue > 100) {
       setMessage('Please enter a value between 1 and 100');
