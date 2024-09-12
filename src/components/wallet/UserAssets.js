@@ -6,15 +6,15 @@ import { FaEthereum } from 'react-icons/fa';
 import AssetsValues from './AssetsValues';
 
 function UserAssets() {
-  // Keep track of the switch state
+  // keep track of the switch state
   const [isSwitched, setIsSwitched] = useState(false);
 
-  // Switch handler
+  // switch handler
   const switchHandler = () => {
     setIsSwitched(!isSwitched);
   };
 
-  // Memoized values for deposit and withdraw sections
+  // memoized values for deposit and withdraw sections
   const depositSection = useMemo(
     () => (
       <motion.div
@@ -103,7 +103,7 @@ function UserAssets() {
           </FormLabel>
         </FormControl>
 
-        {/* Conditionally render deposit or withdraw section */}
+        {/* conditionally render deposit or withdraw section */}
         {isSwitched ? withdrawSection : depositSection}
       </div>
 
