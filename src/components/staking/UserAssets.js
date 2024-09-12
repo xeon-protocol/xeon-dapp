@@ -14,7 +14,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FaEthereum } from 'react-icons/fa';
 import AssetsValues from '../wallet/AssetsValues';
 import { useActiveAccount } from 'thirdweb/react';
@@ -42,26 +42,51 @@ function UserAssets() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const wallet = useActiveAccount();
   const connectedAddress = wallet?.address;
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const XeonToken = new ethers.Contract(
-    Constants.testnet.XeonToken,
-    XeonStakingPoolABI,
-    signer
-  );
-  const XeonStakingPool = new ethers.Contract(
-    Constants.testnet.XeonStakingPool,
-    XeonStakingPoolABI,
-    signer
-  );
-  const WETH = new ethers.Contract(
-    Constants.testnet.WETH,
-    XeonStakingPoolABI,
-    provider
-  );
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = web3Provider.getSigner();
+      setProvider(web3Provider);
+      setSigner(signer);
+    }
+  }, []);
+
+  const XeonToken = useMemo(() => {
+    if (!provider || !signer) return null;
+    return new ethers.Contract(
+      Constants.testnet.XeonToken,
+      XeonStakingPoolABI,
+      signer
+    );
+  }, [provider, signer]);
+
+  const XeonStakingPool = useMemo(() => {
+    if (!provider || !signer) return null;
+    return new ethers.Contract(
+      Constants.testnet.XeonStakingPool,
+      XeonStakingPoolABI,
+      signer
+    );
+  }, [provider, signer]);
+
+  const WETH = useMemo(() => {
+    if (!provider) return null;
+    return new ethers.Contract(
+      Constants.testnet.WETH,
+      XeonStakingPoolABI,
+      provider
+    );
+  }, [provider]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (!XeonStakingPool || !WETH || !XeonToken || !connectedAddress)
+          return;
+
         const epoch = await XeonStakingPool.epoch();
         setEpoch(ethers.utils.formatUnits(epoch, 0));
 
@@ -91,8 +116,9 @@ function UserAssets() {
       fetchData();
     }
   }, [connectedAddress, XeonStakingPool, XeonToken, WETH]);
+
   useEffect(() => {
-    if (wallet) {
+    if (wallet && XeonToken && XeonStakingPool) {
       XeonToken.balanceOf(wallet.address).then((balance) => {
         setWalletBalance(ethers.utils.formatEther(balance));
       });
@@ -119,7 +145,7 @@ function UserAssets() {
   const handleApprove = async () => {
     setLoading(true);
     try {
-      if (!isApproved) {
+      if (!isApproved && XeonToken) {
         const tx = await XeonToken.approve(
           XeonStakingPool.address,
           ethers.utils.parseEther(stakeAmount)
@@ -143,7 +169,7 @@ function UserAssets() {
   const handleStake = async () => {
     setLoading(true);
     try {
-      if (isApproved) {
+      if (isApproved && XeonStakingPool) {
         const tx = await XeonStakingPool.stake(
           ethers.utils.parseEther(stakeAmount)
         );
@@ -160,6 +186,7 @@ function UserAssets() {
       onOpen();
     }
   };
+
   const handleUnstake = async () => {
     setLoading(true);
     try {
