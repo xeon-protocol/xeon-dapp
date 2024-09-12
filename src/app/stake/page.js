@@ -30,7 +30,6 @@ function Page() {
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // todo: add epoch number
 
   // init provider and signer
   useEffect(() => {
