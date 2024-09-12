@@ -1,6 +1,13 @@
-import Image from 'next/image';
+import { Image } from '@chakra-ui/react';
+const explorerUrls = {
+  0: 'https://sepolia.basescan.org/tx/',
+  1: 'https://etherscan.io/tx/',
+  56: 'https://bscscan.com/tx/',
+  137: 'https://polygonscan.com/tx/',
+  84532: 'https://sepolia.basescan.org/tx/',
+};
 
-const BookmarkAdded = ({ message, status, chainId, txHash }) => {
+function BookmarkAdded({ message, status, chainId, txHash }) {
   const explorerUrl = explorerUrls[chainId]
     ? `${explorerUrls[chainId]}${txHash}`
     : null;
@@ -11,10 +18,11 @@ const BookmarkAdded = ({ message, status, chainId, txHash }) => {
       <Image
         src={status === 'success' ? '/success.webp' : '/fail.webp'}
         alt="transaction status"
-        width={100} // adjust as per requirement
-        height={100} // adjust as per requirement
+        className=""
       />
+
       <h3 className="text-2xl mt-4 text-center">{message}</h3>
+
       {status === 'success' && explorerUrl && (
         <a
           href={explorerUrl}
@@ -27,6 +35,6 @@ const BookmarkAdded = ({ message, status, chainId, txHash }) => {
       )}
     </div>
   );
-};
+}
 
 export default BookmarkAdded;
