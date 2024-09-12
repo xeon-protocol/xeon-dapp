@@ -22,12 +22,14 @@ import BookmarkAdded from '@/components/BookmarkAdded';
 
 function Page() {
   const [voteValue, setVoteValue] = useState(5); // state for user vote
+  // todo: for mainnet, ensure current percentage is correct
   const [currentPercentage, setCurrentPercentage] = useState(5); // state for current buyback percentage
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  // todo: add epoch number
 
   // init provider and signer
   useEffect(() => {
@@ -54,6 +56,7 @@ function Page() {
     const fetchBuybackPercentage = async () => {
       if (XeonStakingPool) {
         try {
+          // todo: for mainnet, ensure value is formatted correctly (N/10000)
           const percentage = await XeonStakingPool.buyBackPercentage(); // assume integer value from contract
           setCurrentPercentage(percentage.toNumber()); // update state with value
         } catch (error) {
@@ -66,18 +69,19 @@ function Page() {
   }, [XeonStakingPool]);
 
   // handle increment and decrement of vote value
+  // todo: for mainnet, ensure vote value is clamped to contract min/max
   const handleIncrement = () => {
-    setVoteValue((prevValue) => Math.min(prevValue + 1, 100)); // todo: ensure vote value is clamped to current contract min/max
+    setVoteValue((prevValue) => Math.min(prevValue + 1, 100));
   };
 
   const handleDecrement = () => {
-    setVoteValue((prevValue) => Math.max(prevValue - 1, 1)); // todo: ensure vote value is clamped to current contract min/max
+    setVoteValue((prevValue) => Math.max(prevValue - 1, 1));
   };
 
   // handle voting functionality
   const handleVote = async () => {
     if (!XeonStakingPool || voteValue < 1 || voteValue > 100) {
-      setMessage('Please enter a value between 1 and 100'); // todo: ensure vote value is clamped to current contract min/max
+      setMessage('Please enter a value between 1 and 100');
       return;
     }
 
