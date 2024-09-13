@@ -1,14 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useMemo } from 'react';
-import { Image } from '@chakra-ui/react';
-import Lottie from 'react-lottie-player';
-import lottieJson from '@/assets/animations/PE2.json';
-import XeonStakingPoolABI from '@/abi/XeonStakingPool.abi.json';
-import { Constants } from '@/abi/constants';
-import Header from '@/components/Header';
-import UserAssets from '@/components/staking/UserAssets';
-import { ethers } from 'ethers';
+import {useEffect, useState, useMemo} from "react";
+import XeonStakingPoolABI from "@/abi/XeonStakingPool.abi.json";
+import {Constants} from "@/abi/constants";
+import Header from "@/components/Header";
+import UserAssets from "@/components/staking/UserAssets";
+import {ethers} from "ethers";
 import {
   Modal,
   ModalOverlay,
@@ -18,23 +15,29 @@ import {
   ModalFooter,
   Spinner,
   useDisclosure,
-} from '@chakra-ui/react';
-import BookmarkAdded from '@/components/BookmarkAdded';
+} from "@chakra-ui/react";
+import BookmarkAdded from "@/components/BookmarkAdded";
+import {useActiveAccount} from "thirdweb/react";
 
 function Page() {
-  const [voteValue, setVoteValue] = useState(5); // state for user buyback vote value
-  // todo: for mainnet, ensure currentPercentage is proper default
-  const [currentPercentage, setCurrentPercentage] = useState(5); // state for current buyback percentage
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
+  const [epoch, setEpoch] = useState("0.00"); // todo: app doesn't set epoch, only reads it (value is whole number integer)
+  const [ethInPool, setEthInPool] = useState("0.00");
+  const [buyBackPercentage, setBuyBackPercentage] = useState("0.00");
+  const [teamPercentage, setTeamPercentage] = useState("0.00");
+  const [walletXeonBalance, setWalletXeonBalance] = useState("0.00"); // todo: display user's contract balance
+  const [stakedXeonBalance, setStakedXeonBalance] = useState("0.00"); // todo: display user's staked balance
+  const wallet = useActiveAccount();
+  const connectedAddress = wallet?.address;
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {isOpen, onOpen, onClose} = useDisclosure();
 
   // init provider and signer
   useEffect(() => {
     const initializeProvider = async () => {
-      if (typeof window !== 'undefined' && window.ethereum) {
+      if (typeof window !== "undefined" && window.ethereum) {
         const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = web3Provider.getSigner();
         setProvider(web3Provider);
@@ -55,6 +58,59 @@ function Page() {
     );
   }, [provider, signer]);
 
+  const XeonToken = useMemo(() => {
+    if (!provider || !signer) return null;
+    return new ethers.Contract(
+      Constants.testnet.XeonToken,
+      XeonStakingPoolABI,
+      signer
+    );
+  }, [provider, signer]);
+  const WETH = useMemo(() => {
+    if (!provider) return null;
+    return new ethers.Contract(
+      Constants.testnet.WETH,
+      XeonStakingPoolABI,
+      provider
+    );
+  }, [provider]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!XeonStakingPool || !WETH || !XeonToken || !connectedAddress)
+          return;
+
+        const epoch = await XeonStakingPool.epoch();
+        setEpoch(ethers.utils.formatUnits(epoch, 0));
+
+        const ethBalance = await WETH.balanceOf(
+          Constants.testnet.XeonStakingPool
+        );
+        setEthInPool(ethers.utils.formatEther(ethBalance));
+
+        const buyBackPercentage = await XeonStakingPool.buyBackPercentage();
+        setBuyBackPercentage(ethers.utils.formatUnits(buyBackPercentage, 0));
+
+        const teamPercentage = await XeonStakingPool.teamPercentage();
+        setTeamPercentage(ethers.utils.formatUnits(teamPercentage, 0));
+
+        const xeonBalance = await XeonToken.balanceOf(connectedAddress);
+        setWalletXeonBalance(ethers.utils.formatEther(xeonBalance));
+
+        const stakedXeonBalance = await XeonStakingPool.balanceOf(
+          connectedAddress
+        );
+        setStakedXeonBalance(ethers.utils.formatEther(stakedXeonBalance));
+      } catch (error) {
+        console.error("Error fetching asset values:", error);
+      }
+    };
+
+    if (connectedAddress) {
+      fetchData();
+    }
+  }, [connectedAddress, XeonStakingPool, XeonToken, WETH]);
+
   useEffect(() => {
     // fetch current buyback percentage from contract
     const fetchBuybackPercentage = async () => {
@@ -64,7 +120,7 @@ function Page() {
           const percentage = await XeonStakingPool.buyBackPercentage(); // assume integer value from contract
           setCurrentPercentage(percentage.toNumber()); // update state with value
         } catch (error) {
-          console.error('Error fetching buyback percentage:', error);
+          console.error("Error fetching buyback percentage:", error);
         }
       }
     };
@@ -72,170 +128,66 @@ function Page() {
     fetchBuybackPercentage();
   }, [XeonStakingPool]);
 
-  // handle increment and decrement of vote value
-  // todo: for mainnet, ensure vote value is clamped to contract min/max
-  const handleIncrement = () => {
-    setVoteValue((prevValue) => Math.min(prevValue + 1, 100));
-  };
-
-  const handleDecrement = () => {
-    setVoteValue((prevValue) => Math.max(prevValue - 1, 1));
-  };
-
-  const handleVote = async () => {
-    if (!XeonStakingPool || voteValue < 1 || voteValue > 100) {
-      setMessage('Please enter a value between 1 and 100');
-      return;
-    }
-
-    setLoading(true);
-    onOpen();
-
-    try {
-      const tx = await XeonStakingPool.voteForBuybackPercentage(voteValue);
-      await tx.wait();
-      setLoading(false);
-      setMessage(`Vote successful for ${voteValue}% buyback`);
-    } catch (error) {
-      console.error('Vote failed', error);
-      setLoading(false);
-      setMessage('Vote failed, please try again.');
-    }
-  };
-
-  // handle vote value change
-  const handleVoteChange = (e) => {
-    const value = parseInt(e.target.value);
-    if (Number.isNaN(value)) {
-      setVoteValue(1);
-    } else {
-      setVoteValue(Math.min(Math.max(value, 1), 100));
-    }
-  };
-
   return (
     <div className="bg-[#000] lg:min-h-[100vh] 2xl:min-h-[50vh] px-8 pt-8 max-w-screen-2xl mx-auto relative">
       <Header />
-      <div className="flex flex-col md:gap-12 md:flex-row justify-between 2xl:mt-[20%] mt-[18%]">
-        <div className="md:w-[40%] lg:w-auto md:px-0 lg:px-18 flex items-center md:block">
-          <h1 className="text-grey text-3xl md:text-5xl lg:text-7xl">Stake</h1>
-          <h1 className="text-floral text-3xl md:text-5xl lg:text-7xl ml-1 md:ml-10">
-            Xeon
-          </h1>
-
-          <Image
-            src="/dotted.webp"
-            alt="container"
-            className="md:absolute top-[10%] w-[40%] left-[-10%] hidden lg:block"
-          />
-          <Lottie
-            className="w-[40%] md:absolute top-[-55px] 2xl:right-[47%] right-[46%] hidden lg:block"
-            loop
-            animationData={lottieJson}
-            play
-          />
-        </div>
-        <div className="relative">
-          <p className="text-grey text-lg w-[85%] mt-4">
+      <div className="flex flex-col md:gap-12 md:flex-row justify-between 2xl:mt-[10%] mt-[8%]">
+        <div className="md:w-[40%] lg:w-auto md:px-0 lg:px-10 flex items-center md:block">
+          <p className="text-lime text-2xl mt-4">
             Stake your XEON tokens in just two simple steps.
           </p>
-          <div className="md:absolute md:top-24 lg:top-20 md:left-[30px] lg:left-8 w-full h-full">
-            <p className="text-grey md:text-justify text-lg md:w-[80%]">
+          <div className="mt-3 ">
+            <p className="text-grey md:text-justify text-lg md:w-[65%]">
               Stake XEON tokens to be eligible for revenue sharing. The staking
               window opens for 3 days at the end of each epoch, at which time
               XEON can be staked or unstaked. Protocol revenue is deposited is
               deposited into the staking pool.
             </p>
           </div>
-          <Image
-            src="/card-109.svg"
-            h={{
-              base: '150px',
-              md: '200px',
-              lg: '185px',
-            }}
-            alt="container"
-            className="relative hidden md:block ml-[-20px]"
-          />
+        </div>
+        <div className="relative md:w-[35%]">
+          <div className="w-full lg:px-10">
+            <div className="w-full flex justify-between gap-5">
+              <div className="w-full flex justify-between">
+                <p className="text-grey text-3xl"></p>
+                <p className="text-light-purple">
+                  {wallet?.address.slice(0, 6) +
+                    "..." +
+                    wallet?.address.slice(-4)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 ">
+              <p className="text-right text-grey">Epoch # {epoch}</p>
+              <p className="text-right text-grey">{ethInPool} ETH in pool</p>
+              <p className="text-right text-grey">
+                $XEON Buyback: {buyBackPercentage}%
+              </p>
+              <p className="text-right text-grey">
+                Team Percentage: {teamPercentage}%
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       <div className="mt-20">
         <UserAssets />
       </div>
-      <div className="md:flex justify-between gap-8 px-8 pb-20">
-        <div className="w-full md:w-1/2 p-5">
-          <div className="text-grey text-lg mt-4 border-2 p-2 rounded-md">
-            <h3 className="text-grey text-3xl md:text-5xl lg:text-7xl">
-              Settle
-            </h3>
-            <p className="text-left mt-2">
-              Close expired positions and collect fess into the staking pool
-            </p>
-            <div className="flex">
-              <button className="m-auto text-white bg-floral mx-auto mt-10 mb-12 px-8 p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-lime">
-                Settle
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="w-full md:w-1/2 p-5">
-          <div className="text-grey text-lg mt-4 border-2 p-2 rounded-md">
-            <h3 className="text-grey text-3xl md:text-5xl lg:text-7xl">
-              $XEON Buyback
-            </h3>
-            <p className="text-left mt-2">
-              What percentage of protocol revenue should be used to buyback
-              $XEON token?
-            </p>
-            <div className="flex items-center mt-5">
-              <button
-                className="text-white bg-floral px-4 p-2 rounded-full border-[1px] border-button-gradient hover:bg-purple hover:border-lime"
-                onClick={handleDecrement}
-              >
-                -
-              </button>
 
-              <input
-                type="number"
-                value={voteValue}
-                onChange={handleVoteChange}
-                min={1}
-                max={100}
-                className="border-[1px] text-center bg-[#71637f4d] mx-3 rounded-xl border-grey p-2 focus:outline-lime w-[40%]"
-              />
-
-              <button
-                className="text-white bg-floral px-4 p-2 rounded-full border-[1px] border-button-gradient hover:bg-purple hover:border-lime"
-                onClick={handleIncrement}
-              >
-                +
-              </button>
-              <button
-                className="m-auto text-white bg-floral mx-auto px-8 p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-lime"
-                onClick={handleVote}
-              >
-                Vote
-              </button>
-            </div>
-            <p className="mt-3">
-              Current Buyback Percentage: {currentPercentage}%
-            </p>
-          </div>
-        </div>
-      </div>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent bg={'#000'}>
-          <ModalHeader bg={'#000'} color={'white'}>
+        <ModalContent bg={"#000"}>
+          <ModalHeader bg={"#000"} color={"white"}>
             Vote Feedback
           </ModalHeader>
-          <ModalBody bg={'#000'}>
+          <ModalBody bg={"#000"}>
             {loading ? (
               <Spinner />
             ) : (
               <BookmarkAdded
                 message={message}
-                status={loading ? 'loading' : 'success'}
+                status={loading ? "loading" : "success"}
               />
             )}
           </ModalBody>
