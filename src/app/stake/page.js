@@ -141,10 +141,11 @@ function Page() {
           </p>
           <div className="md:absolute md:top-24 lg:top-20 md:left-[30px] lg:left-8 w-full h-full">
             <p className="text-grey md:text-justify text-lg md:w-[80%]">
-              Stake XEON tokens to be eligible for revenue sharing. The staking
-              window opens for 3 days at the end of each epoch, at which time
-              XEON can be staked or unstaked. Protocol revenue is deposited is
-              deposited into the staking pool.
+              Staking XEON allows you to passively earn a share of the revenue
+              generated through the protocol. Staking Epochs last for 30 days,
+              followed by a 3 day window during which time XEON can be staked or
+              unstaked. All revenue collected through the protocol is deposited
+              into the staking pool.
             </p>
           </div>
           <Image
