@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   FormControl,
   FormLabel,
@@ -12,27 +12,27 @@ import {
   ModalCloseButton,
   ModalFooter,
   useDisclosure,
-} from "@chakra-ui/react";
-import {motion} from "framer-motion";
-import {useState, useEffect, useMemo} from "react";
+} from '@chakra-ui/react';
+import { motion } from 'framer-motion';
+import { useState, useEffect, useMemo } from 'react';
 
-import {ethers} from "ethers";
-import XeonStakingPoolABI from "@/abi/XeonStakingPool.abi.json";
-import {Constants} from "@/abi/constants";
-import BookmarkAdded from "../BookmarkAdded";
-import {useActiveAccount} from "thirdweb/react";
+import { ethers } from 'ethers';
+import XeonStakingPoolABI from '@/abi/XeonStakingPool.abi.json';
+import { Constants } from '@/abi/constants';
+import BookmarkAdded from '../BookmarkAdded';
+import { useActiveAccount } from 'thirdweb/react';
 
 function UserAssets() {
   const [isSwitched, setIsSwitched] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
   const [stakedBalance, setStakedBalance] = useState(0);
-  const [stakeAmount, setStakeAmount] = useState("");
+  const [stakeAmount, setStakeAmount] = useState('');
   const [isApproved, setIsApproved] = useState(false);
-  const [buttonText, setButtonText] = useState("APPROVE");
+  const [buttonText, setButtonText] = useState('APPROVE');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState("");
-  const {isOpen, onOpen, onClose} = useDisclosure();
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState('');
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const wallet = useActiveAccount();
@@ -41,7 +41,7 @@ function UserAssets() {
   const [currentPercentage, setCurrentPercentage] = useState(5); // state for current buyback percentage
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.ethereum) {
+    if (typeof window !== 'undefined' && window.ethereum) {
       const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = web3Provider.getSigner();
       setProvider(web3Provider);
@@ -81,7 +81,7 @@ function UserAssets() {
         (allowance) => {
           if (ethers.utils.formatEther(allowance) > 0) {
             setIsApproved(true);
-            setButtonText("STAKE");
+            setButtonText('STAKE');
           }
         }
       );
@@ -96,7 +96,7 @@ function UserAssets() {
     setLoading(true);
     try {
       if (parseFloat(stakeAmount) > parseFloat(walletBalance)) {
-        throw new Error("Amount exceeds wallet balance");
+        throw new Error('Amount exceeds wallet balance');
       }
 
       if (!isApproved && XeonToken) {
@@ -106,14 +106,14 @@ function UserAssets() {
         );
         await tx.wait();
         setIsApproved(true);
-        setButtonText("STAKE");
-        setStatus("success");
-        setMessage("Approval successful!");
+        setButtonText('STAKE');
+        setStatus('success');
+        setMessage('Approval successful!');
       }
     } catch (error) {
-      setStatus("error");
-      setMessage(error.message || "Approval failed.");
-      console.error("Approval failed", error);
+      setStatus('error');
+      setMessage(error.message || 'Approval failed.');
+      console.error('Approval failed', error);
     } finally {
       setLoading(false);
       onOpen();
@@ -124,7 +124,7 @@ function UserAssets() {
     setLoading(true);
     try {
       if (parseFloat(stakeAmount) > parseFloat(walletBalance)) {
-        throw new Error("Amount exceeds wallet balance");
+        throw new Error('Amount exceeds wallet balance');
       }
 
       if (isApproved && XeonStakingPool) {
@@ -132,13 +132,13 @@ function UserAssets() {
           ethers.utils.parseEther(stakeAmount)
         );
         await tx.wait();
-        setStatus("success");
-        setMessage("Stake successful!");
+        setStatus('success');
+        setMessage('Stake successful!');
       }
     } catch (error) {
-      setStatus("error");
-      setMessage(error.message || "Staking failed.");
-      console.error("Staking failed", error);
+      setStatus('error');
+      setMessage(error.message || 'Staking failed.');
+      console.error('Staking failed', error);
     } finally {
       setLoading(false);
       onOpen();
@@ -149,17 +149,17 @@ function UserAssets() {
     setLoading(true);
     try {
       if (parseFloat(stakeAmount) > parseFloat(stakedBalance)) {
-        throw new Error("Unstake amount exceeds staked balance");
+        throw new Error('Unstake amount exceeds staked balance');
       }
 
       const tx = await XeonStakingPool.unstake(
         ethers.utils.parseEther(stakeAmount)
       );
       await tx.wait();
-      setMessage("Unstake successful");
+      setMessage('Unstake successful');
     } catch (error) {
-      console.error("Unstaking failed", error);
-      setMessage(error.message || "Unstaking failed");
+      console.error('Unstaking failed', error);
+      setMessage(error.message || 'Unstaking failed');
     } finally {
       setLoading(false);
       onOpen();
@@ -192,7 +192,7 @@ function UserAssets() {
 
   const handleVote = async () => {
     if (!XeonStakingPool || voteValue < 1 || voteValue > 100) {
-      setMessage("Please enter a value between 1 and 100");
+      setMessage('Please enter a value between 1 and 100');
       return;
     }
 
@@ -205,9 +205,9 @@ function UserAssets() {
       setLoading(false);
       setMessage(`Vote successful for ${voteValue}% buyback`);
     } catch (error) {
-      console.error("Vote failed", error);
+      console.error('Vote failed', error);
       setLoading(false);
-      setMessage("Vote failed, please try again.");
+      setMessage('Vote failed, please try again.');
     }
   };
 
@@ -225,27 +225,27 @@ function UserAssets() {
     <div className="flex flex-col gap-6 md:gap-6 lg:gap-6 lg:pb-20 relative md:flex-row justify-between  px-8 pt-8 max-w-screen-2xl mx-auto">
       <div className="md:w-[60%]">
         <div className="text-grey text-2xl md:text-3xl mb-4 ">
-          {isSwitched ? "Unstake Tokens" : "Stake Tokens"}
+          {isSwitched ? 'Unstake' : 'Stake'}
         </div>
         <div className="border-2 bg-black rounded-xl border-grey w-full p-4 hover:border-animate">
           {isSwitched ? (
             <motion.div
               className="w-full  py-5"
-              initial={{opacity: 0, x: -50}}
-              animate={{opacity: 1, x: 0}}
-              exit={{opacity: 0, x: 50}}
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
             >
               <div className="w-full flex justify-between mt-2">
                 <div>
                   <div className="my-2">
                     <p className="text-lg text-grey">
-                      Staked: $XEON {stakedBalance}
+                      Staked: {stakedBalance} $XEON
                     </p>
                   </div>
 
                   <div className="flex justify-between my-2">
                     <p className="text-lg text-grey">
-                      Wallet: $XEON {walletBalance}
+                      Wallet: {walletBalance} $XEON
                     </p>
                   </div>
                 </div>
@@ -264,12 +264,12 @@ function UserAssets() {
                       onClick={handleButtonClick}
                       disabled={loading}
                     >
-                      {loading ? <Spinner /> : "Unstake"}
+                      {loading ? <Spinner /> : 'Unstake'}
                     </button>
                     <FormControl display="flex" alignItems="center">
                       <Switch
                         mt={4}
-                        mx={"auto"}
+                        mx={'auto'}
                         isChecked={isSwitched}
                         onChange={switchHandler}
                         id="mode-switch"
@@ -282,21 +282,21 @@ function UserAssets() {
           ) : (
             <motion.div
               className="w-full"
-              initial={{opacity: 0, x: 50}}
-              animate={{opacity: 1, x: 0}}
-              exit={{opacity: 0, x: -50}}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
             >
               <div className="w-full flex justify-between mt-4">
                 <div>
                   <div className="my-2">
                     <p className="text-lg text-grey">
-                      Staked: $XEON {stakedBalance}
+                      Staked: {stakedBalance} $XEON
                     </p>
                   </div>
 
                   <div className="flex justify-between my-2">
                     <p className="text-lg text-grey">
-                      Wallet: $XEON {walletBalance}
+                      Wallet: {walletBalance} $XEON
                     </p>
                   </div>
                 </div>
@@ -320,7 +320,7 @@ function UserAssets() {
                     <FormControl display="flex" alignItems="center">
                       <Switch
                         mt={4}
-                        mx={"auto"}
+                        mx={'auto'}
                         isChecked={isSwitched}
                         onChange={switchHandler}
                         id="mode-switch"
@@ -397,12 +397,12 @@ function UserAssets() {
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent bg={"#000"}>
-          <ModalHeader bg={"#000"} color={"white"}>
-            {status === "success" ? "Success" : "Error"}
+        <ModalContent bg={'#000'}>
+          <ModalHeader bg={'#000'} color={'white'}>
+            {status === 'success' ? 'Success' : 'Error'}
           </ModalHeader>
           <ModalCloseButton />
-          <ModalBody bg={"#000"}>
+          <ModalBody bg={'#000'}>
             {loading ? (
               <Spinner />
             ) : (
