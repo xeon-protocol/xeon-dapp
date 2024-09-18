@@ -15,13 +15,12 @@ import {
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
-import { FaEthereum } from 'react-icons/fa';
-import AssetsValues from '../wallet/AssetsValues';
-import { useActiveAccount } from 'thirdweb/react';
+
 import { ethers } from 'ethers';
 import XeonStakingPoolABI from '@/abi/XeonStakingPool.abi.json';
 import { Constants } from '@/abi/constants';
 import BookmarkAdded from '../BookmarkAdded';
+import { useActiveAccount } from 'thirdweb/react';
 
 function UserAssets() {
   const [isSwitched, setIsSwitched] = useState(false);
@@ -33,17 +32,13 @@ function UserAssets() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('');
-  const [epoch, setEpoch] = useState('0.00'); // todo: app doesn't set epoch, only reads it (value is whole number integer)
-  const [ethInPool, setEthInPool] = useState('0.00');
-  const [buyBackPercentage, setBuyBackPercentage] = useState('0.00');
-  const [teamPercentage, setTeamPercentage] = useState('0.00');
-  const [walletXeonBalance, setWalletXeonBalance] = useState('0.00'); // todo: display user's contract balance
-  const [stakedXeonBalance, setStakedXeonBalance] = useState('0.00'); // todo: display user's staked balance
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const wallet = useActiveAccount();
-  const connectedAddress = wallet?.address;
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
+  const wallet = useActiveAccount();
+  const [voteValue, setVoteValue] = useState(5); // state for user buyback vote value
+  // todo: for mainnet, ensure currentPercentage is proper default
+  const [currentPercentage, setCurrentPercentage] = useState(5); // state for current buyback percentage
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.ethereum) {
@@ -71,51 +66,6 @@ function UserAssets() {
       signer
     );
   }, [provider, signer]);
-
-  const WETH = useMemo(() => {
-    if (!provider) return null;
-    return new ethers.Contract(
-      Constants.testnet.WETH,
-      XeonStakingPoolABI,
-      provider
-    );
-  }, [provider]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!XeonStakingPool || !WETH || !XeonToken || !connectedAddress)
-          return;
-
-        const epoch = await XeonStakingPool.epoch();
-        setEpoch(ethers.utils.formatUnits(epoch, 0));
-
-        const ethBalance = await WETH.balanceOf(
-          Constants.testnet.XeonStakingPool
-        );
-        setEthInPool(ethers.utils.formatEther(ethBalance));
-
-        const buyBackPercentage = await XeonStakingPool.buyBackPercentage();
-        setBuyBackPercentage(ethers.utils.formatUnits(buyBackPercentage, 0));
-
-        const teamPercentage = await XeonStakingPool.teamPercentage();
-        setTeamPercentage(ethers.utils.formatUnits(teamPercentage, 0));
-
-        const xeonBalance = await XeonToken.balanceOf(connectedAddress);
-        setWalletXeonBalance(ethers.utils.formatEther(xeonBalance));
-
-        const stakedXeonBalance =
-          await XeonStakingPool.balanceOf(connectedAddress);
-        setStakedXeonBalance(ethers.utils.formatEther(stakedXeonBalance));
-      } catch (error) {
-        console.error('Error fetching asset values:', error);
-      }
-    };
-
-    if (connectedAddress) {
-      fetchData();
-    }
-  }, [connectedAddress, XeonStakingPool, XeonToken, WETH]);
 
   useEffect(() => {
     if (wallet && XeonToken && XeonStakingPool) {
@@ -145,6 +95,10 @@ function UserAssets() {
   const handleApprove = async () => {
     setLoading(true);
     try {
+      if (parseFloat(stakeAmount) > parseFloat(walletBalance)) {
+        throw new Error('Amount exceeds wallet balance');
+      }
+
       if (!isApproved && XeonToken) {
         const tx = await XeonToken.approve(
           XeonStakingPool.address,
@@ -158,7 +112,7 @@ function UserAssets() {
       }
     } catch (error) {
       setStatus('error');
-      setMessage('Approval failed.');
+      setMessage(error.message || 'Approval failed.');
       console.error('Approval failed', error);
     } finally {
       setLoading(false);
@@ -169,6 +123,10 @@ function UserAssets() {
   const handleStake = async () => {
     setLoading(true);
     try {
+      if (parseFloat(stakeAmount) > parseFloat(walletBalance)) {
+        throw new Error('Amount exceeds wallet balance');
+      }
+
       if (isApproved && XeonStakingPool) {
         const tx = await XeonStakingPool.stake(
           ethers.utils.parseEther(stakeAmount)
@@ -179,7 +137,7 @@ function UserAssets() {
       }
     } catch (error) {
       setStatus('error');
-      setMessage('Staking failed.');
+      setMessage(error.message || 'Staking failed.');
       console.error('Staking failed', error);
     } finally {
       setLoading(false);
@@ -220,125 +178,218 @@ function UserAssets() {
 
   const handleStakeAmountChange = (e) => {
     const value = e.target.value;
-    if (isSwitched && parseFloat(value) > parseFloat(stakedBalance)) {
-      alert('Unstake amount exceeds your staked balance');
-    } else if (!isSwitched && parseFloat(value) > parseFloat(walletBalance)) {
-      alert('Amount exceeds wallet balance');
+    setStakeAmount(value);
+  };
+  // handle increment and decrement of vote value
+  // todo: for mainnet, ensure vote value is clamped to contract min/max
+  const handleIncrement = () => {
+    setVoteValue((prevValue) => Math.min(prevValue + 1, 100));
+  };
+
+  const handleDecrement = () => {
+    setVoteValue((prevValue) => Math.max(prevValue - 1, 1));
+  };
+
+  const handleVote = async () => {
+    if (!XeonStakingPool || voteValue < 1 || voteValue > 100) {
+      setMessage('Please enter a value between 1 and 100');
+      return;
+    }
+
+    setLoading(true);
+    onOpen();
+
+    try {
+      const tx = await XeonStakingPool.voteForBuybackPercentage(voteValue);
+      await tx.wait();
+      setLoading(false);
+      setMessage(`Vote successful for ${voteValue}% buyback`);
+    } catch (error) {
+      console.error('Vote failed', error);
+      setLoading(false);
+      setMessage('Vote failed, please try again.');
+    }
+  };
+
+  // handle vote value change
+  const handleVoteChange = (e) => {
+    const value = parseInt(e.target.value);
+    if (Number.isNaN(value)) {
+      setVoteValue(1);
     } else {
-      setStakeAmount(value);
+      setVoteValue(Math.min(Math.max(value, 1), 100));
     }
   };
 
   return (
-    <div className="flex flex-col gap-6 md:gap-12 lg:gap-12 lg:pb-20 relative md:flex-row justify-between items-center px-8 pt-8 max-w-screen-2xl mx-auto">
-      <div className="border-2 bg-black rounded-xl border-grey w-full p-4 hover:border-animate">
-        <FormControl display="flex" alignItems="center">
-          <Switch
-            isChecked={isSwitched}
-            onChange={switchHandler}
-            id="mode-switch"
-          />
-          <FormLabel htmlFor="mode-switch" mb="0" ml={2} className="text-grey">
-            {isSwitched ? 'Unstaking mode' : 'Staking mode'}
-          </FormLabel>
-        </FormControl>
-        <div className="text-grey text-3xl md:text-5xl lg:text-7xl mt-5">
-          {isSwitched ? 'Unstake Tokens' : 'Stake Tokens'}
+    <div className="flex flex-col gap-6 md:gap-6 lg:gap-6 lg:pb-20 relative md:flex-row justify-between  px-8 pt-8 max-w-screen-2xl mx-auto">
+      <div className="md:w-[60%]">
+        <div className="text-grey text-2xl md:text-3xl mb-4 ">
+          {isSwitched ? 'Unstake' : 'Stake'}
         </div>
-        {isSwitched ? (
-          <motion.div
-            className="w-full  py-5"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 50 }}
-          >
-            <input
-              type="text"
-              placeholder="Amount..."
-              value={stakeAmount}
-              onChange={handleStakeAmountChange}
-              className="border-[1px] bg-[#71637f4d] text-grey mt-5 rounded-xl border-grey p-2 focus:outline-lime w-full"
-            />
-            <div className="flex w-full">
-              <button
-                className="text-white m-auto bg-light-purple mx-auto mt-5 px-8 p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-lime"
-                onClick={handleButtonClick}
-                disabled={loading}
-              >
-                {loading ? <Spinner /> : 'Unstake'}
-              </button>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            className="w-full py-5"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-          >
-            <div className="text-grey mt-5 md:w-[100%]">
-              <input
-                type="text"
-                placeholder="Amount..."
-                value={stakeAmount}
-                onChange={handleStakeAmountChange}
-                className="border-[1px] bg-[#71637f4d] mt-5 rounded-xl border-grey p-2 focus:outline-lime w-full"
-              />
+        <div className="border-2 bg-black rounded-xl border-grey w-full p-4 hover:border-animate">
+          {isSwitched ? (
+            <motion.div
+              className="w-full  py-5"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+            >
+              <div className="w-full flex justify-between mt-2">
+                <div>
+                  <div className="my-2">
+                    <p className="text-lg text-grey">
+                      Staked: {stakedBalance} $XEON
+                    </p>
+                  </div>
 
-              <div className="flex w-full">
-                <button
-                  className="text-white bg-floral mx-auto mt-5 px-8 p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-lime"
-                  onClick={handleButtonClick}
-                  disabled={loading}
-                >
-                  {loading ? <Spinner /> : buttonText}
+                  <div className="flex justify-between my-2">
+                    <p className="text-lg text-grey">
+                      Wallet: {walletBalance} $XEON
+                    </p>
+                  </div>
+                </div>
+                <div className="text-grey">
+                  <input
+                    type="text"
+                    placeholder="Amount..."
+                    value={stakeAmount}
+                    onChange={handleStakeAmountChange}
+                    className="border-[1px] bg-[#71637f4d] mt-5 rounded-xl border-grey p-2 focus:outline-lime w-full"
+                  />
+
+                  <div className="flex flex-col items-center justify-center w-full">
+                    <button
+                      className="text-white bg-button-gradient mx-auto mt-5 px-8 p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-lime"
+                      onClick={handleButtonClick}
+                      disabled={loading}
+                    >
+                      {loading ? <Spinner /> : 'Unstake'}
+                    </button>
+                    <FormControl display="flex" alignItems="center">
+                      <Switch
+                        mt={4}
+                        mx={'auto'}
+                        isChecked={isSwitched}
+                        onChange={switchHandler}
+                        id="mode-switch"
+                      />
+                    </FormControl>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              className="w-full"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+            >
+              <div className="w-full flex justify-between mt-4">
+                <div>
+                  <div className="my-2">
+                    <p className="text-lg text-grey">
+                      Staked: {stakedBalance} $XEON
+                    </p>
+                  </div>
+
+                  <div className="flex justify-between my-2">
+                    <p className="text-lg text-grey">
+                      Wallet: {walletBalance} $XEON
+                    </p>
+                  </div>
+                </div>
+                <div className="text-grey">
+                  <input
+                    type="text"
+                    placeholder="Amount..."
+                    value={stakeAmount}
+                    onChange={handleStakeAmountChange}
+                    className="border-[1px] bg-[#71637f4d] mt-5 rounded-xl border-grey p-2 focus:outline-lime w-full"
+                  />
+
+                  <div className="flex flex-col items-center justify-center w-full">
+                    <button
+                      className="text-white bg-floral mx-auto mt-5 px-8 p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-lime"
+                      onClick={handleButtonClick}
+                      disabled={loading}
+                    >
+                      {loading ? <Spinner /> : buttonText}
+                    </button>
+                    <FormControl display="flex" alignItems="center">
+                      <Switch
+                        mt={4}
+                        mx={'auto'}
+                        isChecked={isSwitched}
+                        onChange={switchHandler}
+                        id="mode-switch"
+                      />
+                    </FormControl>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </div>
+      <div className="w-full rounded-xl  flex gap-2 hover:border-animate">
+        <div className="md:flex justify-between gap-8 px-8 pb-20">
+          <div className="w-full md:w-1/3  ">
+            <h3 className="text-grey text-2xl md:text-3xl mb-4">Settle</h3>
+            <div className="text-grey text-lg  border-2 py-4 px-2 rounded-md">
+              <p className="text-center mt-2">
+                Close expired positions and collect fess into the staking pool
+              </p>
+              <div className="flex">
+                <button className="m-auto text-white bg-floral mx-auto mt-4 mb-4 px-8 p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-lime">
+                  Settle
                 </button>
               </div>
             </div>
-          </motion.div>
-        )}
-      </div>
-
-      <div className="w-full border-2 rounded-xl border-grey lg:py-9 p-4 flex gap-2 hover:border-animate">
-        <div className="w-full">
-          <div className="w-full flex justify-between gap-5">
-            <div className="w-full flex justify-between">
-              <p className="text-grey text-3xl"></p>
-              <p className="text-light-purple">
-                {wallet?.address.slice(0, 6) +
-                  '...' +
-                  wallet?.address.slice(-4)}
-              </p>
-            </div>
           </div>
+          <div className="w-full md:w-2/3  ">
+            <h3 className="text-grey text-2xl md:text-3xl mb-4">
+              $XEON Buyback
+            </h3>
+            <div className="text-grey text-lg py-4 border-2 p-2 rounded-md">
+              <p className="text-left mt-2">
+                What percentage of protocol revenue should be used to buyback
+                $XEON token?
+              </p>
+              <div className="flex items-center mt-5">
+                <button
+                  className="text-white bg-floral px-4 p-2 rounded-full border-[1px] border-button-gradient hover:bg-purple hover:border-lime"
+                  onClick={handleDecrement}
+                >
+                  -
+                </button>
 
-          <div className="flex gap-4">
-            <div className="w-full">
-              <AssetsValues label="Epoch" value={epoch} />
-              <AssetsValues label="ETH in pool" value={ethInPool} />
-              <AssetsValues
-                label="$XEON Buyback"
-                value={`${buyBackPercentage}%`}
-              />
-              <AssetsValues
-                label="Team Percentage"
-                value={`${teamPercentage}%`}
-              />
-            </div>
-            <div className="w-full mt-4">
-              <div className="flex justify-between my-2">
-                <p className="text-lg text-grey">Staked</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-grey"> $XEON {stakedBalance}</p>
-                </div>
-              </div>
+                <input
+                  type="number"
+                  value={voteValue}
+                  onChange={handleVoteChange}
+                  min={1}
+                  max={100}
+                  className="border-[1px] text-center bg-[#71637f4d] mx-3 rounded-xl border-grey p-2 focus:outline-lime w-[40%]"
+                />
 
-              <div className="flex justify-between my-2">
-                <p className="text-lg text-grey">Wallet</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-grey"> $XEON {walletBalance}</p>
-                </div>
+                <button
+                  className="text-white bg-floral px-4 p-2 rounded-full border-[1px] border-button-gradient hover:bg-purple hover:border-lime"
+                  onClick={handleIncrement}
+                >
+                  +
+                </button>
+                <button
+                  className="m-auto text-white bg-floral mx-auto px-8 p-2 rounded-full border-t-none border-b-[1px] border-r-[1px] border-l-[1px] border-button-gradient hover:bg-purple hover:border-lime"
+                  onClick={handleVote}
+                >
+                  Vote
+                </button>
               </div>
+              <p className="mt-3">
+                Current Buyback Percentage: {currentPercentage}%
+              </p>
             </div>
           </div>
         </div>
