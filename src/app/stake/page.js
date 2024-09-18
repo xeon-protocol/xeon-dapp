@@ -136,16 +136,18 @@ function Page() {
           />
         </div>
         <div className="relative">
-          <p className="text-grey text-lg w-[85%] mt-4">
-            Stake your XEON tokens in just two simple steps.
-          </p>
+          <p className="text-grey text-lg w-[85%] mt-4">Stake XEON and earn.</p>
           <div className="md:absolute md:top-24 lg:top-20 md:left-[30px] lg:left-8 w-full h-full">
             <p className="text-grey md:text-justify text-lg md:w-[80%]">
               Staking XEON allows you to passively earn a share of the revenue
               generated through the protocol. Staking Epochs last for 30 days,
               followed by a 3 day window during which time XEON can be staked or
               unstaked. All revenue collected through the protocol is deposited
-              into the staking pool.
+              into the staking pool and split among stakers proportional to the
+              amount of XEON staked. The staking pool also automatically buys
+              back XEON from the LP at the end of every epoch, translating to
+              passive buy pressure on the token. Stakers can vote on the
+              percentage of revenue used to buyback XEON.
             </p>
           </div>
           <Image
