@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useMemo } from 'react';
-import XeonStakingPoolABI from '@/abi/XeonStakingPool.abi.json';
-import { Constants } from '@/abi/constants';
-import Header from '@/components/Header';
-import UserAssets from '@/components/staking/UserAssets';
-import { ethers } from 'ethers';
+import {useEffect, useState, useMemo} from "react";
+import XeonStakingPoolABI from "@/abi/XeonStakingPool.abi.json";
+import {Constants} from "@/abi/constants";
+import Header from "@/components/Header";
+import UserAssets from "@/components/staking/UserAssets";
+import {ethers} from "ethers";
 import {
   Modal,
   ModalOverlay,
@@ -15,29 +15,29 @@ import {
   ModalFooter,
   Spinner,
   useDisclosure,
-} from '@chakra-ui/react';
-import BookmarkAdded from '@/components/BookmarkAdded';
-import { useActiveAccount } from 'thirdweb/react';
+} from "@chakra-ui/react";
+import BookmarkAdded from "@/components/BookmarkAdded";
+import {useActiveAccount} from "thirdweb/react";
 
 function Page() {
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [epoch, setEpoch] = useState('0.00'); // todo: app doesn't set epoch, only reads it (value is whole number integer)
-  const [ethInPool, setEthInPool] = useState('0.00');
-  const [buyBackPercentage, setBuyBackPercentage] = useState('0.00');
-  const [teamPercentage, setTeamPercentage] = useState('0.00');
-  const [walletXeonBalance, setWalletXeonBalance] = useState('0.00'); // todo: display user's contract balance
-  const [stakedXeonBalance, setStakedXeonBalance] = useState('0.00'); // todo: display user's staked balance
+  const [message, setMessage] = useState("");
+  const [epoch, setEpoch] = useState("0.00"); // todo: app doesn't set epoch, only reads it (value is whole number integer)
+  const [ethInPool, setEthInPool] = useState("0.00");
+  const [buyBackPercentage, setBuyBackPercentage] = useState("0.00");
+  const [teamPercentage, setTeamPercentage] = useState("0.00");
+  const [walletXeonBalance, setWalletXeonBalance] = useState("0.00"); // todo: display user's contract balance
+  const [stakedXeonBalance, setStakedXeonBalance] = useState("0.00"); // todo: display user's staked balance
   const wallet = useActiveAccount();
   const connectedAddress = wallet?.address;
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {isOpen, onOpen, onClose} = useDisclosure();
 
   // init provider and signer
   useEffect(() => {
     const initializeProvider = async () => {
-      if (typeof window !== 'undefined' && window.ethereum) {
+      if (typeof window !== "undefined" && window.ethereum) {
         const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = web3Provider.getSigner();
         setProvider(web3Provider);
@@ -97,11 +97,12 @@ function Page() {
         const xeonBalance = await XeonToken.balanceOf(connectedAddress);
         setWalletXeonBalance(ethers.utils.formatEther(xeonBalance));
 
-        const stakedXeonBalance =
-          await XeonStakingPool.balanceOf(connectedAddress);
+        const stakedXeonBalance = await XeonStakingPool.balanceOf(
+          connectedAddress
+        );
         setStakedXeonBalance(ethers.utils.formatEther(stakedXeonBalance));
       } catch (error) {
-        console.error('Error fetching asset values:', error);
+        console.error("Error fetching asset values:", error);
       }
     };
 
@@ -119,7 +120,7 @@ function Page() {
           const percentage = await XeonStakingPool.buyBackPercentage(); // assume integer value from contract
           setCurrentPercentage(percentage.toNumber()); // update state with value
         } catch (error) {
-          console.error('Error fetching buyback percentage:', error);
+          console.error("Error fetching buyback percentage:", error);
         }
       }
     };
@@ -131,12 +132,12 @@ function Page() {
     <div className="bg-[#000] lg:min-h-[100vh] 2xl:min-h-[50vh] px-8 pt-8 max-w-screen-2xl mx-auto relative">
       <Header />
       <div className="flex flex-col md:gap-12 md:flex-row justify-between 2xl:mt-[10%] mt-[8%]">
-        <div className="md:w-[40%] lg:w-auto md:px-0 lg:px-10 flex items-center md:block">
+        <div className="md:w-[40%] lg:w-auto md:px-0 lg:px-10 flex flex-col  md:block">
           <p className="text-lime text-2xl mt-4">
             Stake your XEON tokens in just two simple steps.
           </p>
           <div className="mt-3 ">
-            <p className="text-grey md:text-justify text-lg md:w-[65%]">
+            <p className="text-grey md:text-justify text-lg lg:w-[65%]">
               Stake XEON tokens to be eligible for revenue sharing. The staking
               window opens for 3 days at the end of each epoch, at which time
               XEON can be staked or unstaked. Protocol revenue is deposited is
@@ -170,17 +171,17 @@ function Page() {
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent bg={'#000'}>
-          <ModalHeader bg={'#000'} color={'white'}>
+        <ModalContent bg={"#000"}>
+          <ModalHeader bg={"#000"} color={"white"}>
             Vote Feedback
           </ModalHeader>
-          <ModalBody bg={'#000'}>
+          <ModalBody bg={"#000"}>
             {loading ? (
               <Spinner />
             ) : (
               <BookmarkAdded
                 message={message}
-                status={loading ? 'loading' : 'success'}
+                status={loading ? "loading" : "success"}
               />
             )}
           </ModalBody>
