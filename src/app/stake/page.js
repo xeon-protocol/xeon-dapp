@@ -55,8 +55,8 @@ function Page() {
     );
   }, [provider, signer]);
 
+  // fetch current buyback percentage value from staking contract
   useEffect(() => {
-    // fetch current buyback percentage from contract
     const fetchBuybackPercentage = async () => {
       if (XeonStakingPool) {
         try {
